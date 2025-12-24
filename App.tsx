@@ -126,7 +126,8 @@ const App: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (loginData.user.trim().toLowerCase() === 'jessica' && loginData.pass === '1345') {
+    // Senha atualizada para 9860
+    if (loginData.user.trim().toLowerCase() === 'jessica' && loginData.pass === '9860') {
       setIsLoggedIn(true);
       if (loginData.remember) {
         localStorage.setItem('tatugym_remembered', JSON.stringify(loginData));
@@ -258,7 +259,7 @@ const App: React.FC = () => {
           activeTab === AppTab.DASHBOARD ? (
             <div className="space-y-6 pb-28 pt-4 animate-slide-up">
               <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-black text-white uppercase italic tracking-tighter italic">MEU <span className="text-emerald-500">PAINEL</span></h1>
+                <h1 className="text-2xl font-black text-white uppercase italic tracking-tighter">MEU <span className="text-emerald-500">PAINEL</span></h1>
                 <button onClick={() => setActiveTab(AppTab.SETTINGS)} className="w-10 h-10 bg-zinc-900 rounded-xl flex items-center justify-center text-zinc-500"><Settings size={20}/></button>
               </div>
               
@@ -297,7 +298,7 @@ const App: React.FC = () => {
             </div>
           ) : activeTab === AppTab.SETTINGS ? (
             <div className="space-y-6 pb-32 pt-4 animate-slide-up">
-                <h1 className="text-2xl font-black text-white uppercase italic tracking-tighter italic">CONFIGURAÇÕES</h1>
+                <h1 className="text-2xl font-black text-white uppercase italic tracking-tighter">CONFIGURAÇÕES</h1>
                 <div className="glass-card p-6 rounded-[2.2rem] space-y-4">
                     <div className="flex flex-col gap-1">
                         <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Seu Nome</span>
