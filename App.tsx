@@ -25,33 +25,29 @@ import {
   Camera,
   CalendarDays,
   UserCheck,
-  Zap
+  Zap,
+  Activity
 } from 'lucide-react';
 import { getWorkoutAdvice, chatWithPersonal } from './services/geminiService';
-
-const MOCK_SOCIAL_POSTS: SocialPost[] = [
-  { id: '1', user: 'Jessica', avatar: 'https://i.pravatar.cc/150?u=jessica', content: 'Treino de hoje finalizado na Tatu Gym! 🔥🏋️‍♀️', time: '2h ago', likes: 12 },
-  { id: '2', user: 'Tatu Personal', avatar: 'https://i.pravatar.cc/150?u=marcos', content: 'Lembrem-se: a consistência na Tatu Gym é o segredo.', time: '5h ago', likes: 45 },
-];
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginData, setLoginData] = useState({ user: '', pass: '', remember: false });
   
-  // Estado inicial zerado para Jessica
+  // Perfil populado com os dados reais do PDF
   const [user, setUser] = useState<User>({
     username: 'Jessica',
-    name: '',
-    age: 0,
+    name: 'Jéssica Zanateli',
+    age: 36,
     weight: 0,
     height: 0,
-    goal: 'Hipertrofia',
+    goal: 'Condicionamento Físico / Retomada',
     streak: 0,
     goalStreak: 20,
     totalWorkouts: 0,
     goalWorkouts: 20,
     checkIns: [],
-    avatar: '',
+    avatar: '', // Mantido vazio conforme solicitado (sem foto padrão)
     isProfileComplete: false
   });
 
@@ -78,34 +74,7 @@ const App: React.FC = () => {
         setActiveTab(AppTab.DASHBOARD);
       }
     }
-
-    const savedCheckins = localStorage.getItem('tatugym_checkins_jessica');
-    if (savedCheckins) {
-      const checkins = JSON.parse(savedCheckins);
-      setUser(prev => ({ 
-        ...prev, 
-        checkIns: checkins, 
-        totalWorkouts: checkins.length
-      }));
-    }
   }, []);
-
-  useEffect(() => {
-    const fetchAdvice = async () => {
-      if (selectedWorkout) {
-        setIsLoading(true);
-        try {
-          const advice = await getWorkoutAdvice(selectedWorkout, user.goal || 'Hipertrofia');
-          setAiAdvice(advice);
-        } catch (error) {
-          setAiAdvice({ tips: ["Mantenha o foco"], motivation: "Bora treinar pesado!" });
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-    fetchAdvice();
-  }, [selectedWorkout, user.goal]);
 
   const handleUpdateProfile = (newData: Partial<User>) => {
     const updated = { ...user, ...newData };
@@ -126,7 +95,6 @@ const App: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Senha atualizada para 9860
     if (loginData.user.trim().toLowerCase() === 'jessica' && loginData.pass === '9860') {
       setIsLoggedIn(true);
       if (loginData.remember) {
@@ -142,7 +110,7 @@ const App: React.FC = () => {
 
   const handleCompleteOnboarding = () => {
     if (!user.name || !user.age || !user.weight || !user.height) {
-      alert('Por favor, preencha todos os campos do seu perfil de atleta.');
+      alert('Por favor, preencha peso e altura para cálculo do IMC e acompanhamento.');
       return;
     }
     handleUpdateProfile({ isProfileComplete: true });
@@ -166,8 +134,8 @@ const App: React.FC = () => {
         <div className="mx-auto w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-xl mb-4">
           <Zap size={32} className="text-zinc-900" />
         </div>
-        <h1 className="text-2xl font-black text-white uppercase tracking-tighter">BEM-VINDA, JESSICA!</h1>
-        <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest">Este é seu primeiro acesso. Configure seu perfil de atleta.</p>
+        <h1 className="text-2xl font-black text-white uppercase tracking-tighter">BEM-VINDA, JÉSSICA!</h1>
+        <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest px-8">Confirmamos sua ficha de 36 anos. Complete os dados físicos abaixo.</p>
       </div>
 
       <div className="space-y-6">
@@ -190,25 +158,21 @@ const App: React.FC = () => {
         <div className="glass-card p-6 rounded-[2.2rem] space-y-4">
           <div className="space-y-1">
             <label className="text-[9px] font-black text-zinc-500 uppercase ml-2 tracking-widest">Nome Completo</label>
-            <input type="text" value={user.name} onChange={e => handleUpdateProfile({ name: e.target.value })} className="w-full bg-zinc-800/50 border border-white/5 rounded-2xl p-4 text-white font-bold focus:outline-none focus:border-emerald-500 transition-all" placeholder="Digite seu nome" />
+            <input type="text" value={user.name} onChange={e => handleUpdateProfile({ name: e.target.value })} className="w-full bg-zinc-800/50 border border-white/5 rounded-2xl p-4 text-white font-bold" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <label className="text-[9px] font-black text-zinc-500 uppercase ml-2 tracking-widest">Peso (kg)</label>
-              <input type="number" value={user.weight || ''} onChange={e => handleUpdateProfile({ weight: Number(e.target.value) })} className="w-full bg-zinc-800/50 border border-white/5 rounded-2xl p-4 text-white font-bold focus:outline-none focus:border-emerald-500 transition-all" placeholder="0.0" />
+              <input type="number" value={user.weight || ''} onChange={e => handleUpdateProfile({ weight: Number(e.target.value) })} className="w-full bg-zinc-800/50 border border-white/5 rounded-2xl p-4 text-white font-bold" placeholder="0.0" />
             </div>
             <div className="space-y-1">
               <label className="text-[9px] font-black text-zinc-500 uppercase ml-2 tracking-widest">Altura (m)</label>
-              <input type="number" step="0.01" value={user.height || ''} onChange={e => handleUpdateProfile({ height: Number(e.target.value) })} className="w-full bg-zinc-800/50 border border-white/5 rounded-2xl p-4 text-white font-bold focus:outline-none focus:border-emerald-500 transition-all" placeholder="0.00" />
+              <input type="number" step="0.01" value={user.height || ''} onChange={e => handleUpdateProfile({ height: Number(e.target.value) })} className="w-full bg-zinc-800/50 border border-white/5 rounded-2xl p-4 text-white font-bold" placeholder="0.00" />
             </div>
-          </div>
-          <div className="space-y-1">
-            <label className="text-[9px] font-black text-zinc-500 uppercase ml-2 tracking-widest">Idade</label>
-            <input type="number" value={user.age || ''} onChange={e => handleUpdateProfile({ age: Number(e.target.value) })} className="w-full bg-zinc-800/50 border border-white/5 rounded-2xl p-4 text-white font-bold focus:outline-none focus:border-emerald-500 transition-all" placeholder="Ex: 25" />
           </div>
         </div>
 
-        <button onClick={handleCompleteOnboarding} className="w-full bg-emerald-500 text-zinc-900 font-black py-6 rounded-[2rem] shadow-xl uppercase tracking-widest active:scale-95 transition-all">FINALIZAR CADASTRO</button>
+        <button onClick={handleCompleteOnboarding} className="w-full bg-emerald-500 text-zinc-900 font-black py-6 rounded-[2rem] shadow-xl uppercase tracking-widest active:scale-95 transition-all">INICIAR TREINOS</button>
       </div>
     </div>
   );
@@ -225,27 +189,9 @@ const App: React.FC = () => {
             <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest mt-2">Área do Atleta</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-[9px] font-black text-zinc-500 uppercase ml-2 tracking-widest">Usuário</label>
-              <input 
-                type="text" 
-                value={loginData.user} 
-                onChange={e => setLoginData({...loginData, user: e.target.value})} 
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-5 text-white focus:outline-none focus:border-emerald-500 transition-all" 
-                placeholder="Digite seu usuário" 
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[9px] font-black text-zinc-500 uppercase ml-2 tracking-widest">Senha</label>
-              <input 
-                type="password" 
-                value={loginData.pass} 
-                onChange={e => setLoginData({...loginData, pass: e.target.value})} 
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-5 text-white focus:outline-none focus:border-emerald-500 transition-all" 
-                placeholder="Digite sua senha" 
-              />
-            </div>
-            <button className="w-full bg-emerald-500 text-zinc-900 font-black py-5 rounded-2xl shadow-xl uppercase tracking-widest active:scale-[0.98] transition-all">ENTRAR NO APP</button>
+            <input type="text" value={loginData.user} onChange={e => setLoginData({...loginData, user: e.target.value})} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-5 text-white focus:border-emerald-500 transition-all outline-none" placeholder="Usuário" />
+            <input type="password" value={loginData.pass} onChange={e => setLoginData({...loginData, pass: e.target.value})} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-5 text-white focus:border-emerald-500 transition-all outline-none" placeholder="Senha" />
+            <button className="w-full bg-emerald-500 text-zinc-900 font-black py-5 rounded-2xl shadow-xl uppercase tracking-widest active:scale-95 transition-all">ENTRAR</button>
           </form>
         </div>
       </div>
@@ -259,25 +205,43 @@ const App: React.FC = () => {
           activeTab === AppTab.DASHBOARD ? (
             <div className="space-y-6 pb-28 pt-4 animate-slide-up">
               <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-black text-white uppercase italic tracking-tighter">MEU <span className="text-emerald-500">PAINEL</span></h1>
+                <h1 className="text-2xl font-black text-white uppercase italic tracking-tighter italic">MEU <span className="text-emerald-500">PAINEL</span></h1>
                 <button onClick={() => setActiveTab(AppTab.SETTINGS)} className="w-10 h-10 bg-zinc-900 rounded-xl flex items-center justify-center text-zinc-500"><Settings size={20}/></button>
               </div>
               
               <div className="glass-card p-5 rounded-[2.5rem] border border-white/5 relative overflow-hidden shadow-2xl">
                 <div className="flex items-center gap-4 relative z-10">
                    <div className="w-20 h-20 rounded-3xl p-0.5 bg-gradient-to-tr from-emerald-500 to-indigo-500">
-                     <img src={user.avatar || 'https://i.pravatar.cc/150?u=jessica'} className="w-full h-full rounded-[1.1rem] object-cover border-2 border-zinc-900" />
+                     {user.avatar ? (
+                        <img src={user.avatar} className="w-full h-full rounded-[1.1rem] object-cover border-2 border-zinc-900" />
+                     ) : (
+                        <div className="w-full h-full rounded-[1.1rem] bg-zinc-900 flex items-center justify-center text-zinc-600 border-2 border-zinc-800">
+                          <UserCircle size={32} />
+                        </div>
+                     )}
                    </div>
                    <div>
-                     <h1 className="text-xl font-black text-white uppercase tracking-tighter">{user.name || 'ATLETA'}</h1>
-                     <p className="text-emerald-500 text-[9px] font-black uppercase tracking-[0.2em]">{user.goal} • {calculateIMC()?.status || 'Calculando...'}</p>
+                     <h1 className="text-xl font-black text-white uppercase tracking-tighter">{user.name || 'JÉSSICA'}</h1>
+                     <p className="text-emerald-500 text-[9px] font-black uppercase tracking-[0.2em]">Carga Ciclo: 60%-70%</p>
                    </div>
                 </div>
               </div>
 
+              {/* Destaque para Fortalecimento (CORE) */}
+              <div onClick={() => { setSelectedWorkout(initialWorkouts[0]); setActiveTab(AppTab.WORKOUT); }} className="bg-emerald-500/10 border border-emerald-500/20 p-5 rounded-[2.2rem] flex items-center justify-between cursor-pointer active:scale-95 transition-all">
+                <div className="flex items-center gap-3">
+                  <Activity className="text-emerald-500" />
+                  <div>
+                    <h3 className="text-sm font-black text-emerald-500 uppercase tracking-widest">Foco CORE (Pilates)</h3>
+                    <p className="text-zinc-500 text-[9px] font-bold uppercase tracking-wider">Fortalecimento Específico</p>
+                  </div>
+                </div>
+                <ChevronRight className="text-emerald-500" size={18} />
+              </div>
+
               <div className="space-y-4">
-                <h2 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">MEUS TREINOS TATU</h2>
-                {initialWorkouts.map((workout) => (
+                <h2 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">MEUS TREINOS (A/B/C/D)</h2>
+                {initialWorkouts.slice(1).map((workout) => (
                   <div key={workout.id} onClick={() => { setSelectedWorkout(workout); setActiveTab(AppTab.WORKOUT); }} className="glass-card p-5 rounded-[2.2rem] border border-white/5 flex items-center justify-between active:scale-95 transition-all cursor-pointer">
                     <div>
                       <h3 className="text-lg font-bold text-white tracking-tight">{workout.title}</h3>
@@ -290,45 +254,25 @@ const App: React.FC = () => {
             </div>
           ) : (activeTab === AppTab.WORKOUT && selectedWorkout) ? (
             <div className="space-y-6 pb-32 pt-4 animate-slide-up">
-              <button onClick={() => { setSelectedWorkout(null); setActiveTab(AppTab.DASHBOARD); }} className="flex items-center gap-2 text-zinc-500 text-xs font-black uppercase tracking-widest"><ArrowLeft size={16}/> Voltar ao Painel</button>
-              <h1 className="text-xl font-black text-white uppercase">{selectedWorkout.title}</h1>
+              <button onClick={() => { setSelectedWorkout(null); setActiveTab(AppTab.DASHBOARD); }} className="flex items-center gap-2 text-zinc-500 text-xs font-black uppercase tracking-widest"><ArrowLeft size={16}/> Voltar</button>
+              <div className="flex items-baseline gap-2">
+                 <h1 className="text-xl font-black text-white uppercase">{selectedWorkout.title}</h1>
+                 {selectedWorkout.id !== 'fortalecimento' && <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Séries: 3</span>}
+              </div>
               <div className="space-y-2">
                 {selectedWorkout.exercises.map(ex => <ExerciseItem key={ex.id} exercise={ex} />)}
               </div>
-            </div>
-          ) : activeTab === AppTab.SETTINGS ? (
-            <div className="space-y-6 pb-32 pt-4 animate-slide-up">
-                <h1 className="text-2xl font-black text-white uppercase italic tracking-tighter">CONFIGURAÇÕES</h1>
-                <div className="glass-card p-6 rounded-[2.2rem] space-y-4">
-                    <div className="flex flex-col gap-1">
-                        <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Seu Nome</span>
-                        <p className="text-white font-bold">{user.name || '---'}</p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="flex flex-col gap-1">
-                            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Peso</span>
-                            <p className="text-white font-bold">{user.weight ? `${user.weight}kg` : '---'}</p>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Altura</span>
-                            <p className="text-white font-bold">{user.height ? `${user.height}m` : '---'}</p>
-                        </div>
-                    </div>
-                </div>
-                <button onClick={() => { setIsLoggedIn(false); localStorage.removeItem('tatugym_user_profile'); window.location.reload(); }} className="w-full bg-red-500/10 border border-red-500/20 text-red-500 font-black py-5 rounded-[2rem] flex items-center justify-center gap-2 active:scale-95 transition-all text-xs uppercase tracking-widest">
-                   <LogOut size={16} /> RESETAR TUDO E SAIR
-                </button>
             </div>
           ) : null
         )}
       </main>
 
       {activeTab !== AppTab.ONBOARDING && (
-        <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2.5rem)] max-w-[22rem] bg-[#121214]/90 backdrop-blur-2xl border border-white/5 p-2 rounded-[3rem] flex items-center justify-between shadow-2xl z-50 ring-1 ring-white/10">
-          <button onClick={() => setActiveTab(AppTab.DASHBOARD)} className={`p-4 rounded-full transition-all active:scale-90 ${activeTab === AppTab.DASHBOARD ? 'bg-emerald-500 text-zinc-900 shadow-lg' : 'text-zinc-500'}`}><Dumbbell size={22} /></button>
-          <button onClick={() => setActiveTab(AppTab.SOCIAL)} className={`p-4 rounded-full transition-all active:scale-90 ${activeTab === AppTab.SOCIAL ? 'bg-emerald-500 text-zinc-900 shadow-lg' : 'text-zinc-500'}`}><Users size={22} /></button>
-          <button onClick={() => setActiveTab(AppTab.AI_ASSISTANT)} className={`p-4 rounded-full transition-all active:scale-90 ${activeTab === AppTab.AI_ASSISTANT ? 'bg-indigo-500 text-white shadow-lg' : 'text-zinc-500'}`}><Bot size={22} /></button>
-          <button onClick={() => setActiveTab(AppTab.SETTINGS)} className={`p-4 rounded-full transition-all active:scale-90 ${activeTab === AppTab.SETTINGS ? 'bg-emerald-500 text-zinc-900 shadow-lg' : 'text-zinc-500'}`}><Settings size={22} /></button>
+        <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2.5rem)] max-w-[22rem] bg-[#121214]/90 backdrop-blur-2xl border border-white/5 p-2 rounded-[3rem] flex items-center justify-between shadow-2xl z-50">
+          <button onClick={() => setActiveTab(AppTab.DASHBOARD)} className={`p-4 rounded-full ${activeTab === AppTab.DASHBOARD ? 'bg-emerald-500 text-zinc-900 shadow-lg' : 'text-zinc-500'}`}><Dumbbell size={22} /></button>
+          <button onClick={() => setActiveTab(AppTab.SOCIAL)} className={`p-4 rounded-full ${activeTab === AppTab.SOCIAL ? 'bg-emerald-500 text-zinc-900' : 'text-zinc-500'}`}><Users size={22} /></button>
+          <button onClick={() => setActiveTab(AppTab.AI_ASSISTANT)} className={`p-4 rounded-full ${activeTab === AppTab.AI_ASSISTANT ? 'bg-indigo-500 text-white' : 'text-zinc-500'}`}><Bot size={22} /></button>
+          <button onClick={() => setActiveTab(AppTab.SETTINGS)} className={`p-4 rounded-full ${activeTab === AppTab.SETTINGS ? 'bg-emerald-500 text-zinc-900' : 'text-zinc-500'}`}><Settings size={22} /></button>
         </nav>
       )}
     </div>
