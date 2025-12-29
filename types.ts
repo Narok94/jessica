@@ -19,6 +19,13 @@ export interface WorkoutRoutine {
   color: string;
 }
 
+export interface SetPerformance {
+  weight: number;
+  reps: number;
+  rpe?: number; // Rate of Perceived Exertion (1-10)
+  completed: boolean;
+}
+
 export interface WorkoutHistoryEntry {
   id: string;
   date: string; // ISO string
@@ -27,9 +34,7 @@ export interface WorkoutHistoryEntry {
   exercises: {
     exerciseId: string;
     name: string;
-    setsCompleted: number;
-    totalSets: number;
-    weight: number;
+    performance: SetPerformance[];
   }[];
 }
 
@@ -49,18 +54,8 @@ export interface User {
   checkIns: string[];
   avatar?: string;
   isProfileComplete: boolean;
-  weights?: Record<string, number>; // Mapping of exerciseId -> weight
+  weights?: Record<string, number>; 
   history: WorkoutHistoryEntry[];
-}
-
-export interface SocialPost {
-  id: string;
-  user: string;
-  avatar: string;
-  content: string;
-  time: string;
-  likes: number;
-  image?: string;
 }
 
 export enum AppTab {
