@@ -36,14 +36,14 @@ const App: React.FC = () => {
   const [loginData, setLoginData] = useState({ user: '', pass: '', remember: false });
   
   const [user, setUser] = useState<User>({
-    username: 'Jessica',
-    name: 'Jéssica Zanateli',
-    age: 36,
-    weight: 0,
-    height: 0,
-    sex: 'feminino',
+    username: 'Henrique',
+    name: 'Henrique',
+    age: 25,
+    weight: 75,
+    height: 1.75,
+    sex: 'masculino',
     goalIMC: 22,
-    goal: 'Condicionamento Físico / Retomada',
+    goal: 'Condicionamento Físico em Casa',
     streak: 0,
     goalStreak: 20,
     totalWorkouts: 0,
@@ -198,7 +198,7 @@ const App: React.FC = () => {
         <div className="flex justify-between items-center px-1">
           <div className="flex flex-col">
             <h1 className="text-xl font-black text-white uppercase italic tracking-tighter">TATU <span className="text-emerald-500">GYM</span></h1>
-            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-0.5">{greeting}, Jéssica!</p>
+            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-0.5">{greeting}, {user.name}!</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="bg-orange-500/10 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-orange-500/20">
@@ -217,10 +217,10 @@ const App: React.FC = () => {
                <div className="w-full h-full rounded-[1.6rem] bg-zinc-900 flex items-center justify-center text-zinc-600 font-black text-2xl">{user.name.charAt(0)}</div>
              </div>
              <div className="flex-1">
-               <h1 className="text-xl font-black text-white uppercase tracking-tighter leading-tight">{user.name.split(' ')[0]}</h1>
+               <h1 className="text-xl font-black text-white uppercase tracking-tighter leading-tight">{user.name}</h1>
                <div className="flex items-center gap-2 mt-1">
-                 <span className="text-emerald-400 text-[8px] font-black uppercase tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/10">ATLETA ELITE</span>
-                 <span className="text-zinc-500 text-[8px] font-black uppercase tracking-widest">♀️ {user.weight}kg</span>
+                 <span className="text-emerald-400 text-[8px] font-black uppercase tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/10">PLANO CASA</span>
+                 <span className="text-zinc-500 text-[8px] font-black uppercase tracking-widest">{user.sex === 'masculino' ? '♂️' : '♀️'} {user.weight}kg</span>
                </div>
              </div>
              <div className="text-right">
@@ -257,14 +257,14 @@ const App: React.FC = () => {
         {/* Lista de Treinos */}
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">ESCOLHER TREINO</h2>
+            <h2 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">CRONOGRAMA SEMANAL</h2>
             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
           </div>
           {initialWorkouts.map((workout) => (
-            <div key={workout.id} onClick={() => { setSelectedWorkout(workout); setActiveTab(AppTab.WORKOUT); }} className={`p-5 rounded-[2.2rem] border flex items-center justify-between active:scale-[0.97] transition-all cursor-pointer group shadow-lg ${workout.id === 'fortalecimento' ? 'bg-emerald-500/10 border-emerald-500/20 glow-emerald' : 'glass-card border-white/5'}`}>
+            <div key={workout.id} onClick={() => { setSelectedWorkout(workout); setActiveTab(AppTab.WORKOUT); }} className={`p-5 rounded-[2.2rem] border flex items-center justify-between active:scale-[0.97] transition-all cursor-pointer group shadow-lg glass-card border-white/5`}>
               <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-inner ${workout.id === 'fortalecimento' ? 'bg-emerald-500 text-zinc-900' : 'bg-zinc-800 border border-white/5'}`}>
-                  {workout.id === 'fortalecimento' ? <Zap size={22} fill="currentColor" /> : workout.title.charAt(7)}
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-inner bg-zinc-800 border border-white/5`}>
+                   {workout.title.charAt(0)}
                 </div>
                 <div>
                   <h3 className="text-lg font-black text-white tracking-tight leading-none mb-1">{workout.title}</h3>
@@ -293,7 +293,7 @@ const App: React.FC = () => {
           <div className="text-right">
              <div className="flex items-center gap-1.5 justify-end">
                 <Clock size={10} className="text-emerald-500 animate-pulse" />
-                <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">TREINO SALVO</p>
+                <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">AUTO-SALVAMENTO</p>
              </div>
              <p className="text-xs font-black text-white">{progressPercent}% CONCLUÍDO</p>
           </div>
@@ -386,7 +386,7 @@ const App: React.FC = () => {
           {chatMessages.length === 0 && (
              <div className="glass-card border-white/5 rounded-[2.2rem] p-8 text-center space-y-4">
                 <div className="w-12 h-12 bg-indigo-500/10 rounded-full flex items-center justify-center text-indigo-500 mx-auto"><Quote size={20}/></div>
-                <p className="text-white font-bold text-sm">Olá Jéssica! O que vamos evoluir hoje?</p>
+                <p className="text-white font-bold text-sm">Olá {user.name}! Estou pronto para te ajudar com seu treino em casa hoje.</p>
              </div>
           )}
           {chatMessages.map((msg, i) => (
@@ -426,7 +426,7 @@ const App: React.FC = () => {
       <div className="text-center space-y-3">
         <div className="mx-auto w-20 h-20 bg-emerald-500 rounded-[2.2rem] flex items-center justify-center shadow-2xl mb-6 transform rotate-12 glow-emerald"><Zap size={40} className="text-zinc-900" fill="currentColor" /></div>
         <h1 className="text-3xl font-black text-white uppercase tracking-tighter italic">TATU <span className="text-emerald-500">GYM</span></h1>
-        <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] px-12 leading-relaxed text-center">BEM-VINDA AO SEU PERSONAL INTELIGENTE.</p>
+        <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] px-12 leading-relaxed text-center">BEM-VINDO AO SEU PERSONAL INTELIGENTE.</p>
       </div>
       <div className="glass-card p-8 rounded-[2.5rem] space-y-6">
         <div className="space-y-2">
@@ -477,7 +477,17 @@ const App: React.FC = () => {
             <h1 className="text-5xl font-black text-white tracking-tighter uppercase leading-none italic">TATU<span className="text-emerald-500">GYM</span></h1>
             <p className="text-zinc-600 text-[11px] font-black uppercase tracking-[0.4em] mt-3">Personal Inteligente</p>
           </div>
-          <form onSubmit={(e) => { e.preventDefault(); if (loginData.user.trim().toLowerCase() === 'jessica' && loginData.pass === '9860') { setIsLoggedIn(true); if (loginData.remember) localStorage.setItem('tatugym_remembered', JSON.stringify(loginData)); } else alert('Dados incorretos.'); }} className="space-y-4">
+          <form onSubmit={(e) => { 
+            e.preventDefault(); 
+            const u = loginData.user.trim().toLowerCase();
+            if ((u === 'jessica' || u === 'henrique') && loginData.pass === '9860') { 
+              setIsLoggedIn(true); 
+              if (u === 'henrique' && user.name !== 'Henrique') {
+                handleUpdateProfile({ name: 'Henrique', username: 'Henrique' });
+              }
+              if (loginData.remember) localStorage.setItem('tatugym_remembered', JSON.stringify(loginData)); 
+            } else alert('Dados incorretos.'); 
+          }} className="space-y-4">
             <input type="text" value={loginData.user} onChange={e => setLoginData({...loginData, user: e.target.value})} className="w-full bg-zinc-900 border border-white/5 rounded-3xl p-6 text-white text-center font-bold outline-none focus:border-emerald-500/50" placeholder="Usuário" />
             <input type="password" value={loginData.pass} onChange={e => setLoginData({...loginData, pass: e.target.value})} className="w-full bg-zinc-900 border border-white/5 rounded-3xl p-6 text-white text-center font-bold outline-none focus:border-emerald-500/50" placeholder="Senha" />
             <button className="w-full bg-white text-zinc-950 font-black py-6 rounded-3xl shadow-2xl uppercase tracking-widest active:scale-95 text-sm">ENTRAR NO APP</button>
