@@ -514,11 +514,11 @@ const App: React.FC = () => {
           <form onSubmit={(e) => { e.preventDefault(); handleLogin(loginData.user, loginData.pass, true); }} className="space-y-4">
             <div className="space-y-1">
               <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-4">Usuário</label>
-              <input type="text" value={loginData.user} onChange={e => setLoginData({...loginData, user: e.target.value})} className="w-full bg-zinc-900 border border-white/5 rounded-3xl p-6 text-white text-center font-bold outline-none focus:border-emerald-500/50" placeholder="Jessica ou Henrique" />
+              <input type="text" value={loginData.user} onChange={e => setLoginData({...loginData, user: e.target.value})} className="w-full bg-zinc-900 border border-white/5 rounded-3xl p-6 text-white text-center font-bold outline-none focus:border-emerald-500/50" placeholder="" />
             </div>
             <div className="space-y-1">
               <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-4">Senha</label>
-              <input type="password" value={loginData.pass} onChange={e => setLoginData({...loginData, pass: e.target.value})} className="w-full bg-zinc-900 border border-white/5 rounded-3xl p-6 text-white text-center font-bold outline-none focus:border-emerald-500/50" placeholder="9860" />
+              <input type="password" value={loginData.pass} onChange={e => setLoginData({...loginData, pass: e.target.value})} className="w-full bg-zinc-900 border border-white/5 rounded-3xl p-6 text-white text-center font-bold outline-none focus:border-emerald-500/50" placeholder="" />
             </div>
             <div className="flex items-center gap-2 px-4 py-2">
               <input type="checkbox" id="remember" checked={loginData.remember} onChange={e => setLoginData({...loginData, remember: e.target.checked})} className="w-4 h-4 rounded bg-zinc-900 border-white/10 accent-emerald-500" />
