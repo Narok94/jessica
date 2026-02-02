@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { initialWorkouts } from './data/workoutData';
+import { jessicaWorkouts, henriqueWorkouts } from './data/workoutData';
 import { AppTab, WorkoutRoutine, User, WorkoutHistoryEntry, SetPerformance } from './types';
 import { ExerciseItem } from './components/ExerciseItem';
 import { 
@@ -35,25 +35,7 @@ const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginData, setLoginData] = useState({ user: '', pass: '', remember: false });
   
-  const [user, setUser] = useState<User>({
-    username: 'Henrique',
-    name: 'Henrique',
-    age: 25,
-    weight: 75,
-    height: 1.75,
-    sex: 'masculino',
-    goalIMC: 22,
-    goal: 'Condicionamento Físico em Casa',
-    streak: 0,
-    goalStreak: 20,
-    totalWorkouts: 0,
-    goalWorkouts: 20,
-    checkIns: [],
-    avatar: '',
-    isProfileComplete: false,
-    weights: {},
-    history: []
-  });
+  const [user, setUser] = useState<User | null>(null);
 
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.DASHBOARD);
   const [selectedWorkout, setSelectedWorkout] = useState<WorkoutRoutine | null>(null);
@@ -70,48 +52,93 @@ const App: React.FC = () => {
     return "Boa noite";
   }, []);
 
-  // Carregamento inicial de dados
+  // Determine available workouts based on the logged in user
+  const initialWorkouts = useMemo(() => {
+    if (!user) return [];
+    const name = user.username.toLowerCase();
+    if (name === 'henrique') return henriqueWorkouts;
+    if (name === 'jessica') return jessicaWorkouts;
+    return [];
+  }, [user]);
+
+  // Initial load
   useEffect(() => {
     const saved = localStorage.getItem('tatugym_remembered');
     if (saved) {
       const parsed = JSON.parse(saved);
       setLoginData({ user: parsed.user, pass: parsed.pass, remember: true });
-    }
-    
-    const savedUser = localStorage.getItem('tatugym_user_profile');
-    if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      setUser(prev => ({ ...prev, ...parsedUser }));
-      if (parsedUser.isProfileComplete && activeTab === AppTab.ONBOARDING) {
-        setActiveTab(AppTab.DASHBOARD);
-      }
-    }
-
-    // Restaurar treino em andamento
-    const activeSession = localStorage.getItem('tatugym_active_session');
-    if (activeSession) {
-      const parsed = JSON.parse(activeSession);
-      const workout = initialWorkouts.find(w => w.id === parsed.workoutId);
-      if (workout) {
-        setSelectedWorkout(workout);
-        setCurrentSessionProgress(parsed.progress);
-        setActiveTab(AppTab.WORKOUT);
-      }
+      
+      // Auto-login if remembered
+      handleLogin(parsed.user, parsed.pass, false);
     }
   }, []);
 
-  // Sincronizar treino em andamento com LocalStorage
+  // Sync active session for the specific user
   useEffect(() => {
-    if (selectedWorkout) {
-      localStorage.setItem('tatugym_active_session', JSON.stringify({
+    if (user && selectedWorkout) {
+      localStorage.setItem(`tatugym_active_session_${user.username}`, JSON.stringify({
         workoutId: selectedWorkout.id,
         progress: currentSessionProgress,
         timestamp: new Date().toISOString()
       }));
-    } else {
-      localStorage.removeItem('tatugym_active_session');
+    } else if (user) {
+      localStorage.removeItem(`tatugym_active_session_${user.username}`);
     }
-  }, [selectedWorkout, currentSessionProgress]);
+  }, [selectedWorkout, currentSessionProgress, user]);
+
+  const handleLogin = (usernameInput: string, passwordInput: string, manual: boolean) => {
+    const u = usernameInput.trim().toLowerCase();
+    if ((u === 'jessica' || u === 'henrique') && passwordInput === '9860') {
+      
+      const storageKey = `tatugym_user_profile_${u}`;
+      const savedUser = localStorage.getItem(storageKey);
+      
+      let userData: User;
+      if (savedUser) {
+        userData = JSON.parse(savedUser);
+      } else {
+        // Create new user profile
+        userData = {
+          username: u.charAt(0).toUpperCase() + u.slice(1),
+          name: u.charAt(0).toUpperCase() + u.slice(1),
+          weight: 0,
+          height: 0,
+          sex: u === 'henrique' ? 'masculino' : 'feminino',
+          streak: 0,
+          totalWorkouts: 0,
+          checkIns: [],
+          isProfileComplete: false,
+          weights: {},
+          history: []
+        };
+      }
+
+      setUser(userData);
+      setIsLoggedIn(true);
+
+      // Restore session
+      const activeSession = localStorage.getItem(`tatugym_active_session_${userData.username}`);
+      if (activeSession) {
+        const parsed = JSON.parse(activeSession);
+        // Find workout in the specific user's set
+        const workoutsSet = u === 'henrique' ? henriqueWorkouts : jessicaWorkouts;
+        const workout = workoutsSet.find(w => w.id === parsed.workoutId);
+        if (workout) {
+          setSelectedWorkout(workout);
+          setCurrentSessionProgress(parsed.progress);
+          setActiveTab(AppTab.WORKOUT);
+        }
+      } else {
+        setActiveTab(userData.isProfileComplete ? AppTab.DASHBOARD : AppTab.ONBOARDING);
+      }
+
+      if (manual && loginData.remember) {
+        localStorage.setItem('tatugym_remembered', JSON.stringify({ user: usernameInput, pass: passwordInput }));
+      }
+    } else if (manual) {
+      alert('Dados incorretos.');
+    }
+  };
 
   const triggerConfetti = () => {
     if (typeof confetti !== 'undefined') {
@@ -125,12 +152,14 @@ const App: React.FC = () => {
   };
 
   const handleUpdateProfile = (newData: Partial<User>) => {
+    if (!user) return;
     const updated = { ...user, ...newData };
     setUser(updated);
-    localStorage.setItem('tatugym_user_profile', JSON.stringify(updated));
+    localStorage.setItem(`tatugym_user_profile_${user.username.toLowerCase()}`, JSON.stringify(updated));
   };
 
   const handleManualCheckIn = () => {
+    if (!user) return;
     const today = new Date().toISOString().split('T')[0];
     if (user.checkIns.includes(today)) return;
     const newCheckIns = [...user.checkIns, today];
@@ -143,7 +172,7 @@ const App: React.FC = () => {
   };
 
   const handleFinishWorkout = () => {
-    if (!selectedWorkout) return;
+    if (!selectedWorkout || !user) return;
     const today = new Date().toISOString().split('T')[0];
     
     const historyEntry: WorkoutHistoryEntry = {
@@ -171,18 +200,19 @@ const App: React.FC = () => {
       history: [historyEntry, ...user.history],
       totalWorkouts: (user.totalWorkouts || 0) + 1,
       weights: newWeights,
-      checkIns: newCheckIns
+      checkIns: newCheckIns,
+      streak: user.streak + 1
     });
 
     triggerConfetti();
-    localStorage.removeItem('tatugym_active_session');
+    localStorage.removeItem(`tatugym_active_session_${user.username}`);
     setSelectedWorkout(null);
     setCurrentSessionProgress({});
     setActiveTab(AppTab.DASHBOARD);
   };
 
   const calculateIMC = () => {
-    if (!user.weight || !user.height) return { val: '0', targetWeight: 0, goalDiff: 0 };
+    if (!user || !user.weight || !user.height) return { val: '0', targetWeight: 0, goalDiff: 0 };
     const h = user.height > 3 ? user.height / 100 : user.height;
     const imc = user.weight / (h * h);
     const tw = (user.goalIMC || 22) * (h * h);
@@ -190,6 +220,7 @@ const App: React.FC = () => {
   };
 
   const renderDashboard = () => {
+    if (!user) return null;
     const imcInfo = calculateIMC();
     const isCheckedInToday = user.checkIns?.includes(new Date().toISOString().split('T')[0]);
 
@@ -219,7 +250,7 @@ const App: React.FC = () => {
              <div className="flex-1">
                <h1 className="text-xl font-black text-white uppercase tracking-tighter leading-tight">{user.name}</h1>
                <div className="flex items-center gap-2 mt-1">
-                 <span className="text-emerald-400 text-[8px] font-black uppercase tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/10">PLANO CASA</span>
+                 <span className="text-emerald-400 text-[8px] font-black uppercase tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/10">ATLETA ELITE</span>
                  <span className="text-zinc-500 text-[8px] font-black uppercase tracking-widest">{user.sex === 'masculino' ? '♂️' : '♀️'} {user.weight}kg</span>
                </div>
              </div>
@@ -257,14 +288,14 @@ const App: React.FC = () => {
         {/* Lista de Treinos */}
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">CRONOGRAMA SEMANAL</h2>
+            <h2 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">MEUS TREINOS</h2>
             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
           </div>
           {initialWorkouts.map((workout) => (
-            <div key={workout.id} onClick={() => { setSelectedWorkout(workout); setActiveTab(AppTab.WORKOUT); }} className={`p-5 rounded-[2.2rem] border flex items-center justify-between active:scale-[0.97] transition-all cursor-pointer group shadow-lg glass-card border-white/5`}>
+            <div key={workout.id} onClick={() => { setSelectedWorkout(workout); setActiveTab(AppTab.WORKOUT); }} className={`p-5 rounded-[2.2rem] border flex items-center justify-between active:scale-[0.97] transition-all cursor-pointer group shadow-lg ${workout.id.includes('h-') || workout.id === 'fortalecimento' ? 'bg-emerald-500/10 border-emerald-500/20 glow-emerald' : 'glass-card border-white/5'}`}>
               <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-inner bg-zinc-800 border border-white/5`}>
-                   {workout.title.charAt(0)}
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-inner ${workout.id.includes('h-') || workout.id === 'fortalecimento' ? 'bg-emerald-500 text-zinc-900' : 'bg-zinc-800 border border-white/5'}`}>
+                  {workout.id === 'fortalecimento' || workout.id.includes('h-') ? <Zap size={22} fill="currentColor" /> : workout.title.charAt(0)}
                 </div>
                 <div>
                   <h3 className="text-lg font-black text-white tracking-tight leading-none mb-1">{workout.title}</h3>
@@ -280,7 +311,7 @@ const App: React.FC = () => {
   };
 
   const renderWorkoutMode = () => {
-    if (!selectedWorkout) return null;
+    if (!selectedWorkout || !user) return null;
     
     const totalSets = selectedWorkout.exercises.reduce((acc, ex) => acc + ex.sets, 0);
     const completedSets = (Object.values(currentSessionProgress) as SetPerformance[][]).reduce((acc, perf) => acc + perf.filter(p => p.completed).length, 0);
@@ -293,7 +324,7 @@ const App: React.FC = () => {
           <div className="text-right">
              <div className="flex items-center gap-1.5 justify-end">
                 <Clock size={10} className="text-emerald-500 animate-pulse" />
-                <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">AUTO-SALVAMENTO</p>
+                <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">TREINO SALVO</p>
              </div>
              <p className="text-xs font-black text-white">{progressPercent}% CONCLUÍDO</p>
           </div>
@@ -332,49 +363,52 @@ const App: React.FC = () => {
     );
   };
 
-  const renderHistory = () => (
-    <div className="space-y-6 pb-28 pt-4 animate-slide-up">
-      <h1 className="text-2xl font-black text-white uppercase italic tracking-tighter">MEU <span className="text-emerald-500">HISTÓRICO</span></h1>
-      {user.history.length === 0 ? (
-        <div className="glass-card p-12 rounded-[2.5rem] text-center border border-white/5">
-           <div className="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center text-zinc-700 mx-auto mb-4 border border-white/5"><History size={32} /></div>
-           <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">Sem registros.</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {user.history.map((entry) => (
-            <div key={entry.id} className="glass-card p-5 rounded-[2.2rem] space-y-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-base font-black text-white uppercase tracking-tight">{entry.workoutTitle}</h3>
-                  <p className="text-zinc-500 text-[9px] font-black uppercase mt-1">
-                    {new Date(entry.date).toLocaleDateString('pt-BR')}
-                  </p>
-                </div>
-                <div className="bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-                   <span className="text-emerald-500 text-[8px] font-black uppercase">SUCESSO</span>
-                </div>
-              </div>
-              <div className="space-y-2 pt-3 border-t border-white/5">
-                {entry.exercises.map((ex, idx) => (
-                  <div key={idx} className="flex flex-col gap-1">
-                    <span className="text-[11px] font-black text-zinc-400 uppercase">{ex.name}</span>
-                    <div className="flex flex-wrap gap-1">
-                      {ex.performance.map((s, si) => (
-                        <span key={si} className="text-[9px] font-bold bg-zinc-900 text-white px-2 py-0.5 rounded-md border border-white/5">
-                          {si+1}: {s.weight}kg x {s.reps}
-                        </span>
-                      ))}
-                    </div>
+  const renderHistory = () => {
+    if (!user) return null;
+    return (
+      <div className="space-y-6 pb-28 pt-4 animate-slide-up">
+        <h1 className="text-2xl font-black text-white uppercase italic tracking-tighter">MEU <span className="text-emerald-500">HISTÓRICO</span></h1>
+        {user.history.length === 0 ? (
+          <div className="glass-card p-12 rounded-[2.5rem] text-center border border-white/5">
+             <div className="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center text-zinc-700 mx-auto mb-4 border border-white/5"><History size={32} /></div>
+             <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">Sem registros.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {user.history.map((entry) => (
+              <div key={entry.id} className="glass-card p-5 rounded-[2.2rem] space-y-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-base font-black text-white uppercase tracking-tight">{entry.workoutTitle}</h3>
+                    <p className="text-zinc-500 text-[9px] font-black uppercase mt-1">
+                      {new Date(entry.date).toLocaleDateString('pt-BR')}
+                    </p>
                   </div>
-                ))}
+                  <div className="bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                     <span className="text-emerald-500 text-[8px] font-black uppercase">SUCESSO</span>
+                  </div>
+                </div>
+                <div className="space-y-2 pt-3 border-t border-white/5">
+                  {entry.exercises.map((ex, idx) => (
+                    <div key={idx} className="flex flex-col gap-1">
+                      <span className="text-[11px] font-black text-zinc-400 uppercase">{ex.name}</span>
+                      <div className="flex flex-wrap gap-1">
+                        {ex.performance.map((s, si) => (
+                          <span key={si} className="text-[9px] font-bold bg-zinc-900 text-white px-2 py-0.5 rounded-md border border-white/5">
+                            {si+1}: {s.weight}kg x {s.reps}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const renderAIAssistant = () => (
     <div className="flex flex-col h-[calc(100vh-10rem)] pb-28 pt-4 animate-slide-up">
@@ -386,7 +420,7 @@ const App: React.FC = () => {
           {chatMessages.length === 0 && (
              <div className="glass-card border-white/5 rounded-[2.2rem] p-8 text-center space-y-4">
                 <div className="w-12 h-12 bg-indigo-500/10 rounded-full flex items-center justify-center text-indigo-500 mx-auto"><Quote size={20}/></div>
-                <p className="text-white font-bold text-sm">Olá {user.name}! Estou pronto para te ajudar com seu treino em casa hoje.</p>
+                <p className="text-white font-bold text-sm">Olá {user?.name}! O que vamos evoluir hoje?</p>
              </div>
           )}
           {chatMessages.map((msg, i) => (
@@ -426,19 +460,19 @@ const App: React.FC = () => {
       <div className="text-center space-y-3">
         <div className="mx-auto w-20 h-20 bg-emerald-500 rounded-[2.2rem] flex items-center justify-center shadow-2xl mb-6 transform rotate-12 glow-emerald"><Zap size={40} className="text-zinc-900" fill="currentColor" /></div>
         <h1 className="text-3xl font-black text-white uppercase tracking-tighter italic">TATU <span className="text-emerald-500">GYM</span></h1>
-        <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] px-12 leading-relaxed text-center">BEM-VINDO AO SEU PERSONAL INTELIGENTE.</p>
+        <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] px-12 leading-relaxed text-center">BEM-VINDO(A) AO SEU PERSONAL INTELIGENTE.</p>
       </div>
       <div className="glass-card p-8 rounded-[2.5rem] space-y-6">
         <div className="space-y-2">
           <label className="text-[10px] font-black text-zinc-500 uppercase ml-3 tracking-widest">Peso Atual (kg)</label>
-          <input type="number" inputMode="decimal" step="0.1" value={user.weight || ''} onChange={e => handleUpdateProfile({ weight: parseFloat(e.target.value) || 0 })} className="w-full bg-zinc-900 border border-white/5 rounded-2xl p-5 text-white font-black text-xl outline-none" placeholder="0.0" />
+          <input type="number" inputMode="decimal" step="0.1" value={user?.weight || ''} onChange={e => handleUpdateProfile({ weight: parseFloat(e.target.value) || 0 })} className="w-full bg-zinc-900 border border-white/5 rounded-2xl p-5 text-white font-black text-xl outline-none" placeholder="0.0" />
         </div>
         <div className="space-y-2">
           <label className="text-[10px] font-black text-zinc-500 uppercase ml-3 tracking-widest">Altura (m)</label>
-          <input type="number" inputMode="decimal" step="0.01" value={user.height || ''} onChange={e => handleUpdateProfile({ height: parseFloat(e.target.value) || 0 })} className="w-full bg-zinc-900 border border-white/5 rounded-2xl p-5 text-white font-black text-xl outline-none" placeholder="1.70" />
+          <input type="number" inputMode="decimal" step="0.01" value={user?.height || ''} onChange={e => handleUpdateProfile({ height: parseFloat(e.target.value) || 0 })} className="w-full bg-zinc-900 border border-white/5 rounded-2xl p-5 text-white font-black text-xl outline-none" placeholder="1.70" />
         </div>
       </div>
-      <button onClick={() => { if (!user.weight || !user.height) return alert('Preencha os dados.'); handleUpdateProfile({ isProfileComplete: true }); setActiveTab(AppTab.DASHBOARD); }} className="w-full bg-emerald-500 text-zinc-900 font-black py-6 rounded-[2.2rem] shadow-2xl uppercase tracking-widest active:scale-95 text-sm">FINALIZAR CONFIGURAÇÃO</button>
+      <button onClick={() => { if (!user?.weight || !user?.height) return alert('Preencha os dados.'); handleUpdateProfile({ isProfileComplete: true }); setActiveTab(AppTab.DASHBOARD); }} className="w-full bg-emerald-500 text-zinc-900 font-black py-6 rounded-[2.2rem] shadow-2xl uppercase tracking-widest active:scale-95 text-sm">FINALIZAR CONFIGURAÇÃO</button>
     </div>
   );
 
@@ -447,23 +481,23 @@ const App: React.FC = () => {
       <h1 className="text-2xl font-black text-white uppercase italic tracking-tighter">PERFIL</h1>
       <div className="glass-card p-6 rounded-[2.5rem] space-y-6">
          <div className="flex items-center gap-4">
-           <div className="w-20 h-20 rounded-[2rem] bg-indigo-600 flex items-center justify-center text-white text-3xl font-black shadow-xl">{user.name.charAt(0)}</div>
+           <div className="w-20 h-20 rounded-[2rem] bg-indigo-600 flex items-center justify-center text-white text-3xl font-black shadow-xl">{user?.name.charAt(0)}</div>
            <div>
-             <h3 className="text-xl font-black text-white">{user.name}</h3>
+             <h3 className="text-xl font-black text-white">{user?.name}</h3>
              <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">Atleta Tatu Gym</p>
            </div>
          </div>
          <div className="grid grid-cols-2 gap-3">
             <div className="bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
               <p className="text-[8px] font-black text-zinc-600 uppercase mb-1">PESO</p>
-              <p className="text-sm font-black text-white">{user.weight}kg</p>
+              <p className="text-sm font-black text-white">{user?.weight}kg</p>
             </div>
             <div className="bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
               <p className="text-[8px] font-black text-zinc-600 uppercase mb-1">ALTURA</p>
-              <p className="text-sm font-black text-white">{user.height}m</p>
+              <p className="text-sm font-black text-white">{user?.height}m</p>
             </div>
          </div>
-         <button onClick={() => { setIsLoggedIn(false); localStorage.removeItem('tatugym_remembered'); }} className="w-full bg-zinc-900 text-red-500/70 py-5 rounded-2xl font-black uppercase tracking-widest active:scale-95 border border-white/5 flex items-center justify-center gap-2 text-[10px]"><LogOut size={14}/> Sair da Conta</button>
+         <button onClick={() => { setIsLoggedIn(false); setUser(null); }} className="w-full bg-zinc-900 text-red-500/70 py-5 rounded-2xl font-black uppercase tracking-widest active:scale-95 border border-white/5 flex items-center justify-center gap-2 text-[10px]"><LogOut size={14}/> Sair da Conta</button>
       </div>
     </div>
   );
@@ -477,19 +511,19 @@ const App: React.FC = () => {
             <h1 className="text-5xl font-black text-white tracking-tighter uppercase leading-none italic">TATU<span className="text-emerald-500">GYM</span></h1>
             <p className="text-zinc-600 text-[11px] font-black uppercase tracking-[0.4em] mt-3">Personal Inteligente</p>
           </div>
-          <form onSubmit={(e) => { 
-            e.preventDefault(); 
-            const u = loginData.user.trim().toLowerCase();
-            if ((u === 'jessica' || u === 'henrique') && loginData.pass === '9860') { 
-              setIsLoggedIn(true); 
-              if (u === 'henrique' && user.name !== 'Henrique') {
-                handleUpdateProfile({ name: 'Henrique', username: 'Henrique' });
-              }
-              if (loginData.remember) localStorage.setItem('tatugym_remembered', JSON.stringify(loginData)); 
-            } else alert('Dados incorretos.'); 
-          }} className="space-y-4">
-            <input type="text" value={loginData.user} onChange={e => setLoginData({...loginData, user: e.target.value})} className="w-full bg-zinc-900 border border-white/5 rounded-3xl p-6 text-white text-center font-bold outline-none focus:border-emerald-500/50" placeholder="Usuário" />
-            <input type="password" value={loginData.pass} onChange={e => setLoginData({...loginData, pass: e.target.value})} className="w-full bg-zinc-900 border border-white/5 rounded-3xl p-6 text-white text-center font-bold outline-none focus:border-emerald-500/50" placeholder="Senha" />
+          <form onSubmit={(e) => { e.preventDefault(); handleLogin(loginData.user, loginData.pass, true); }} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-4">Usuário</label>
+              <input type="text" value={loginData.user} onChange={e => setLoginData({...loginData, user: e.target.value})} className="w-full bg-zinc-900 border border-white/5 rounded-3xl p-6 text-white text-center font-bold outline-none focus:border-emerald-500/50" placeholder="Jessica ou Henrique" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-4">Senha</label>
+              <input type="password" value={loginData.pass} onChange={e => setLoginData({...loginData, pass: e.target.value})} className="w-full bg-zinc-900 border border-white/5 rounded-3xl p-6 text-white text-center font-bold outline-none focus:border-emerald-500/50" placeholder="9860" />
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2">
+              <input type="checkbox" id="remember" checked={loginData.remember} onChange={e => setLoginData({...loginData, remember: e.target.checked})} className="w-4 h-4 rounded bg-zinc-900 border-white/10 accent-emerald-500" />
+              <label htmlFor="remember" className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Lembrar de mim</label>
+            </div>
             <button className="w-full bg-white text-zinc-950 font-black py-6 rounded-3xl shadow-2xl uppercase tracking-widest active:scale-95 text-sm">ENTRAR NO APP</button>
           </form>
         </div>
