@@ -20,10 +20,8 @@
         margin: 0;
         overflow-x: hidden;
         -webkit-tap-highlight-color: transparent;
-        user-select: none;
       }
       
-      /* Mesh Gradient Background */
       .bg-mesh {
         position: fixed;
         top: 0;
@@ -32,42 +30,38 @@
         height: 100%;
         z-index: -1;
         background: 
-          radial-gradient(at 0% 0%, hsla(161, 91%, 43%, 0.05) 0px, transparent 50%),
-          radial-gradient(at 100% 0%, hsla(242, 47%, 45%, 0.08) 0px, transparent 50%),
-          radial-gradient(at 100% 100%, hsla(161, 91%, 43%, 0.05) 0px, transparent 50%),
-          radial-gradient(at 0% 100%, hsla(242, 47%, 45%, 0.08) 0px, transparent 50%);
+          radial-gradient(at 0% 0%, hsla(161, 91%, 43%, 0.03) 0px, transparent 50%),
+          radial-gradient(at 100% 0%, hsla(242, 47%, 45%, 0.05) 0px, transparent 50%),
+          radial-gradient(at 100% 100%, hsla(161, 91%, 43%, 0.03) 0px, transparent 50%),
+          radial-gradient(at 0% 100%, hsla(242, 47%, 45%, 0.05) 0px, transparent 50%);
       }
 
-      .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-      .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-      .custom-scrollbar::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       
-      input, button, select {
-        touch-action: manipulation;
-        font-size: 16px !important;
-      }
-
       @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
       @keyframes slide-up { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-      @keyframes pulse-glow { 
-        0%, 100% { opacity: 0.5; transform: scale(1); }
-        50% { opacity: 0.8; transform: scale(1.05); }
-      }
-
+      
       .animate-fade { animation: fade-in 0.4s ease-out; }
       .animate-slide-up { animation: slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
       
       .glass-card {
-        background: rgba(20, 20, 23, 0.6);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        background: rgba(20, 20, 23, 0.4);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
       }
 
       .glow-emerald {
-        box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+        box-shadow: 0 0 40px rgba(16, 185, 129, 0.1);
+      }
+
+      /* Custom scrollbar for desktop */
+      @media (min-width: 768px) {
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
       }
     </style>
   <script type="importmap">
