@@ -76,64 +76,75 @@ export const jessicaWorkouts: WorkoutRoutine[] = [
 
 export const henriqueWorkouts: WorkoutRoutine[] = [
   {
-    id: 'h-segunda',
-    title: 'Segunda (Superior)',
-    description: 'Flexão, Remada e Mergulho.',
+    id: 'h-seg',
+    title: 'SEG (Superior)',
+    description: 'Foco em empurrar e tríceps.',
     color: 'blue',
     exercises: [
-      { id: 'hs1', name: 'Flexão de Braços', muscleGroup: 'Peitoral', sets: 3, reps: '12-15', rest: 60 },
-      { id: 'hs2', name: 'Flexão Diamante', muscleGroup: 'Tríceps', sets: 3, reps: '10-12', rest: 60 },
-      { id: 'hs3', name: 'Remada com Toalha', muscleGroup: 'Costas', sets: 3, reps: '15', rest: 60 },
-      { id: 'hs4', name: 'Mergulho no Banco', muscleGroup: 'Tríceps', sets: 3, reps: '12-15', rest: 60 },
-      { id: 'hs5', name: 'Polichinelos', muscleGroup: 'Cardio', sets: 3, reps: '45s', rest: 45 }
+      { id: 'hs1', name: 'Flexão Clássica', muscleGroup: 'Peitoral', sets: 4, reps: '15-25', rest: 30 },
+      { id: 'hs2', name: 'Flexão Diamante', muscleGroup: 'Tríceps', sets: 3, reps: '12-15', rest: 30 },
+      { id: 'hs3', name: 'Mergulho no Banco (Dips)', muscleGroup: 'Tríceps', sets: 4, reps: '15-20', rest: 30 },
+      { id: 'hs4', name: 'Flexão Inclinada (Sofá)', muscleGroup: 'Peitoral', sets: 3, reps: '20', rest: 30 }
     ]
   },
   {
-    id: 'h-terca',
-    title: 'Terça (Inferior)',
-    description: 'Agachamentos e Panturrilha.',
+    id: 'h-ter',
+    title: 'TER (Inferior)',
+    description: 'Pernas e glúteos intensos.',
     color: 'emerald',
     exercises: [
-      { id: 'ht1', name: 'Agachamento Búlgaro', muscleGroup: 'Quadríceps', sets: 3, reps: '10/10', rest: 60 },
-      { id: 'ht2', name: 'Agachamento Sumô com Salto', muscleGroup: 'Pernas', sets: 3, reps: '12', rest: 60 },
-      { id: 'ht3', name: 'Elevação Pélvica Unilateral', muscleGroup: 'Glúteo', sets: 3, reps: '12/12', rest: 60 },
-      { id: 'ht4', name: 'Panturrilha Unilateral', muscleGroup: 'Panturrilha', sets: 3, reps: '15/15', rest: 45 }
+      { id: 'ht1', name: 'Agachamento Búlgaro', muscleGroup: 'Pernas', sets: 4, reps: '15/15', rest: 45 },
+      { id: 'ht2', name: 'Agachamento Sumô', muscleGroup: 'Pernas', sets: 4, reps: '30', rest: 45 },
+      { id: 'ht3', name: 'Afundo Alternado', muscleGroup: 'Pernas', sets: 4, reps: '20', rest: 30 },
+      { id: 'ht4', name: 'Panturrilha Unilateral', muscleGroup: 'Panturrilha', sets: 4, reps: 'Falha', rest: 30 }
     ]
   },
   {
-    id: 'h-quarta',
-    title: 'Quarta (Core/Cardio)',
-    description: 'Burpees e Prancha.',
+    id: 'h-qua',
+    title: 'QUA (Core/HIIT)',
+    description: 'Abdômen e queima calórica.',
     color: 'orange',
     exercises: [
-      { id: 'hq1', name: 'Burpees', muscleGroup: 'Cardio', sets: 3, reps: '10-12', rest: 60 },
-      { id: 'hq2', name: 'Prancha Toque no Ombro', muscleGroup: 'CORE', sets: 3, reps: '20', rest: 45 },
-      { id: 'hq3', name: 'Abdominal Canivete', muscleGroup: 'Abdomen', sets: 3, reps: '15', rest: 45 },
-      { id: 'hq4', name: 'Mountain Climbers', muscleGroup: 'Cardio', sets: 3, reps: '45s', rest: 45 }
+      { id: 'hq1', name: 'Abdominal Canivete', muscleGroup: 'Abdômen', sets: 4, reps: '20', rest: 30 },
+      { id: 'hq2', name: 'Prancha Abdominal', muscleGroup: 'CORE', sets: 4, reps: '1 min', rest: 30 },
+      { id: 'hq3', name: 'Bicicleta Abdominal', muscleGroup: 'Abdômen', sets: 4, reps: '1 min', rest: 30 },
+      { id: 'hq4', name: 'Corrida Estacionária', muscleGroup: 'Cardio', sets: 5, reps: '1 min', rest: 30 }
     ]
   },
   {
-    id: 'h-quinta',
-    title: 'Quinta (Full Body)',
-    description: 'Corpo inteiro.',
+    id: 'h-qui',
+    title: 'QUI (Full Body)',
+    description: 'Trabalho de corpo inteiro.',
     color: 'purple',
     exercises: [
-      { id: 'hqi1', name: 'Sprawl', muscleGroup: 'Full Body', sets: 3, reps: '12', rest: 60 },
-      { id: 'hqi2', name: 'Avanço Alternado', muscleGroup: 'Pernas', sets: 3, reps: '20', rest: 60 },
-      { id: 'hqi3', name: 'Flexão com Toque no Joelho', muscleGroup: 'Peitoral/CORE', sets: 3, reps: '12', rest: 60 },
-      { id: 'hqi4', name: 'Ponte com Marcha', muscleGroup: 'CORE', sets: 3, reps: '15', rest: 60 }
+      { id: 'hqi1', name: 'Agachamento com Salto', muscleGroup: 'Pernas/Cardio', sets: 4, reps: '20', rest: 45 },
+      { id: 'hqi2', name: 'Flexão Aberta', muscleGroup: 'Peitoral', sets: 3, reps: '15', rest: 30 },
+      { id: 'hqi3', name: 'Ponte para Glúteo', muscleGroup: 'Glúteo', sets: 4, reps: '25', rest: 30 },
+      { id: 'hqi4', name: 'Polichinelos', muscleGroup: 'Cardio', sets: 4, reps: '1 min', rest: 30 }
     ]
   },
   {
-    id: 'h-sexta',
-    title: 'Sexta (Exaustão)',
-    description: 'Máxima intensidade.',
+    id: 'h-sex',
+    title: 'SEX (Exaustão)',
+    description: 'Isometria e alta intensidade.',
     color: 'red',
     exercises: [
-      { id: 'hsx1', name: 'Agachamento Isométrico', muscleGroup: 'Pernas', sets: 3, reps: '45s', rest: 45 },
-      { id: 'hsx2', name: 'Flexão Sustentada', muscleGroup: 'Peitoral', sets: 3, reps: '30s', rest: 45 },
-      { id: 'hsx3', name: 'Prancha Lateral', muscleGroup: 'CORE', sets: 3, reps: '30s/30s', rest: 45 },
-      { id: 'hsx4', name: 'Corrida Estacionária', muscleGroup: 'Cardio', sets: 3, reps: '60s', rest: 30 }
+      { id: 'hsx1', name: 'Agachamento Isométrico', muscleGroup: 'Pernas', sets: 4, reps: 'Falha', rest: 30 },
+      { id: 'hsx2', name: 'Flexão Isométrica (90°)', muscleGroup: 'Peitoral', sets: 3, reps: '30-45s', rest: 30 },
+      { id: 'hsx3', name: 'Prancha Lateral', muscleGroup: 'CORE', sets: 3, reps: '45s/45s', rest: 15 },
+      { id: 'hsx4', name: 'Burpee Adaptado', muscleGroup: 'Cardio', sets: 4, reps: '12', rest: 45 }
+    ]
+  },
+  {
+    id: 'h-sab',
+    title: 'SÁB (HIIT/Queima)',
+    description: 'Finalização da semana.',
+    color: 'pink',
+    exercises: [
+      { id: 'hsb1', name: 'Mountain Climbers', muscleGroup: 'Cardio', sets: 5, reps: '45s', rest: 15 },
+      { id: 'hsb2', name: 'Agachamento Lateral', muscleGroup: 'Pernas', sets: 4, reps: '20', rest: 30 },
+      { id: 'hsb3', name: 'Abdominal Infra', muscleGroup: 'Abdômen', sets: 4, reps: '20', rest: 30 },
+      { id: 'hsb4', name: 'Trote ou Caminhada Rápida', muscleGroup: 'Cardio', sets: 1, reps: '20 min', rest: 0 }
     ]
   }
 ];
