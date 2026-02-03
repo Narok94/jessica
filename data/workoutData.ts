@@ -78,13 +78,13 @@ export const henriqueWorkouts: WorkoutRoutine[] = [
   {
     id: 'h-seg',
     title: 'SEG (Superior)',
-    description: 'Foco em empurrar e tríceps.',
+    description: 'Foco em peitoral e tríceps.',
     color: 'blue',
     exercises: [
-      { id: 'hs1', name: 'Flexão Clássica', muscleGroup: 'Peitoral', sets: 4, reps: '15-25', rest: 30 },
-      { id: 'hs2', name: 'Flexão Diamante', muscleGroup: 'Tríceps', sets: 3, reps: '12-15', rest: 30 },
-      { id: 'hs3', name: 'Mergulho no Banco (Dips)', muscleGroup: 'Tríceps', sets: 4, reps: '15-20', rest: 30 },
-      { id: 'hs4', name: 'Flexão Inclinada (Sofá)', muscleGroup: 'Peitoral', sets: 3, reps: '20', rest: 30 }
+      { id: 'hs1', name: 'Flexão Clássica', muscleGroup: 'Peitoral', sets: 4, reps: '10-12', rest: 45 },
+      { id: 'hs2', name: 'Tríceps na Parede (Testa)', muscleGroup: 'Tríceps', sets: 4, reps: '10-12', rest: 30 },
+      { id: 'hs3', name: 'Mergulho no Banco (Dips)', muscleGroup: 'Tríceps', sets: 4, reps: '10-12', rest: 45 },
+      { id: 'hs4', name: 'Flexão Inclinada (Mãos no sofá)', muscleGroup: 'Peitoral', sets: 3, reps: '12', rest: 30 }
     ]
   },
   {
@@ -118,7 +118,7 @@ export const henriqueWorkouts: WorkoutRoutine[] = [
     color: 'purple',
     exercises: [
       { id: 'hqi1', name: 'Agachamento com Salto', muscleGroup: 'Pernas/Cardio', sets: 4, reps: '20', rest: 45 },
-      { id: 'hqi2', name: 'Flexão Aberta', muscleGroup: 'Peitoral', sets: 3, reps: '15', rest: 30 },
+      { id: 'hqi2', name: 'Flexão Aberta', muscleGroup: 'Peitoral', sets: 3, reps: '10-12', rest: 45 },
       { id: 'hqi3', name: 'Ponte para Glúteo', muscleGroup: 'Glúteo', sets: 4, reps: '25', rest: 30 },
       { id: 'hqi4', name: 'Polichinelos', muscleGroup: 'Cardio', sets: 4, reps: '1 min', rest: 30 }
     ]
@@ -130,9 +130,9 @@ export const henriqueWorkouts: WorkoutRoutine[] = [
     color: 'red',
     exercises: [
       { id: 'hsx1', name: 'Agachamento Isométrico', muscleGroup: 'Pernas', sets: 4, reps: 'Falha', rest: 30 },
-      { id: 'hsx2', name: 'Flexão Isométrica (90°)', muscleGroup: 'Peitoral', sets: 3, reps: '30-45s', rest: 30 },
+      { id: 'hsx2', name: 'Flexão Isométrica (90°)', muscleGroup: 'Peitoral', sets: 3, reps: '20-30s', rest: 30 },
       { id: 'hsx3', name: 'Prancha Lateral', muscleGroup: 'CORE', sets: 3, reps: '45s/45s', rest: 15 },
-      { id: 'hsx4', name: 'Burpee Adaptado', muscleGroup: 'Cardio', sets: 4, reps: '12', rest: 45 }
+      { id: 'hsx4', name: 'Burpee Adaptado', muscleGroup: 'Cardio', sets: 4, reps: '10-12', rest: 45 }
     ]
   },
   {
