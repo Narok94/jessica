@@ -11,8 +11,14 @@ import {
   Check, 
   Play, 
   RotateCcw,
-  X
+  X,
+  Plus,
+  Minus,
+  Info,
+  Trophy
 } from 'lucide-react';
+
+declare var confetti: any;
 
 interface ExerciseItemProps {
   exercise: Exercise;
@@ -29,6 +35,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [restTimeLeft, setRestTimeLeft] = useState<number | null>(null);
+  const [isFinishing, setIsFinishing] = useState(false);
   const timerRef = useRef<number | null>(null);
   
   const [performance, setPerformance] = useState<SetPerformance[]>(() => {
@@ -37,6 +44,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
     return new Array(exercise.sets).fill(null).map(() => ({
       weight: savedWeight || 0,
       reps: parseInt(exercise.reps) || 0,
+      rpe: 8,
       completed: false
     }));
   });
@@ -46,21 +54,17 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const oscillator = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
-
       oscillator.connect(gainNode);
       gainNode.connect(audioCtx.destination);
-
       oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
-      
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); 
       gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
       gainNode.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.1);
       gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
-
       oscillator.start(audioCtx.currentTime);
       oscillator.stop(audioCtx.currentTime + 0.8);
     } catch (e) {
-      console.warn("Audio context not supported or blocked", e);
+      console.warn("Audio context not supported", e);
     }
   };
 
@@ -97,114 +101,223 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
     
     if (updates.completed) {
       if (window.navigator.vibrate) window.navigator.vibrate(20);
-      if (index < performance.length - 1 && updates.completed) {
+      
+      const allDone = newPerf.every(p => p.completed);
+      if (allDone) {
+        setIsFinishing(true);
+        triggerLocalConfetti();
+        setTimeout(() => setIsFinishing(false), 800);
+      } else if (index < performance.length - 1) {
         startRestTimer();
       }
     }
+  };
+
+  const triggerLocalConfetti = () => {
+    if (typeof confetti !== 'undefined') {
+      confetti({
+        particleCount: 40,
+        spread: 70,
+        origin: { y: 0.7 },
+        colors: ['#10b981', '#34d399', '#ffffff'],
+        disableForReducedMotion: true
+      });
+    }
+  };
+
+  const adjustValue = (index: number, key: 'weight' | 'reps' | 'rpe', delta: number) => {
+    const currentVal = performance[index][key] || 0;
+    const newVal = Math.max(0, currentVal + delta);
+    updateSet(index, { [key]: newVal });
   };
 
   const allSetsDone = performance.every(p => p.completed);
   const completedCount = performance.filter(p => p.completed).length;
 
   return (
-    <div className={`glass-card rounded-[1.8rem] border transition-all duration-500 mb-3 overflow-hidden ${
+    <div className={`glass-card rounded-[2rem] border transition-all duration-500 mb-4 overflow-hidden ${
       isOpen 
-      ? 'border-emerald-500/30 bg-zinc-900/90' 
+      ? 'border-emerald-500/40 bg-zinc-900/95 ring-1 ring-emerald-500/10' 
       : 'border-white/5'
-    } ${allSetsDone && !isOpen ? 'opacity-40' : 'opacity-100'}`}>
+    } ${allSetsDone && !isOpen ? 'opacity-50 grayscale-[0.3] scale-[0.98]' : 'opacity-100 scale-100'} ${isFinishing ? 'scale-[1.05] ring-4 ring-emerald-500/20' : ''}`}>
       
       {restTimeLeft !== null && (
-        <div className="bg-emerald-500 text-zinc-950 flex items-center justify-between py-1 px-4 text-[8px] font-black uppercase tracking-widest animate-pulse">
-          <div className="flex items-center gap-1.5">
-            <Timer size={10} strokeWidth={3} /> Descanso Ativo
+        <div className="bg-emerald-500 text-zinc-950 flex items-center justify-between py-1.5 px-5 text-[9px] font-black uppercase tracking-[0.2em] animate-pulse">
+          <div className="flex items-center gap-2">
+            <Timer size={12} strokeWidth={3} /> Descanso em curso
           </div>
-          <span className="text-xs font-black">{restTimeLeft}s</span>
+          <span className="text-sm font-black">{restTimeLeft}s</span>
         </div>
       )}
 
       <div 
-        className="p-4 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
+        className="p-5 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex-1 min-w-0 pr-4">
-          <div className="flex items-center gap-2 mb-0.5">
-             <h3 className={`text-base font-black tracking-tight leading-none truncate ${allSetsDone ? 'text-zinc-600 line-through' : 'text-white'}`}>
+          <div className="flex items-center gap-2.5 mb-1">
+             <h3 className={`text-lg font-black tracking-tight leading-none truncate transition-all duration-300 ${allSetsDone ? 'text-emerald-500/80 line-through' : 'text-white'}`}>
               {exercise.name}
             </h3>
-            {allSetsDone && <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />}
+            {allSetsDone && <CheckCircle2 size={18} className="text-emerald-500 shrink-0 animate-[bounce_0.5s_ease-in-out]" />}
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 bg-zinc-800/50 px-1.5 py-0.5 rounded-lg border border-white/5">
-                <span className="text-[8px] font-black text-emerald-500">{completedCount}</span>
-                <span className="text-[7px] font-black text-zinc-500 uppercase">/ {exercise.sets}</span>
+          <div className="flex items-center gap-3">
+            <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full border transition-colors ${allSetsDone ? 'bg-emerald-500/20 border-emerald-500/30' : 'bg-zinc-800/80 border-white/5'}`}>
+                <span className={`text-[10px] font-black ${allSetsDone ? 'text-emerald-400' : 'text-emerald-500'}`}>{completedCount}</span>
+                <span className="text-[9px] font-black text-zinc-500 uppercase">/ {exercise.sets} séries</span>
             </div>
-            <p className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">
-              {exercise.reps} Reps
+            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+              {exercise.reps} reps
             </p>
           </div>
         </div>
         
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${isOpen ? 'bg-emerald-500 text-zinc-900 rotate-180' : 'bg-zinc-800 text-zinc-600'}`}>
-          <ChevronDown size={16} strokeWidth={3} />
+        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${isOpen ? 'bg-emerald-500 text-zinc-950 rotate-180 shadow-lg shadow-emerald-500/20' : 'bg-zinc-800/50 text-zinc-500'}`}>
+          <ChevronDown size={20} strokeWidth={3} />
         </div>
       </div>
 
       {isOpen && (
-        <div className="px-4 pb-5 pt-1 animate-slide-up space-y-4">
-          <div className="bg-zinc-950/40 border border-white/5 rounded-xl p-3 flex items-center justify-between">
-             <div className="flex items-center gap-2.5">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${restTimeLeft !== null ? 'bg-emerald-500 text-zinc-950' : 'bg-zinc-900 text-zinc-500'}`}>
-                   <Timer size={16} />
+        <div className="px-5 pb-6 pt-2 animate-slide-up space-y-6">
+          {allSetsDone && (
+            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-3 flex items-center justify-center gap-2 animate-[pulse_2s_infinite]">
+              <Trophy size={16} className="text-emerald-500" />
+              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Parabéns! Exercício Finalizado</span>
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-3">
+             <div className="flex-1 bg-zinc-950/60 border border-white/5 rounded-[1.2rem] p-3 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${restTimeLeft !== null ? 'bg-emerald-500 text-zinc-950' : 'bg-zinc-900 text-zinc-500'}`}>
+                      <Timer size={20} />
+                   </div>
+                   <div>
+                      <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Descanso</p>
+                      <p className="text-base font-black text-white">{restTimeLeft !== null ? `${restTimeLeft}s` : `${exercise.rest}s`}</p>
+                   </div>
                 </div>
-                <div>
-                   <p className="text-[7px] font-black text-zinc-500 uppercase tracking-widest">Descanso</p>
-                   <p className="text-sm font-black text-white">{restTimeLeft !== null ? `${restTimeLeft}s` : `${exercise.rest}s`}</p>
+                <div className="flex items-center gap-2">
+                   {restTimeLeft !== null ? (
+                      <>
+                       <button onClick={cancelRestTimer} className="w-10 h-10 bg-zinc-900 text-zinc-400 rounded-xl flex items-center justify-center border border-white/10 active:scale-90 transition-transform"><X size={18} /></button>
+                       <button onClick={startRestTimer} className="w-10 h-10 bg-emerald-500 text-zinc-950 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-90 transition-transform"><RotateCcw size={18} /></button>
+                      </>
+                   ) : (
+                     <button onClick={startRestTimer} className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 text-zinc-950 rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-emerald-500/10">
+                       <Play size={12} fill="currentColor" /> Iniciar Timer
+                     </button>
+                   )}
                 </div>
-             </div>
-             
-             <div className="flex items-center gap-2">
-                {restTimeLeft !== null ? (
-                   <>
-                    <button onClick={cancelRestTimer} className="w-8 h-8 bg-zinc-900 text-zinc-400 rounded-lg flex items-center justify-center border border-white/5"><X size={14} /></button>
-                    <button onClick={startRestTimer} className="w-8 h-8 bg-emerald-500 text-zinc-950 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20"><RotateCcw size={14} /></button>
-                   </>
-                ) : (
-                  <button onClick={startRestTimer} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-zinc-950 rounded-lg font-black text-[9px] uppercase tracking-widest active:scale-95 transition-all">
-                    <Play size={10} fill="currentColor" /> Play
-                  </button>
-                )}
              </div>
           </div>
 
-          <div className="space-y-1.5">
-            <div className="grid grid-cols-4 gap-2 text-[7px] font-black text-zinc-600 uppercase tracking-widest text-center px-2">
-              <div>Série</div>
-              <div>Peso</div>
-              <div>Reps</div>
-              <div>Fim</div>
+          <div className="space-y-3">
+            <div className="grid grid-cols-12 gap-2 text-[8px] font-black text-zinc-600 uppercase tracking-widest px-2">
+              <div className="col-span-1 text-center">Set</div>
+              <div className="col-span-4 text-center">Peso (kg)</div>
+              <div className="col-span-4 text-center">Reps</div>
+              <div className="col-span-2 text-center">RPE</div>
+              <div className="col-span-1 text-center">Ok</div>
             </div>
 
             {performance.map((set, idx) => (
-              <div key={idx} className={`flex items-center gap-2 p-1.5 rounded-xl border transition-all ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/30 border-white/5'}`}>
-                <div className="w-7 h-7 flex items-center justify-center bg-zinc-900/50 rounded-lg text-[9px] font-black text-zinc-600">{idx + 1}</div>
-                <div className="flex-1"><input type="number" inputMode="decimal" value={set.weight || ''} disabled={set.completed} onChange={(e) => updateSet(idx, { weight: parseFloat(e.target.value) || 0 })} className="w-full bg-transparent text-center text-xs font-black text-white outline-none placeholder:text-zinc-800" placeholder="0"/></div>
-                <div className="flex-1"><input type="number" inputMode="numeric" value={set.reps || ''} disabled={set.completed} onChange={(e) => updateSet(idx, { reps: parseInt(e.target.value) || 0 })} className="w-full bg-transparent text-center text-xs font-black text-white outline-none placeholder:text-zinc-800" placeholder="0"/></div>
-                <button onClick={() => updateSet(idx, { completed: !set.completed })} className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${set.completed ? 'bg-emerald-500 text-zinc-950' : 'bg-zinc-900 border border-white/10 text-zinc-700'}`}><Check size={16} strokeWidth={4} /></button>
+              <div key={idx} className={`grid grid-cols-12 items-center gap-2 p-2 rounded-2xl border transition-all ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20 opacity-60' : 'bg-zinc-800/40 border-white/5'}`}>
+                {/* Set Number */}
+                <div className="col-span-1 flex items-center justify-center">
+                  <div className="w-7 h-7 flex items-center justify-center bg-zinc-900/80 rounded-lg text-[10px] font-black text-zinc-500 border border-white/5">
+                    {idx + 1}
+                  </div>
+                </div>
+
+                {/* Weight Stepper */}
+                <div className="col-span-4 flex items-center bg-zinc-900/50 rounded-xl border border-white/5 overflow-hidden">
+                  <button 
+                    disabled={set.completed} 
+                    onClick={() => adjustValue(idx, 'weight', -1)} 
+                    className="p-2 text-zinc-500 hover:text-white active:bg-zinc-800 disabled:opacity-30 transition-colors"
+                  >
+                    <Minus size={14} strokeWidth={3} />
+                  </button>
+                  <input 
+                    type="number" 
+                    inputMode="decimal" 
+                    value={set.weight} 
+                    disabled={set.completed} 
+                    onChange={(e) => updateSet(idx, { weight: parseFloat(e.target.value) || 0 })} 
+                    className="w-full bg-transparent text-center text-xs font-black text-white outline-none"
+                  />
+                  <button 
+                    disabled={set.completed} 
+                    onClick={() => adjustValue(idx, 'weight', 1)} 
+                    className="p-2 text-zinc-500 hover:text-white active:bg-zinc-800 disabled:opacity-30 transition-colors"
+                  >
+                    <Plus size={14} strokeWidth={3} />
+                  </button>
+                </div>
+
+                {/* Reps Stepper */}
+                <div className="col-span-4 flex items-center bg-zinc-900/50 rounded-xl border border-white/5 overflow-hidden">
+                  <button 
+                    disabled={set.completed} 
+                    onClick={() => adjustValue(idx, 'reps', -1)} 
+                    className="p-2 text-zinc-500 hover:text-white active:bg-zinc-800 disabled:opacity-30 transition-colors"
+                  >
+                    <Minus size={14} strokeWidth={3} />
+                  </button>
+                  <input 
+                    type="number" 
+                    inputMode="numeric" 
+                    value={set.reps} 
+                    disabled={set.completed} 
+                    onChange={(e) => updateSet(idx, { reps: parseInt(e.target.value) || 0 })} 
+                    className="w-full bg-transparent text-center text-xs font-black text-white outline-none"
+                  />
+                  <button 
+                    disabled={set.completed} 
+                    onClick={() => adjustValue(idx, 'reps', 1)} 
+                    className="p-2 text-zinc-500 hover:text-white active:bg-zinc-800 disabled:opacity-30 transition-colors"
+                  >
+                    <Plus size={14} strokeWidth={3} />
+                  </button>
+                </div>
+
+                {/* RPE Selector */}
+                <div className="col-span-2 flex items-center justify-center">
+                  <select 
+                    disabled={set.completed}
+                    value={set.rpe}
+                    onChange={(e) => updateSet(idx, { rpe: parseInt(e.target.value) })}
+                    className="bg-zinc-900 text-white font-black text-[10px] rounded-lg border border-white/5 p-1 outline-none appearance-none text-center min-w-[34px]"
+                  >
+                    {[6,7,8,9,10].map(v => <option key={v} value={v}>{v}</option>)}
+                  </select>
+                </div>
+
+                {/* Completion Check */}
+                <div className="col-span-1 flex items-center justify-center">
+                  <button 
+                    onClick={() => updateSet(idx, { completed: !set.completed })} 
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
+                      set.completed 
+                      ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/20' 
+                      : 'bg-zinc-900 border border-white/10 text-zinc-700 hover:border-emerald-500/30'
+                    }`}
+                  >
+                    <Check size={18} strokeWidth={4} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-xl p-2 flex items-start gap-2">
-              <Zap size={12} className="text-indigo-500 mt-0.5" />
-              <p className="text-[9px] font-medium text-zinc-500 leading-tight">Mantenha a postura e respire fundo.</p>
+          <div className="flex flex-col gap-3">
+            <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-2xl p-4 flex items-start gap-3">
+              <Info size={16} className="text-indigo-400 mt-0.5 shrink-0" />
+              <p className="text-[11px] font-medium text-zinc-400 leading-relaxed">
+                {exercise.notes || 'Foque no controle motor. Sinta o músculo trabalhar em cada fase.'}
+              </p>
             </div>
-            {savedWeight && (
-              <div className="bg-zinc-950/40 border border-white/5 rounded-xl p-2 flex items-center justify-between">
-                <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Peso Ant.</p>
-                <div className="flex items-center gap-0.5"><span className="text-[10px] font-black text-emerald-500">{savedWeight}kg</span><ArrowUpRight size={10} className="text-emerald-500" /></div>
-              </div>
-            )}
           </div>
         </div>
       )}

@@ -30,13 +30,15 @@ import {
   Menu,
   X,
   LayoutDashboard,
-  Lock
+  Lock,
+  Sparkles,
+  BarChart3,
+  MapPin
 } from 'lucide-react';
 
 declare var confetti: any;
 
 const LOGIN_IMAGE = "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop";
-const DASHBOARD_BG = "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=1470&auto=format&fit=crop";
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -49,6 +51,8 @@ const App: React.FC = () => {
   const [chatInput, setChatInput] = useState('');
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const [lastWorkoutVolume, setLastWorkoutVolume] = useState(0);
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
@@ -74,17 +78,16 @@ const App: React.FC = () => {
     }
   }, []);
 
+  // Automatic saving of current session to prevent data loss on refresh/exit
   useEffect(() => {
-    if (user && selectedWorkout) {
-      localStorage.setItem(`tatugym_active_session_${user.username}`, JSON.stringify({
+    if (user && selectedWorkout && !showSummary) {
+      localStorage.setItem(`tatugym_active_session_${user.username.toLowerCase()}`, JSON.stringify({
         workoutId: selectedWorkout.id,
         progress: currentSessionProgress,
         timestamp: new Date().toISOString()
       }));
-    } else if (user) {
-      localStorage.removeItem(`tatugym_active_session_${user.username}`);
     }
-  }, [selectedWorkout, currentSessionProgress, user]);
+  }, [selectedWorkout, currentSessionProgress, user, showSummary]);
 
   const handleLogin = (usernameInput: string, passwordInput: string, manual: boolean) => {
     const u = usernameInput.trim().toLowerCase();
@@ -111,7 +114,8 @@ const App: React.FC = () => {
       }
       setUser(userData);
       setIsLoggedIn(true);
-      const activeSession = localStorage.getItem(`tatugym_active_session_${userData.username}`);
+      
+      const activeSession = localStorage.getItem(`tatugym_active_session_${u}`);
       if (activeSession) {
         const parsed = JSON.parse(activeSession);
         const workoutsSet = u === 'henrique' ? henriqueWorkouts : jessicaWorkouts;
@@ -120,10 +124,13 @@ const App: React.FC = () => {
           setSelectedWorkout(workout);
           setCurrentSessionProgress(parsed.progress);
           setActiveTab(AppTab.WORKOUT);
+        } else {
+          setActiveTab(userData.isProfileComplete ? AppTab.DASHBOARD : AppTab.ONBOARDING);
         }
       } else {
         setActiveTab(userData.isProfileComplete ? AppTab.DASHBOARD : AppTab.ONBOARDING);
       }
+      
       if (manual && loginData.remember) {
         localStorage.setItem('tatugym_remembered', JSON.stringify({ user: usernameInput, pass: passwordInput }));
       }
@@ -134,7 +141,12 @@ const App: React.FC = () => {
 
   const triggerConfetti = () => {
     if (typeof confetti !== 'undefined') {
-      confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#10b981', '#6366f1', '#fbbf24'] });
+      confetti({ 
+        particleCount: 150, 
+        spread: 80, 
+        origin: { y: 0.6 }, 
+        colors: ['#10b981', '#6366f1', '#fbbf24'] 
+      });
     }
   };
 
@@ -148,9 +160,15 @@ const App: React.FC = () => {
   const handleManualCheckIn = () => {
     if (!user) return;
     const today = new Date().toISOString().split('T')[0];
-    if (user.checkIns.includes(today)) return;
+    if (user.checkIns.includes(today)) {
+      alert("Você já realizou o check-in hoje!");
+      return;
+    }
     const newCheckIns = [...user.checkIns, today];
-    handleUpdateProfile({ checkIns: newCheckIns });
+    handleUpdateProfile({ 
+      checkIns: newCheckIns,
+      streak: (user.streak || 0) + 1 
+    });
     triggerConfetti();
   };
 
@@ -158,9 +176,24 @@ const App: React.FC = () => {
     setCurrentSessionProgress(prev => ({ ...prev, [exerciseId]: performance }));
   };
 
+  const calculateVolume = () => {
+    let total = 0;
+    (Object.values(currentSessionProgress) as SetPerformance[][]).forEach((perf) => {
+      if (perf) {
+        perf.filter(p => p.completed).forEach(p => {
+          total += (p.weight * p.reps);
+        });
+      }
+    });
+    return total;
+  };
+
   const handleFinishWorkout = () => {
     if (!selectedWorkout || !user) return;
     const today = new Date().toISOString().split('T')[0];
+    const volume = calculateVolume();
+    setLastWorkoutVolume(volume);
+
     const historyEntry: WorkoutHistoryEntry = {
       id: Date.now().toString(),
       date: new Date().toISOString(),
@@ -172,24 +205,44 @@ const App: React.FC = () => {
         performance: currentSessionProgress[ex.id] || []
       }))
     };
+
     const newWeights: Record<string, number> = { ...(user.weights || {}) };
-    (Object.entries(currentSessionProgress) as [string, SetPerformance[]][]).forEach(([id, perf]) => {
-      const lastWeight = perf.filter(p => p.completed).reverse()[0]?.weight;
+    
+    Object.entries(currentSessionProgress).forEach(([id, perf]) => {
+      const p = perf as SetPerformance[];
+      const lastWeight = p.filter(item => item.completed).reverse()[0]?.weight;
       if (lastWeight) newWeights[id] = lastWeight;
     });
+
     const newCheckIns = user.checkIns.includes(today) ? user.checkIns : [...user.checkIns, today];
+    
     handleUpdateProfile({ 
       history: [historyEntry, ...user.history],
       totalWorkouts: (user.totalWorkouts || 0) + 1,
       weights: newWeights,
       checkIns: newCheckIns,
-      streak: user.streak + 1
+      streak: (user.streak || 0) + 1
     });
+
     triggerConfetti();
-    localStorage.removeItem(`tatugym_active_session_${user.username}`);
+    localStorage.removeItem(`tatugym_active_session_${user.username.toLowerCase()}`);
+    setShowSummary(true);
+  };
+
+  const closeSummary = () => {
+    setShowSummary(false);
     setSelectedWorkout(null);
     setCurrentSessionProgress({});
     setActiveTab(AppTab.DASHBOARD);
+  };
+
+  const exitWorkout = () => {
+    if(confirm('Sair do treino? Seu progresso atual está salvo e será mantido para quando você voltar.')) { 
+      setSelectedWorkout(null);
+      setShowSummary(false);
+      // Force return to Dashboard
+      setActiveTab(AppTab.DASHBOARD);
+    }
   };
 
   const calculateIMC = () => {
@@ -207,7 +260,7 @@ const App: React.FC = () => {
     const isActive = activeTab === tab || (tab === AppTab.DASHBOARD && activeTab === AppTab.WORKOUT);
     return (
       <button 
-        onClick={() => { setActiveTab(tab); setSelectedWorkout(null); setIsSidebarOpen(false); }}
+        onClick={() => { setActiveTab(tab); setSelectedWorkout(null); setShowSummary(false); setIsSidebarOpen(false); }}
         className={`flex items-center gap-4 px-6 py-4 rounded-[1.5rem] transition-all duration-300 w-full group ${
           isActive 
           ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/20' 
@@ -225,28 +278,47 @@ const App: React.FC = () => {
     const imcInfo = calculateIMC();
     const today = new Date().toISOString().split('T')[0];
     const isCheckedInToday = user.checkIns?.includes(today);
+    
     const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
     const currentDay = new Date().getDay();
     const weekStart = new Date();
     weekStart.setDate(weekStart.getDate() - currentDay);
+    
     const weekActivity = weekDays.map((label, idx) => {
         const d = new Date(weekStart);
         d.setDate(d.getDate() + idx);
         const iso = d.toISOString().split('T')[0];
-        return { label, active: user.checkIns?.includes(iso), today: iso === today };
+        return { 
+          label, 
+          active: user.checkIns?.includes(iso), 
+          today: iso === today,
+          iso 
+        };
     });
 
     return (
       <div className="space-y-4 animate-slide-up pb-10">
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-1">
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <h1 className="text-xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">
               Olá, <span className="text-emerald-500">{user.name}</span>
             </h1>
             <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] mt-1 text-[9px]">{greeting}!</p>
           </div>
-          <div className="hidden md:flex gap-2">
-             <div className="glass-card px-3 py-1.5 rounded-xl flex items-center gap-2">
+          <div className="flex gap-2">
+             <button 
+               onClick={handleManualCheckIn}
+               disabled={isCheckedInToday}
+               className={`px-6 py-2.5 rounded-xl flex items-center gap-2 transition-all font-black text-[10px] uppercase tracking-widest border ${
+                 isCheckedInToday 
+                 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 cursor-default' 
+                 : 'bg-emerald-500 border-emerald-400 text-zinc-950 hover:scale-105 shadow-lg shadow-emerald-500/20 active:scale-95'
+               }`}
+             >
+                {isCheckedInToday ? <Check size={14} strokeWidth={4} /> : <MapPin size={14} strokeWidth={3} />}
+                {isCheckedInToday ? 'Check-in OK' : 'Check-in Agora'}
+             </button>
+             <div className="glass-card px-4 py-2.5 rounded-xl flex items-center gap-2">
                 <Flame size={14} className="text-orange-500" />
                 <span className="text-sm font-black text-white">{user.streak || 0}</span>
              </div>
@@ -254,7 +326,6 @@ const App: React.FC = () => {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          {/* Left Column - Main Action & Consistancy */}
           <div className="lg:col-span-8 space-y-4">
             <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-emerald-400 to-emerald-600 p-5 md:p-8 group cursor-pointer" onClick={() => { if(initialWorkouts[0]) { setSelectedWorkout(initialWorkouts[0]); setActiveTab(AppTab.WORKOUT); } }}>
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 blur-[60px] rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-125"></div>
@@ -267,35 +338,44 @@ const App: React.FC = () => {
                     <span className="flex items-center gap-1"><Activity size={12}/> {initialWorkouts[0]?.exercises.length} Exs</span>
                   </div>
                 </div>
-                <button className="bg-zinc-950 text-white w-12 h-12 md:w-16 md:h-16 rounded-[1.5rem] flex items-center justify-center shadow-xl hover:scale-105 transition-transform">
+                <div className="bg-zinc-950 text-white w-12 h-12 md:w-16 md:h-16 rounded-[1.5rem] flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
                    <ArrowRight size={24} strokeWidth={3} />
-                </button>
+                </div>
               </div>
             </div>
 
             <div className="glass-card p-4 md:p-6 rounded-[2rem] space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.3em] flex items-center gap-1.5">
-                  <Calendar size={14} className="text-emerald-500" /> Consistência
+                  <Calendar size={14} className="text-emerald-500" /> Consistência Semanal
                 </h3>
               </div>
               <div className="flex justify-between items-center max-w-lg mx-auto gap-1">
                 {weekActivity.map((day, i) => (
                   <div key={i} className="flex flex-col items-center gap-2">
-                    <div className={`w-9 h-11 md:w-12 md:h-14 rounded-[1rem] flex items-center justify-center transition-all duration-300 border ${
-                      day.active 
-                      ? 'bg-emerald-500 border-emerald-400 text-zinc-950 shadow-lg shadow-emerald-500/20 scale-105' 
-                      : day.today ? 'bg-zinc-900 border-emerald-500/20 text-white' : 'bg-zinc-900/40 border-white/5 text-zinc-600'
-                    }`}>
+                    <button 
+                      onClick={() => day.today && !day.active ? handleManualCheckIn() : null}
+                      disabled={!day.today || day.active}
+                      className={`w-9 h-11 md:w-12 md:h-14 rounded-[1rem] flex flex-col items-center justify-center transition-all duration-300 border ${
+                        day.active 
+                        ? 'bg-emerald-500 border-emerald-400 text-zinc-950 shadow-lg shadow-emerald-500/20 scale-105' 
+                        : day.today 
+                          ? 'bg-zinc-900 border-emerald-500/50 text-white animate-pulse' 
+                          : 'bg-zinc-900/40 border-white/5 text-zinc-600'
+                      }`}
+                    >
                       <span className="text-[10px] md:text-xs font-black">{day.label}</span>
-                    </div>
+                      {day.today && !day.active && <div className="w-1 h-1 bg-emerald-500 rounded-full mt-1"></div>}
+                    </button>
                   </div>
                 ))}
               </div>
+              {!isCheckedInToday && (
+                <p className="text-center text-[8px] font-black text-emerald-500/60 uppercase tracking-widest animate-fade">Clique no dia atual para marcar check-in!</p>
+              )}
             </div>
           </div>
 
-          {/* Right Column - Stats & AI */}
           <div className="lg:col-span-4 space-y-4">
              <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
                 <div className="glass-card p-4 rounded-[1.5rem] flex flex-col justify-between h-24 md:h-28">
@@ -320,15 +400,16 @@ const App: React.FC = () => {
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-indigo-400 text-[8px] font-black uppercase tracking-widest">Personal AI</p>
-                  <p className="text-zinc-300 font-bold italic text-[10px] leading-tight line-clamp-2">"O segredo é não parar."</p>
+                  <p className="text-zinc-300 font-bold italic text-[10px] leading-tight line-clamp-2">"O único treino ruim é aquele que você não fez."</p>
                 </div>
              </div>
           </div>
         </div>
 
-        {/* Workout Library - Compact Cards */}
         <section className="space-y-3 pt-2">
-          <h2 className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.3em] px-1">Sessões Disponíveis</h2>
+          <div className="flex items-center justify-between px-1">
+             <h2 className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.3em]">Sessões de Treino</h2>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {initialWorkouts.map((workout) => (
               <div 
@@ -354,25 +435,83 @@ const App: React.FC = () => {
 
   const renderWorkoutMode = () => {
     if (!selectedWorkout || !user) return null;
+    
+    if (showSummary) {
+      return (
+        <div className="max-w-xl mx-auto space-y-8 animate-slide-up py-6 text-center">
+           <div className="space-y-4">
+              <div className="mx-auto w-24 h-24 bg-emerald-500 rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-emerald-500/30 transform rotate-12 animate-fade">
+                <CheckCircle2 size={48} className="text-zinc-950" strokeWidth={3} />
+              </div>
+              <div>
+                <h1 className="text-4xl font-black text-white uppercase tracking-tighter italic leading-none">Treino <span className="text-emerald-500">Completo!</span></h1>
+                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] mt-3">Sessão finalizada com sucesso.</p>
+              </div>
+           </div>
+
+           <div className="grid grid-cols-2 gap-4">
+              <div className="glass-card p-6 rounded-[2rem] border border-emerald-500/10 bg-emerald-500/5">
+                 <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1">Volume de Carga</p>
+                 <div className="flex items-end justify-center gap-1">
+                    <span className="text-3xl font-black text-white">{lastWorkoutVolume}</span>
+                    <span className="text-[10px] font-bold text-emerald-500 mb-1.5 uppercase">kg</span>
+                 </div>
+              </div>
+              <div className="glass-card p-6 rounded-[2rem] border border-indigo-500/10 bg-indigo-500/5">
+                 <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1">Frequência</p>
+                 <div className="flex items-end justify-center gap-1">
+                    <span className="text-3xl font-black text-white">{user.streak}</span>
+                    <Flame size={20} className="text-orange-500 mb-1.5" />
+                 </div>
+              </div>
+           </div>
+
+           <div className="glass-card p-8 rounded-[2.5rem] space-y-4 relative overflow-hidden">
+              <Quote className="absolute -top-4 -left-4 text-white/5 w-24 h-24" />
+              <div className="relative z-10">
+                 <p className="text-zinc-300 font-bold italic text-lg leading-relaxed">
+                   "A disciplina é a base da evolução. Hoje você venceu a preguiça."
+                 </p>
+              </div>
+           </div>
+
+           <button 
+             onClick={closeSummary} 
+             className="w-full bg-white text-zinc-950 font-black py-5 rounded-[1.8rem] shadow-xl uppercase tracking-[0.4em] active:scale-95 text-[10px] transition-all flex items-center justify-center gap-3"
+           >
+             <LayoutDashboard size={18} /> Voltar ao Início
+           </button>
+        </div>
+      );
+    }
+
     const totalSets = selectedWorkout.exercises.reduce((acc, ex) => acc + ex.sets, 0);
-    const completedSets = (Object.values(currentSessionProgress) as SetPerformance[][]).reduce((acc, perf) => acc + perf.filter(p => p.completed).length, 0);
+    const completedSets = (Object.values(currentSessionProgress) as SetPerformance[][]).reduce((acc, perf) => acc + (perf ? perf.filter(p => p.completed).length : 0), 0);
     const progressPercent = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
 
     return (
       <div className="space-y-6 animate-slide-up pb-32">
         <header className="flex items-center justify-between">
-          <button onClick={() => { if(confirm('Sair do treino?')) { setSelectedWorkout(null); setActiveTab(AppTab.DASHBOARD); } }} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-[9px] font-black uppercase tracking-widest"><ChevronLeft size={16}/> Voltar</button>
+          <button onClick={exitWorkout} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-all text-[9px] font-black uppercase tracking-widest bg-zinc-900/60 px-4 py-2 rounded-xl border border-white/5 active:scale-95">
+            <ChevronLeft size={16}/> Sair do Treino
+          </button>
           <div className="text-right">
              <div className="flex items-center gap-1.5 justify-end mb-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span className="text-emerald-500 text-[8px] font-black uppercase tracking-widest">Sessão Ativa</span>
+                <span className="text-emerald-500 text-[8px] font-black uppercase tracking-widest">Ativo</span>
              </div>
              <p className="text-lg font-black text-white italic tracking-tighter uppercase">{selectedWorkout.title}</p>
           </div>
         </header>
 
-        <div className="h-2 w-full bg-zinc-900 rounded-full overflow-hidden border border-white/5">
-           <div className="h-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all duration-700 ease-out" style={{ width: `${progressPercent}%` }}></div>
+        <div className="bg-zinc-900/50 p-4 rounded-[1.5rem] border border-white/5">
+           <div className="flex items-center justify-between mb-2 px-1">
+              <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Progresso Total</span>
+              <span className="text-sm font-black text-emerald-500">{progressPercent}%</span>
+           </div>
+           <div className="h-2.5 w-full bg-zinc-950 rounded-full overflow-hidden border border-white/5">
+              <div className="h-full bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.5)] transition-all duration-700 ease-out" style={{ width: `${progressPercent}%` }}></div>
+           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
@@ -387,18 +526,18 @@ const App: React.FC = () => {
           ))}
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 p-5 md:p-8 md:left-[260px] z-50 pointer-events-none">
+        <div className="fixed bottom-0 left-0 right-0 p-5 md:p-8 md:left-[240px] z-50 pointer-events-none">
            <div className="max-w-4xl mx-auto pointer-events-auto">
               <button 
                 onClick={handleFinishWorkout} 
                 disabled={completedSets === 0} 
-                className={`w-full font-black py-5 md:py-6 rounded-[1.8rem] shadow-2xl uppercase tracking-[0.3em] active:scale-95 flex items-center justify-center gap-3 text-[10px] transition-all border-b-4 ${
+                className={`w-full font-black py-5 md:py-6 rounded-[1.8rem] shadow-2xl uppercase tracking-[0.4em] active:scale-95 flex items-center justify-center gap-3 text-[10px] transition-all border-b-4 ${
                   completedSets > 0 
                   ? 'bg-emerald-500 text-zinc-950 border-emerald-700 shadow-emerald-500/30' 
                   : 'bg-zinc-800 text-zinc-600 border-zinc-900 opacity-50 cursor-not-allowed'
                 }`}
               >
-                <CheckCircle2 size={20} strokeWidth={4} /> Finalizar Sessão
+                <CheckCircle2 size={20} strokeWidth={4} /> Concluir e Salvar Sessão
               </button>
            </div>
         </div>
@@ -409,47 +548,53 @@ const App: React.FC = () => {
   const renderHistory = () => (
     <div className="space-y-6 animate-slide-up pb-10">
       <header>
-        <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Histórico de <span className="text-emerald-500">Treinos</span></h1>
-        <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] mt-1 text-[9px]">Sua evolução registrada.</p>
+        <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Meus <span className="text-emerald-500">Registros</span></h1>
+        <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] mt-1 text-[9px]">Sua jornada passo a passo.</p>
       </header>
       
       {user?.history.length === 0 ? (
         <div className="glass-card p-12 rounded-[2.5rem] text-center border border-dashed border-white/10">
            <div className="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center text-zinc-800 mx-auto mb-4"><History size={32} /></div>
-           <p className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.2em]">Sem registros.</p>
+           <p className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.2em]">Nenhum treino salvo ainda.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-          {user?.history.map((entry) => (
-            <div key={entry.id} className="glass-card p-5 md:p-6 rounded-[2rem] space-y-4 border-l-4 border-l-emerald-500">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-black text-white uppercase tracking-tight">{entry.workoutTitle}</h3>
-                  <div className="flex items-center gap-1.5 mt-0.5 text-zinc-500">
-                      <Calendar size={10} />
-                      <p className="text-[8px] font-black uppercase tracking-widest">
-                        {new Date(entry.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
-                      </p>
-                  </div>
-                </div>
-                <span className="bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest border border-emerald-500/20">Check</span>
-              </div>
-              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-white/5">
-                {entry.exercises.slice(0, 4).map((ex, idx) => (
-                  <div key={idx} className="space-y-0.5">
-                    <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest truncate">{ex.name}</p>
-                    <div className="flex flex-wrap gap-1">
-                      {ex.performance.slice(0, 2).map((s, si) => (
-                        <div key={si} className="text-[7px] font-bold bg-zinc-900/80 text-white px-1.5 py-0.5 rounded-md">
-                           {s.weight}kg
-                        </div>
-                      ))}
+          {user?.history.map((entry) => {
+            const vol = entry.exercises.reduce((acc, ex) => acc + (ex.performance ? ex.performance.reduce((sa, p) => sa + (p.weight * p.reps), 0) : 0), 0);
+            return (
+              <div key={entry.id} className="glass-card p-5 md:p-6 rounded-[2rem] space-y-4 border-l-4 border-l-emerald-500">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-black text-white uppercase tracking-tight">{entry.workoutTitle}</h3>
+                    <div className="flex items-center gap-1.5 mt-0.5 text-zinc-500">
+                        <Calendar size={10} />
+                        <p className="text-[8px] font-black uppercase tracking-widest">
+                          {new Date(entry.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </p>
                     </div>
                   </div>
-                ))}
+                  <div className="flex flex-col items-end">
+                    <span className="bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border border-emerald-500/20">OK</span>
+                    <span className="text-[9px] font-bold text-zinc-600 mt-1 uppercase tracking-tighter">{vol}kg movidos</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3 pt-3 border-t border-white/5">
+                  {entry.exercises.slice(0, 4).map((ex, idx) => (
+                    <div key={idx} className="space-y-0.5">
+                      <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest truncate">{ex.name}</p>
+                      <div className="flex flex-wrap gap-1">
+                        {ex.performance && ex.performance.slice(0, 2).map((s, si) => (
+                          <div key={si} className="text-[7px] font-bold bg-zinc-900/80 text-white px-1.5 py-0.5 rounded-md">
+                             {s.weight}kg x {s.reps}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
@@ -458,16 +603,16 @@ const App: React.FC = () => {
   const renderAIAssistant = () => (
     <div className="flex flex-col h-[calc(100vh-10rem)] animate-slide-up pb-10">
        <header className="mb-4">
-          <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Tatu <span className="text-indigo-500">Assistant</span></h1>
-          <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] mt-1 text-[9px]">Dúvidas e motivação.</p>
+          <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Tatu <span className="text-indigo-500">Expert</span></h1>
+          <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] mt-1 text-[9px]">Sua consultoria 24h.</p>
        </header>
        <div className="flex-1 overflow-y-auto space-y-4 px-1 scrollbar-hide mb-4">
           {chatMessages.length === 0 && (
-             <div className="glass-card rounded-[2rem] p-8 text-center space-y-4 max-w-xl mx-auto">
-                <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center text-white mx-auto"><Bot size={28}/></div>
+             <div className="glass-card rounded-[2rem] p-8 text-center space-y-4 max-w-xl mx-auto border border-indigo-500/10 bg-indigo-500/5">
+                <div className="w-14 h-14 bg-indigo-500 rounded-2xl flex items-center justify-center text-white mx-auto shadow-xl shadow-indigo-500/20"><Bot size={32}/></div>
                 <div>
                     <h2 className="text-lg font-black text-white uppercase tracking-tight">Fala, Atleta!</h2>
-                    <p className="text-zinc-500 text-[10px] font-medium mt-1 leading-relaxed">Pronto para otimizar seus ganhos?</p>
+                    <p className="text-zinc-400 text-[10px] font-medium mt-1 leading-relaxed">Alguma dúvida técnica? Estou aqui para calibrar seus ganhos.</p>
                 </div>
              </div>
           )}
@@ -495,15 +640,15 @@ const App: React.FC = () => {
             value={chatInput} 
             onChange={e => setChatInput(e.target.value)} 
             onKeyDown={e => e.key === 'Enter' && handleSendMessage()} 
-            placeholder="Pergunte algo..." 
+            placeholder="Dúvida técnica ou motivação..." 
             className="flex-1 bg-transparent px-4 py-2 text-xs font-bold text-white outline-none placeholder:text-zinc-700" 
           />
           <button 
             onClick={handleSendMessage} 
             disabled={isChatLoading || !chatInput.trim()}
-            className="w-10 h-10 bg-indigo-500 text-white rounded-xl flex items-center justify-center shadow-lg active:scale-90 transition-all disabled:opacity-50"
+            className="w-12 h-12 bg-indigo-500 text-white rounded-2xl flex items-center justify-center shadow-xl active:scale-90 transition-all disabled:opacity-50"
           >
-            <ChevronRight size={20} strokeWidth={3} />
+            <ChevronRight size={24} strokeWidth={3} />
           </button>
        </div>
     </div>
@@ -520,7 +665,7 @@ const App: React.FC = () => {
       const responseText = await chatWithPersonal(chatMessages.map(m => ({ role: m.role, parts: [{ text: m.text }] })), userMsg);
       setChatMessages(prev => [...prev, { role: 'model', text: responseText }]);
     } catch (error) {
-      setChatMessages(prev => [...prev, { role: 'model', text: "Conexão interrompida. Tente novamente." }]);
+      setChatMessages(prev => [...prev, { role: 'model', text: "Erro na conexão AI. Verifique sua rede." }]);
     } finally {
       setIsChatLoading(false);
     }
@@ -530,12 +675,12 @@ const App: React.FC = () => {
     <div className="max-w-md mx-auto space-y-8 py-8 animate-slide-up relative z-10 text-center">
       <div className="space-y-4">
         <div className="mx-auto w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-xl mb-4 transform rotate-12 glow-emerald"><Zap size={32} className="text-zinc-950" fill="currentColor" /></div>
-        <h1 className="text-3xl font-black text-white uppercase tracking-tighter italic leading-none">Perfil <span className="text-emerald-500">Biométrico</span></h1>
-        <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-[0.2em] px-8 leading-relaxed">Configure seus dados para calibração.</p>
+        <h1 className="text-3xl font-black text-white uppercase tracking-tighter italic leading-none">Perfil <span className="text-emerald-500">Body</span></h1>
+        <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-[0.2em] px-8 leading-relaxed">Dados essenciais para calibragem de IMC.</p>
       </div>
       <div className="glass-card p-8 rounded-[2.5rem] space-y-6">
         <div className="space-y-2 text-left">
-          <label className="text-[8px] font-black text-zinc-500 uppercase ml-4 tracking-[0.4em]">Peso (kg)</label>
+          <label className="text-[8px] font-black text-zinc-500 uppercase ml-4 tracking-[0.4em]">Peso Atual (kg)</label>
           <input type="number" inputMode="decimal" step="0.1" value={user?.weight || ''} onChange={e => handleUpdateProfile({ weight: parseFloat(e.target.value) || 0 })} className="w-full bg-zinc-900/60 border border-white/10 rounded-[1.5rem] p-5 text-white font-black text-xl outline-none focus:border-emerald-500/50 text-center" placeholder="0.0" />
         </div>
         <div className="space-y-2 text-left">
@@ -543,33 +688,36 @@ const App: React.FC = () => {
           <input type="number" inputMode="decimal" step="0.01" value={user?.height || ''} onChange={e => handleUpdateProfile({ height: parseFloat(e.target.value) || 0 })} className="w-full bg-zinc-900/60 border border-white/10 rounded-[1.5rem] p-5 text-white font-black text-xl outline-none focus:border-emerald-500/50 text-center" placeholder="1.75" />
         </div>
       </div>
-      <button onClick={() => { if (!user?.weight || !user?.height) return alert('Preencha os dados.'); handleUpdateProfile({ isProfileComplete: true }); setActiveTab(AppTab.DASHBOARD); }} className="w-full bg-white text-zinc-950 font-black py-5 rounded-[1.8rem] shadow-xl uppercase tracking-[0.4em] active:scale-95 text-xs transition-all hover:bg-emerald-500">Confirmar</button>
+      <button onClick={() => { if (!user?.weight || !user?.height) return alert('Por favor, insira peso e altura.'); handleUpdateProfile({ isProfileComplete: true }); setActiveTab(AppTab.DASHBOARD); }} className="w-full bg-white text-zinc-950 font-black py-5 rounded-[1.8rem] shadow-xl uppercase tracking-[0.4em] active:scale-95 text-xs transition-all hover:bg-emerald-500">Salvar Dados</button>
     </div>
   );
 
   const renderSettings = () => (
     <div className="space-y-5 animate-slide-up pb-10 max-w-2xl">
-      <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Meu <span className="text-emerald-500">Perfil</span></h1>
+      <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Meu <span className="text-emerald-500">Painel</span></h1>
       <div className="glass-card p-8 md:p-10 rounded-[2.5rem] space-y-8">
          <div className="flex flex-col md:flex-row items-center gap-6">
-           <div className="w-20 h-20 rounded-[1.8rem] bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center text-white text-3xl font-black shadow-xl border-2 border-zinc-900">{user?.name.charAt(0)}</div>
+           <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center text-white text-4xl font-black shadow-xl border-4 border-zinc-900">{user?.name.charAt(0)}</div>
            <div className="text-center md:text-left">
-             <h3 className="text-xl font-black text-white uppercase tracking-tight">{user?.name}</h3>
-             <span className="inline-block mt-1 text-emerald-500 text-[8px] font-black uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/10">Nível: Pro</span>
+             <h3 className="text-2xl font-black text-white uppercase tracking-tight">{user?.name}</h3>
+             <div className="flex items-center gap-2 mt-2">
+                <span className="inline-block text-emerald-500 text-[9px] font-black uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/10">Nível: Pro</span>
+                <span className="inline-block text-orange-400 text-[9px] font-black uppercase tracking-widest bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/10">{user?.streak} dias seguidos</span>
+             </div>
            </div>
          </div>
          <div className="grid grid-cols-2 gap-4">
             <div className="bg-zinc-900/40 p-6 rounded-[1.8rem] border border-white/5 space-y-0.5 text-center">
-              <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Peso</p>
-              <p className="text-2xl font-black text-white">{user?.weight}kg</p>
+              <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Massa</p>
+              <p className="text-3xl font-black text-white">{user?.weight}<span className="text-sm ml-1 text-zinc-500">kg</span></p>
             </div>
             <div className="bg-zinc-900/40 p-6 rounded-[1.8rem] border border-white/5 space-y-0.5 text-center">
-              <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Altura</p>
-              <p className="text-2xl font-black text-white">{user?.height}m</p>
+              <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Estatura</p>
+              <p className="text-3xl font-black text-white">{user?.height}<span className="text-sm ml-1 text-zinc-500">m</span></p>
             </div>
          </div>
          <div className="pt-2">
-             <button onClick={() => { setIsLoggedIn(false); setUser(null); }} className="w-full bg-red-500/5 text-red-500 py-4 rounded-[1.5rem] font-black uppercase tracking-[0.3em] active:scale-95 border border-red-500/10 flex items-center justify-center gap-2 text-[10px]"><LogOut size={16}/> Sair do App</button>
+             <button onClick={() => { if(confirm('Sair da conta?')) { setIsLoggedIn(false); setUser(null); } }} className="w-full bg-red-500/5 text-red-500 py-4 rounded-[1.5rem] font-black uppercase tracking-[0.3em] active:scale-95 border border-red-500/10 flex items-center justify-center gap-2 text-[10px]"><LogOut size={16}/> Encerrar Sessão</button>
          </div>
       </div>
     </div>
@@ -578,7 +726,6 @@ const App: React.FC = () => {
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-5 relative overflow-hidden bg-black">
-        {/* Background Layer with fix for mobile aspect ratio */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <div 
             className="absolute inset-0 opacity-60" 
@@ -593,9 +740,8 @@ const App: React.FC = () => {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
         </div>
         
-        <style>{`@keyframes kenburns { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.15) translate(-2%, -2%); } }`}</style>
+        <style>{`@keyframes kenburns { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.1) translate(-2%, -2%); } }`}</style>
 
-        {/* Login Form Container */}
         <div className="w-full max-w-xs space-y-10 animate-fade relative z-10 flex flex-col items-center">
           <div className="text-center space-y-4">
             <div className="mx-auto w-20 h-20 bg-emerald-500 rounded-[2.2rem] flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.3)] transform rotate-6 animate-pulse">
@@ -605,7 +751,7 @@ const App: React.FC = () => {
               <h1 className="text-5xl font-black text-white tracking-tighter uppercase leading-none italic drop-shadow-2xl">
                 TATU<span className="text-emerald-500">GYM</span>
               </h1>
-              <p className="text-zinc-400 text-[9px] font-black uppercase tracking-[0.5em] mt-2 opacity-80">Personal AI System</p>
+              <p className="text-zinc-400 text-[9px] font-black uppercase tracking-[0.5em] mt-2 opacity-80">Professional AI Trainer</p>
             </div>
           </div>
 
@@ -622,7 +768,7 @@ const App: React.FC = () => {
                 value={loginData.user} 
                 onChange={e => setLoginData({...loginData, user: e.target.value})} 
                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 text-white font-black text-sm outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all backdrop-blur-xl" 
-                placeholder="USUÁRIO" 
+                placeholder="NOME DE USUÁRIO" 
               />
             </div>
 
@@ -635,17 +781,17 @@ const App: React.FC = () => {
                 value={loginData.pass} 
                 onChange={e => setLoginData({...loginData, pass: e.target.value})} 
                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 text-white font-black text-sm outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all backdrop-blur-xl" 
-                placeholder="SENHA" 
+                placeholder="CÓDIGO DE ACESSO" 
               />
             </div>
 
             <button className="w-full bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black py-5 rounded-2xl shadow-[0_15px_30px_rgba(16,185,129,0.2)] uppercase tracking-[0.3em] active:scale-95 text-xs transition-all mt-2">
-              Acessar Sistema
+              Iniciar Sistema
             </button>
           </form>
 
           <p className="text-zinc-600 text-[8px] font-black uppercase tracking-widest mt-4">
-            Authorized Personnel Only
+            Security Protocol 9860
           </p>
         </div>
       </div>
@@ -654,7 +800,6 @@ const App: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-[#050505] relative overflow-hidden">
-      {/* Sidebar for Desktop */}
       <aside className={`fixed inset-y-0 left-0 z-50 w-[240px] glass-card border-r border-white/5 p-6 flex flex-col transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between mb-10">
           <div className="flex flex-col">
@@ -665,23 +810,21 @@ const App: React.FC = () => {
         </div>
         
         <nav className="flex-1 space-y-2">
-           <NavItem tab={AppTab.DASHBOARD} icon={LayoutDashboard} label="Home" />
-           <NavItem tab={AppTab.HISTORY} icon={History} label="Treinos" />
-           <NavItem tab={AppTab.AI_ASSISTANT} icon={Bot} label="Chat AI" />
-           <NavItem tab={AppTab.SETTINGS} icon={UserIcon} label="Perfil" />
+           <NavItem tab={AppTab.DASHBOARD} icon={LayoutDashboard} label="Dashboard" />
+           <NavItem tab={AppTab.HISTORY} icon={History} label="Histórico" />
+           <NavItem tab={AppTab.AI_ASSISTANT} icon={Bot} label="Personal AI" />
+           <NavItem tab={AppTab.SETTINGS} icon={UserIcon} label="Meu Perfil" />
         </nav>
 
         <div className="pt-4 border-t border-white/5">
-           <button onClick={() => { setIsLoggedIn(false); setUser(null); }} className="flex items-center gap-3 px-5 py-2.5 rounded-xl text-red-500 hover:bg-red-500/10 transition-all w-full">
+           <button onClick={() => { if(confirm('Sair da conta?')) { setIsLoggedIn(false); setUser(null); } }} className="flex items-center gap-3 px-5 py-2.5 rounded-xl text-red-500 hover:bg-red-500/10 transition-all w-full">
              <LogOut size={16} />
              <span className="text-[9px] font-black uppercase tracking-widest">Sair</span>
            </button>
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <main className="flex-1 md:ml-[240px] p-4 md:p-8 relative z-10 max-w-6xl mx-auto w-full">
-        {/* Mobile Navbar */}
         <div className="flex md:hidden items-center justify-between mb-4">
            <h1 className="text-lg font-black text-white italic tracking-tighter">TATU<span className="text-emerald-500">GYM</span></h1>
            <button onClick={() => setIsSidebarOpen(true)} className="p-2 bg-zinc-900 rounded-lg text-zinc-400 border border-white/10"><Menu size={18}/></button>
@@ -690,7 +833,7 @@ const App: React.FC = () => {
         <div className="animate-fade no-scrollbar">
           {activeTab === AppTab.ONBOARDING ? renderOnboarding() : (
             activeTab === AppTab.DASHBOARD ? renderDashboard() : 
-            (activeTab === AppTab.WORKOUT && selectedWorkout) ? renderWorkoutMode() : 
+            (activeTab === AppTab.WORKOUT) ? renderWorkoutMode() : 
             activeTab === AppTab.HISTORY ? renderHistory() : 
             activeTab === AppTab.AI_ASSISTANT ? renderAIAssistant() :
             activeTab === AppTab.SETTINGS ? renderSettings() : null
@@ -698,13 +841,12 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* Mobile Bottom Nav */}
       {activeTab !== AppTab.ONBOARDING && (
-        <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2.5rem)] max-w-sm glass-card border border-white/10 p-1 rounded-[1.8rem] flex md:hidden items-center justify-between shadow-2xl z-50">
-          <button onClick={() => { setActiveTab(AppTab.DASHBOARD); setSelectedWorkout(null); }} className={`p-3.5 rounded-full transition-all ${activeTab === AppTab.DASHBOARD || activeTab === AppTab.WORKOUT ? 'bg-emerald-500 text-zinc-950 shadow-lg' : 'text-zinc-600'}`}><LayoutDashboard size={18}/></button>
-          <button onClick={() => { setActiveTab(AppTab.HISTORY); setSelectedWorkout(null); }} className={`p-3.5 rounded-full transition-all ${activeTab === AppTab.HISTORY ? 'bg-emerald-500 text-zinc-950 shadow-lg' : 'text-zinc-600'}`}><History size={18}/></button>
-          <button onClick={() => { setActiveTab(AppTab.AI_ASSISTANT); setSelectedWorkout(null); }} className={`p-3.5 rounded-full transition-all ${activeTab === AppTab.AI_ASSISTANT ? 'bg-indigo-500 text-white shadow-lg' : 'text-zinc-600'}`}><Bot size={18}/></button>
-          <button onClick={() => { setActiveTab(AppTab.SETTINGS); setSelectedWorkout(null); }} className={`p-3.5 rounded-full transition-all ${activeTab === AppTab.SETTINGS ? 'bg-emerald-500 text-zinc-950 shadow-lg' : 'text-zinc-600'}`}><UserIcon size={18}/></button>
+        <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2.5rem)] max-w-md glass-card border border-white/10 p-1 rounded-[1.8rem] flex md:hidden items-center justify-between shadow-2xl z-50">
+          <button onClick={() => { setActiveTab(AppTab.DASHBOARD); setSelectedWorkout(null); setShowSummary(false); }} className={`p-3.5 rounded-full transition-all ${activeTab === AppTab.DASHBOARD || activeTab === AppTab.WORKOUT ? 'bg-emerald-500 text-zinc-950 shadow-lg' : 'text-zinc-600'}`}><LayoutDashboard size={18}/></button>
+          <button onClick={() => { setActiveTab(AppTab.HISTORY); setSelectedWorkout(null); setShowSummary(false); }} className={`p-3.5 rounded-full transition-all ${activeTab === AppTab.HISTORY ? 'bg-emerald-500 text-zinc-950 shadow-lg' : 'text-zinc-600'}`}><History size={18}/></button>
+          <button onClick={() => { setActiveTab(AppTab.AI_ASSISTANT); setSelectedWorkout(null); setShowSummary(false); }} className={`p-3.5 rounded-full transition-all ${activeTab === AppTab.AI_ASSISTANT ? 'bg-indigo-500 text-white shadow-lg' : 'text-zinc-600'}`}><Bot size={18}/></button>
+          <button onClick={() => { setActiveTab(AppTab.SETTINGS); setSelectedWorkout(null); setShowSummary(false); }} className={`p-3.5 rounded-full transition-all ${activeTab === AppTab.SETTINGS ? 'bg-emerald-500 text-zinc-950 shadow-lg' : 'text-zinc-600'}`}><UserIcon size={18}/></button>
         </nav>
       )}
     </div>
