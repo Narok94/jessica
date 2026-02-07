@@ -15,7 +15,9 @@ import {
   Plus,
   Minus,
   Info,
-  Trophy
+  Trophy,
+  PlayCircle,
+  ExternalLink
 } from 'lucide-react';
 
 declare var confetti: any;
@@ -36,6 +38,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [restTimeLeft, setRestTimeLeft] = useState<number | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
   const timerRef = useRef<number | null>(null);
   
   const [performance, setPerformance] = useState<SetPerformance[]>(() => {
@@ -48,6 +51,16 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
       completed: false
     }));
   });
+
+  const getEmbedUrl = (url: string) => {
+    if (!url) return '';
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      return match && match[2].length === 11 ? `https://www.youtube.com/embed/${match[2]}` : url;
+    }
+    return url;
+  };
 
   const playBeep = () => {
     try {
@@ -327,11 +340,65 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
           </div>
 
           <div className="flex flex-col gap-3">
+            {exercise.videoUrl && (
+              <button 
+                onClick={() => setShowVideo(true)}
+                className="w-full bg-zinc-900 border border-white/5 hover:border-emerald-500/30 rounded-2xl p-4 flex items-center justify-between group transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-emerald-500/10 text-emerald-500 rounded-xl flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-zinc-950 transition-all">
+                    <PlayCircle size={20} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[10px] font-black text-white uppercase tracking-widest">Tutorial em Vídeo</p>
+                    <p className="text-[8px] font-bold text-zinc-500 uppercase">Assista a execução correta</p>
+                  </div>
+                </div>
+                <ExternalLink size={14} className="text-zinc-700 group-hover:text-emerald-500 transition-colors" />
+              </button>
+            )}
+
             <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-2xl p-4 flex items-start gap-3">
               <Info size={16} className="text-indigo-400 mt-0.5 shrink-0" />
               <p className="text-[11px] font-medium text-zinc-400 leading-relaxed">
                 {exercise.notes || 'Foque no controle motor. Sinta o músculo trabalhar em cada fase.'}
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video Modal */}
+      {showVideo && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 animate-fade">
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={() => setShowVideo(false)}></div>
+          <div className="relative w-full max-w-4xl glass-card rounded-[2.5rem] border border-white/10 overflow-hidden shadow-2xl animate-slide-up">
+            <div className="flex items-center justify-between p-6 border-b border-white/5">
+               <div>
+                 <h2 className="text-xl font-black text-white uppercase tracking-tight">{exercise.name}</h2>
+                 <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Guia de Execução</p>
+               </div>
+               <button onClick={() => setShowVideo(false)} className="w-10 h-10 bg-zinc-900 text-zinc-400 rounded-full flex items-center justify-center hover:text-white transition-colors">
+                 <X size={20} />
+               </button>
+            </div>
+            <div className="aspect-video w-full bg-black">
+              {exercise.videoUrl?.includes('embed') || exercise.videoUrl?.includes('youtube') || exercise.videoUrl?.includes('youtu.be') ? (
+                <iframe 
+                  src={getEmbedUrl(exercise.videoUrl)} 
+                  className="w-full h-full"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              ) : (
+                <video src={exercise.videoUrl} controls className="w-full h-full" autoPlay></video>
+              )}
+            </div>
+            <div className="p-6 bg-zinc-900/50">
+               <p className="text-zinc-400 text-sm font-medium leading-relaxed italic">
+                 {exercise.notes || 'Siga as orientações do vídeo para garantir a melhor técnica e evitar lesões.'}
+               </p>
             </div>
           </div>
         </div>
