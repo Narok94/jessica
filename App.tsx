@@ -240,7 +240,6 @@ const App: React.FC = () => {
     if(confirm('Sair do treino? Seu progresso atual está salvo e será mantido para quando você voltar.')) { 
       setSelectedWorkout(null);
       setShowSummary(false);
-      // Force return to Dashboard
       setActiveTab(AppTab.DASHBOARD);
     }
   };
@@ -316,7 +315,7 @@ const App: React.FC = () => {
                }`}
              >
                 {isCheckedInToday ? <Check size={14} strokeWidth={4} /> : <MapPin size={14} strokeWidth={3} />}
-                {isCheckedInToday ? 'Check-in OK' : 'Check-in Agora'}
+                {isCheckedInToday ? 'Check-in OK' : 'Fazer Check-in'}
              </button>
              <div className="glass-card px-4 py-2.5 rounded-xl flex items-center gap-2">
                 <Flame size={14} className="text-orange-500" />
@@ -331,7 +330,7 @@ const App: React.FC = () => {
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 blur-[60px] rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-125"></div>
               <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1.5">
-                  <span className="bg-zinc-950 text-emerald-400 text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">Sugerido</span>
+                  <span className="bg-zinc-950 text-emerald-400 text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">Recomendado</span>
                   <h2 className="text-2xl md:text-3xl font-black text-zinc-950 uppercase tracking-tight">{initialWorkouts[0]?.title || 'Treino A'}</h2>
                   <div className="flex gap-3 text-zinc-900/70 font-black text-[10px] uppercase">
                     <span className="flex items-center gap-1"><Clock size={12}/> ~45 min</span>
@@ -365,13 +364,13 @@ const App: React.FC = () => {
                       }`}
                     >
                       <span className="text-[10px] md:text-xs font-black">{day.label}</span>
-                      {day.today && !day.active && <div className="w-1 h-1 bg-emerald-500 rounded-full mt-1"></div>}
+                      {day.today && !day.active && <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-1.5"></div>}
                     </button>
                   </div>
                 ))}
               </div>
               {!isCheckedInToday && (
-                <p className="text-center text-[8px] font-black text-emerald-500/60 uppercase tracking-widest animate-fade">Clique no dia atual para marcar check-in!</p>
+                <p className="text-center text-[8px] font-black text-emerald-500/80 uppercase tracking-widest animate-fade">Clique no dia atual para marcar presença!</p>
               )}
             </div>
           </div>
@@ -400,7 +399,7 @@ const App: React.FC = () => {
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-indigo-400 text-[8px] font-black uppercase tracking-widest">Personal AI</p>
-                  <p className="text-zinc-300 font-bold italic text-[10px] leading-tight line-clamp-2">"O único treino ruim é aquele que você não fez."</p>
+                  <p className="text-zinc-300 font-bold italic text-[10px] leading-tight line-clamp-2">"O resultado vem para quem não desiste."</p>
                 </div>
              </div>
           </div>
@@ -408,7 +407,7 @@ const App: React.FC = () => {
 
         <section className="space-y-3 pt-2">
           <div className="flex items-center justify-between px-1">
-             <h2 className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.3em]">Sessões de Treino</h2>
+             <h2 className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.3em]">Minhas Sessões</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {initialWorkouts.map((workout) => (
@@ -444,7 +443,7 @@ const App: React.FC = () => {
                 <CheckCircle2 size={48} className="text-zinc-950" strokeWidth={3} />
               </div>
               <div>
-                <h1 className="text-4xl font-black text-white uppercase tracking-tighter italic leading-none">Treino <span className="text-emerald-500">Completo!</span></h1>
+                <h1 className="text-4xl font-black text-white uppercase tracking-tighter italic leading-none">Treino <span className="text-emerald-500">Concluído!</span></h1>
                 <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] mt-3">Sessão finalizada com sucesso.</p>
               </div>
            </div>
@@ -470,7 +469,7 @@ const App: React.FC = () => {
               <Quote className="absolute -top-4 -left-4 text-white/5 w-24 h-24" />
               <div className="relative z-10">
                  <p className="text-zinc-300 font-bold italic text-lg leading-relaxed">
-                   "A disciplina é a base da evolução. Hoje você venceu a preguiça."
+                   "A constância é a mãe da evolução. Parabéns por hoje."
                  </p>
               </div>
            </div>
@@ -479,7 +478,7 @@ const App: React.FC = () => {
              onClick={closeSummary} 
              className="w-full bg-white text-zinc-950 font-black py-5 rounded-[1.8rem] shadow-xl uppercase tracking-[0.4em] active:scale-95 text-[10px] transition-all flex items-center justify-center gap-3"
            >
-             <LayoutDashboard size={18} /> Voltar ao Início
+             <LayoutDashboard size={18} /> Voltar para o Dashboard
            </button>
         </div>
       );
@@ -493,12 +492,12 @@ const App: React.FC = () => {
       <div className="space-y-6 animate-slide-up pb-32">
         <header className="flex items-center justify-between">
           <button onClick={exitWorkout} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-all text-[9px] font-black uppercase tracking-widest bg-zinc-900/60 px-4 py-2 rounded-xl border border-white/5 active:scale-95">
-            <ChevronLeft size={16}/> Sair do Treino
+            <ChevronLeft size={16}/> Voltar
           </button>
           <div className="text-right">
              <div className="flex items-center gap-1.5 justify-end mb-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span className="text-emerald-500 text-[8px] font-black uppercase tracking-widest">Ativo</span>
+                <span className="text-emerald-500 text-[8px] font-black uppercase tracking-widest">Sessão Ativa</span>
              </div>
              <p className="text-lg font-black text-white italic tracking-tighter uppercase">{selectedWorkout.title}</p>
           </div>
@@ -506,7 +505,7 @@ const App: React.FC = () => {
 
         <div className="bg-zinc-900/50 p-4 rounded-[1.5rem] border border-white/5">
            <div className="flex items-center justify-between mb-2 px-1">
-              <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Progresso Total</span>
+              <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Conclusão do Treino</span>
               <span className="text-sm font-black text-emerald-500">{progressPercent}%</span>
            </div>
            <div className="h-2.5 w-full bg-zinc-950 rounded-full overflow-hidden border border-white/5">
@@ -537,7 +536,7 @@ const App: React.FC = () => {
                   : 'bg-zinc-800 text-zinc-600 border-zinc-900 opacity-50 cursor-not-allowed'
                 }`}
               >
-                <CheckCircle2 size={20} strokeWidth={4} /> Concluir e Salvar Sessão
+                <CheckCircle2 size={20} strokeWidth={4} /> Finalizar Sessão
               </button>
            </div>
         </div>
@@ -548,14 +547,14 @@ const App: React.FC = () => {
   const renderHistory = () => (
     <div className="space-y-6 animate-slide-up pb-10">
       <header>
-        <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Meus <span className="text-emerald-500">Registros</span></h1>
-        <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] mt-1 text-[9px]">Sua jornada passo a passo.</p>
+        <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Meus <span className="text-emerald-500">Treinos</span></h1>
+        <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] mt-1 text-[9px]">Histórico de progresso.</p>
       </header>
       
       {user?.history.length === 0 ? (
         <div className="glass-card p-12 rounded-[2.5rem] text-center border border-dashed border-white/10">
            <div className="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center text-zinc-800 mx-auto mb-4"><History size={32} /></div>
-           <p className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.2em]">Nenhum treino salvo ainda.</p>
+           <p className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.2em]">Sua história começa agora.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
@@ -574,7 +573,7 @@ const App: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border border-emerald-500/20">OK</span>
+                    <span className="bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border border-emerald-500/20">Finalizado</span>
                     <span className="text-[9px] font-bold text-zinc-600 mt-1 uppercase tracking-tighter">{vol}kg movidos</span>
                   </div>
                 </div>
@@ -611,8 +610,8 @@ const App: React.FC = () => {
              <div className="glass-card rounded-[2rem] p-8 text-center space-y-4 max-w-xl mx-auto border border-indigo-500/10 bg-indigo-500/5">
                 <div className="w-14 h-14 bg-indigo-500 rounded-2xl flex items-center justify-center text-white mx-auto shadow-xl shadow-indigo-500/20"><Bot size={32}/></div>
                 <div>
-                    <h2 className="text-lg font-black text-white uppercase tracking-tight">Fala, Atleta!</h2>
-                    <p className="text-zinc-400 text-[10px] font-medium mt-1 leading-relaxed">Alguma dúvida técnica? Estou aqui para calibrar seus ganhos.</p>
+                    <h2 className="text-lg font-black text-white uppercase tracking-tight">O que vamos evoluir hoje?</h2>
+                    <p className="text-zinc-400 text-[10px] font-medium mt-1 leading-relaxed">Tire dúvidas sobre execução, cargas ou peça motivação.</p>
                 </div>
              </div>
           )}
@@ -640,7 +639,7 @@ const App: React.FC = () => {
             value={chatInput} 
             onChange={e => setChatInput(e.target.value)} 
             onKeyDown={e => e.key === 'Enter' && handleSendMessage()} 
-            placeholder="Dúvida técnica ou motivação..." 
+            placeholder="Pergunte ao Tatu..." 
             className="flex-1 bg-transparent px-4 py-2 text-xs font-bold text-white outline-none placeholder:text-zinc-700" 
           />
           <button 
@@ -665,7 +664,7 @@ const App: React.FC = () => {
       const responseText = await chatWithPersonal(chatMessages.map(m => ({ role: m.role, parts: [{ text: m.text }] })), userMsg);
       setChatMessages(prev => [...prev, { role: 'model', text: responseText }]);
     } catch (error) {
-      setChatMessages(prev => [...prev, { role: 'model', text: "Erro na conexão AI. Verifique sua rede." }]);
+      setChatMessages(prev => [...prev, { role: 'model', text: "Conexão interrompida. Tente novamente." }]);
     } finally {
       setIsChatLoading(false);
     }
@@ -676,11 +675,11 @@ const App: React.FC = () => {
       <div className="space-y-4">
         <div className="mx-auto w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-xl mb-4 transform rotate-12 glow-emerald"><Zap size={32} className="text-zinc-950" fill="currentColor" /></div>
         <h1 className="text-3xl font-black text-white uppercase tracking-tighter italic leading-none">Perfil <span className="text-emerald-500">Body</span></h1>
-        <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-[0.2em] px-8 leading-relaxed">Dados essenciais para calibragem de IMC.</p>
+        <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-[0.2em] px-8 leading-relaxed">Calibramos o sistema com seus dados.</p>
       </div>
       <div className="glass-card p-8 rounded-[2.5rem] space-y-6">
         <div className="space-y-2 text-left">
-          <label className="text-[8px] font-black text-zinc-500 uppercase ml-4 tracking-[0.4em]">Peso Atual (kg)</label>
+          <label className="text-[8px] font-black text-zinc-500 uppercase ml-4 tracking-[0.4em]">Peso (kg)</label>
           <input type="number" inputMode="decimal" step="0.1" value={user?.weight || ''} onChange={e => handleUpdateProfile({ weight: parseFloat(e.target.value) || 0 })} className="w-full bg-zinc-900/60 border border-white/10 rounded-[1.5rem] p-5 text-white font-black text-xl outline-none focus:border-emerald-500/50 text-center" placeholder="0.0" />
         </div>
         <div className="space-y-2 text-left">
@@ -688,13 +687,13 @@ const App: React.FC = () => {
           <input type="number" inputMode="decimal" step="0.01" value={user?.height || ''} onChange={e => handleUpdateProfile({ height: parseFloat(e.target.value) || 0 })} className="w-full bg-zinc-900/60 border border-white/10 rounded-[1.5rem] p-5 text-white font-black text-xl outline-none focus:border-emerald-500/50 text-center" placeholder="1.75" />
         </div>
       </div>
-      <button onClick={() => { if (!user?.weight || !user?.height) return alert('Por favor, insira peso e altura.'); handleUpdateProfile({ isProfileComplete: true }); setActiveTab(AppTab.DASHBOARD); }} className="w-full bg-white text-zinc-950 font-black py-5 rounded-[1.8rem] shadow-xl uppercase tracking-[0.4em] active:scale-95 text-xs transition-all hover:bg-emerald-500">Salvar Dados</button>
+      <button onClick={() => { if (!user?.weight || !user?.height) return alert('Insira seus dados.'); handleUpdateProfile({ isProfileComplete: true }); setActiveTab(AppTab.DASHBOARD); }} className="w-full bg-white text-zinc-950 font-black py-5 rounded-[1.8rem] shadow-xl uppercase tracking-[0.4em] active:scale-95 text-xs transition-all hover:bg-emerald-500">Continuar</button>
     </div>
   );
 
   const renderSettings = () => (
     <div className="space-y-5 animate-slide-up pb-10 max-w-2xl">
-      <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Meu <span className="text-emerald-500">Painel</span></h1>
+      <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Minha <span className="text-emerald-500">Conta</span></h1>
       <div className="glass-card p-8 md:p-10 rounded-[2.5rem] space-y-8">
          <div className="flex flex-col md:flex-row items-center gap-6">
            <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center text-white text-4xl font-black shadow-xl border-4 border-zinc-900">{user?.name.charAt(0)}</div>
@@ -702,7 +701,7 @@ const App: React.FC = () => {
              <h3 className="text-2xl font-black text-white uppercase tracking-tight">{user?.name}</h3>
              <div className="flex items-center gap-2 mt-2">
                 <span className="inline-block text-emerald-500 text-[9px] font-black uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/10">Nível: Pro</span>
-                <span className="inline-block text-orange-400 text-[9px] font-black uppercase tracking-widest bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/10">{user?.streak} dias seguidos</span>
+                <span className="inline-block text-orange-400 text-[9px] font-black uppercase tracking-widest bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/10">{user?.streak} dias de sequência</span>
              </div>
            </div>
          </div>
@@ -717,7 +716,7 @@ const App: React.FC = () => {
             </div>
          </div>
          <div className="pt-2">
-             <button onClick={() => { if(confirm('Sair da conta?')) { setIsLoggedIn(false); setUser(null); } }} className="w-full bg-red-500/5 text-red-500 py-4 rounded-[1.5rem] font-black uppercase tracking-[0.3em] active:scale-95 border border-red-500/10 flex items-center justify-center gap-2 text-[10px]"><LogOut size={16}/> Encerrar Sessão</button>
+             <button onClick={() => { if(confirm('Sair da conta?')) { setIsLoggedIn(false); setUser(null); } }} className="w-full bg-red-500/5 text-red-500 py-4 rounded-[1.5rem] font-black uppercase tracking-[0.3em] active:scale-95 border border-red-500/10 flex items-center justify-center gap-2 text-[10px]"><LogOut size={16}/> Sair do App</button>
          </div>
       </div>
     </div>
@@ -751,7 +750,7 @@ const App: React.FC = () => {
               <h1 className="text-5xl font-black text-white tracking-tighter uppercase leading-none italic drop-shadow-2xl">
                 TATU<span className="text-emerald-500">GYM</span>
               </h1>
-              <p className="text-zinc-400 text-[9px] font-black uppercase tracking-[0.5em] mt-2 opacity-80">Professional AI Trainer</p>
+              <p className="text-zinc-400 text-[9px] font-black uppercase tracking-[0.5em] mt-2 opacity-80">Personal AI System</p>
             </div>
           </div>
 
@@ -768,7 +767,7 @@ const App: React.FC = () => {
                 value={loginData.user} 
                 onChange={e => setLoginData({...loginData, user: e.target.value})} 
                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 text-white font-black text-sm outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all backdrop-blur-xl" 
-                placeholder="NOME DE USUÁRIO" 
+                placeholder="USUÁRIO" 
               />
             </div>
 
@@ -781,17 +780,17 @@ const App: React.FC = () => {
                 value={loginData.pass} 
                 onChange={e => setLoginData({...loginData, pass: e.target.value})} 
                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 text-white font-black text-sm outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all backdrop-blur-xl" 
-                placeholder="CÓDIGO DE ACESSO" 
+                placeholder="CÓDIGO" 
               />
             </div>
 
             <button className="w-full bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black py-5 rounded-2xl shadow-[0_15px_30px_rgba(16,185,129,0.2)] uppercase tracking-[0.3em] active:scale-95 text-xs transition-all mt-2">
-              Iniciar Sistema
+              Iniciar Sessão
             </button>
           </form>
 
           <p className="text-zinc-600 text-[8px] font-black uppercase tracking-widest mt-4">
-            Security Protocol 9860
+            Security Protected v2.5
           </p>
         </div>
       </div>
@@ -811,7 +810,7 @@ const App: React.FC = () => {
         
         <nav className="flex-1 space-y-2">
            <NavItem tab={AppTab.DASHBOARD} icon={LayoutDashboard} label="Dashboard" />
-           <NavItem tab={AppTab.HISTORY} icon={History} label="Histórico" />
+           <NavItem tab={AppTab.HISTORY} icon={History} label="Meus Treinos" />
            <NavItem tab={AppTab.AI_ASSISTANT} icon={Bot} label="Personal AI" />
            <NavItem tab={AppTab.SETTINGS} icon={UserIcon} label="Meu Perfil" />
         </nav>

@@ -106,7 +106,10 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
       if (allDone) {
         setIsFinishing(true);
         triggerLocalConfetti();
-        setTimeout(() => setIsFinishing(false), 800);
+        setTimeout(() => {
+          setIsFinishing(false);
+          setIsOpen(false);
+        }, 1200);
       } else if (index < performance.length - 1) {
         startRestTimer();
       }
@@ -116,8 +119,8 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   const triggerLocalConfetti = () => {
     if (typeof confetti !== 'undefined') {
       confetti({
-        particleCount: 40,
-        spread: 70,
+        particleCount: 50,
+        spread: 80,
         origin: { y: 0.7 },
         colors: ['#10b981', '#34d399', '#ffffff'],
         disableForReducedMotion: true
@@ -135,12 +138,24 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   const completedCount = performance.filter(p => p.completed).length;
 
   return (
-    <div className={`glass-card rounded-[2rem] border transition-all duration-500 mb-4 overflow-hidden ${
+    <div className={`glass-card rounded-[2rem] border transition-all duration-500 mb-4 overflow-hidden relative ${
       isOpen 
       ? 'border-emerald-500/40 bg-zinc-900/95 ring-1 ring-emerald-500/10' 
       : 'border-white/5'
-    } ${allSetsDone && !isOpen ? 'opacity-50 grayscale-[0.3] scale-[0.98]' : 'opacity-100 scale-100'} ${isFinishing ? 'scale-[1.05] ring-4 ring-emerald-500/20' : ''}`}>
+    } ${allSetsDone && !isOpen ? 'opacity-50 grayscale-[0.2] scale-[0.98]' : 'opacity-100 scale-100'} 
+      ${isFinishing ? 'scale-[1.03] !border-emerald-400 !bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.3)] z-10' : ''}`}
+    >
+      <style>{`
+        @keyframes success-pulse {
+          0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+          70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .animate-success { animation: success-pulse 1.2s cubic-bezier(0.66, 0, 0, 1); }
+      `}</style>
       
+      {isFinishing && <div className="absolute inset-0 animate-success pointer-events-none rounded-[2rem]" />}
+
       {restTimeLeft !== null && (
         <div className="bg-emerald-500 text-zinc-950 flex items-center justify-between py-1.5 px-5 text-[9px] font-black uppercase tracking-[0.2em] animate-pulse">
           <div className="flex items-center gap-2">
@@ -156,10 +171,10 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
       >
         <div className="flex-1 min-w-0 pr-4">
           <div className="flex items-center gap-2.5 mb-1">
-             <h3 className={`text-lg font-black tracking-tight leading-none truncate transition-all duration-300 ${allSetsDone ? 'text-emerald-500/80 line-through' : 'text-white'}`}>
+             <h3 className={`text-lg font-black tracking-tight leading-none truncate transition-all duration-300 ${allSetsDone ? 'text-emerald-500 line-through' : 'text-white'}`}>
               {exercise.name}
             </h3>
-            {allSetsDone && <CheckCircle2 size={18} className="text-emerald-500 shrink-0 animate-[bounce_0.5s_ease-in-out]" />}
+            {allSetsDone && <CheckCircle2 size={20} className="text-emerald-500 shrink-0 animate-[bounce_0.6s_infinite]" />}
           </div>
           <div className="flex items-center gap-3">
             <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full border transition-colors ${allSetsDone ? 'bg-emerald-500/20 border-emerald-500/30' : 'bg-zinc-800/80 border-white/5'}`}>
@@ -222,10 +237,10 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
             </div>
 
             {performance.map((set, idx) => (
-              <div key={idx} className={`grid grid-cols-12 items-center gap-2 p-2 rounded-2xl border transition-all ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20 opacity-60' : 'bg-zinc-800/40 border-white/5'}`}>
+              <div key={idx} className={`grid grid-cols-12 items-center gap-2 p-2 rounded-2xl border transition-all ${set.completed ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-zinc-800/40 border-white/5'}`}>
                 {/* Set Number */}
                 <div className="col-span-1 flex items-center justify-center">
-                  <div className="w-7 h-7 flex items-center justify-center bg-zinc-900/80 rounded-lg text-[10px] font-black text-zinc-500 border border-white/5">
+                  <div className={`w-7 h-7 flex items-center justify-center rounded-lg text-[10px] font-black border transition-colors ${set.completed ? 'bg-emerald-500 text-zinc-950 border-emerald-400' : 'bg-zinc-900/80 text-zinc-500 border-white/5'}`}>
                     {idx + 1}
                   </div>
                 </div>
