@@ -29,7 +29,8 @@ import {
   ArrowRight,
   Menu,
   X,
-  LayoutDashboard
+  LayoutDashboard,
+  Lock
 } from 'lucide-react';
 
 declare var confetti: any;
@@ -576,25 +577,76 @@ const App: React.FC = () => {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center p-6 relative overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0" style={{ backgroundImage: `url(${LOGIN_IMAGE})`, backgroundSize: 'cover', backgroundPosition: 'center', animation: 'kenburns 20s infinite alternate ease-in-out' }} />
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-[4px]"></div>
+      <div className="min-h-screen w-full flex items-center justify-center p-5 relative overflow-hidden bg-black">
+        {/* Background Layer with fix for mobile aspect ratio */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <div 
+            className="absolute inset-0 opacity-60" 
+            style={{ 
+              backgroundImage: `url(${LOGIN_IMAGE})`, 
+              backgroundSize: 'cover', 
+              backgroundPosition: 'center', 
+              animation: 'kenburns 20s infinite alternate ease-in-out' 
+            }} 
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
         </div>
-        <style>{`@keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.15); } }`}</style>
-        <div className="w-full max-w-sm space-y-8 animate-fade relative z-10">
-          <div className="text-center">
-            <div className="mx-auto w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-2xl mb-6 transform rotate-6 glow-emerald">
-              <Dumbbell size={32} className="text-zinc-950" strokeWidth={3} />
+        
+        <style>{`@keyframes kenburns { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.15) translate(-2%, -2%); } }`}</style>
+
+        {/* Login Form Container */}
+        <div className="w-full max-w-xs space-y-10 animate-fade relative z-10 flex flex-col items-center">
+          <div className="text-center space-y-4">
+            <div className="mx-auto w-20 h-20 bg-emerald-500 rounded-[2.2rem] flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.3)] transform rotate-6 animate-pulse">
+              <Dumbbell size={40} className="text-zinc-950" strokeWidth={3} />
             </div>
-            <h1 className="text-4xl font-black text-white tracking-tighter uppercase leading-none italic">TATU<span className="text-emerald-500">GYM</span></h1>
-            <p className="text-zinc-500 text-[8px] font-black uppercase tracking-[0.5em] mt-3">Personal AI System</p>
+            <div className="space-y-1">
+              <h1 className="text-5xl font-black text-white tracking-tighter uppercase leading-none italic drop-shadow-2xl">
+                TATU<span className="text-emerald-500">GYM</span>
+              </h1>
+              <p className="text-zinc-400 text-[9px] font-black uppercase tracking-[0.5em] mt-2 opacity-80">Personal AI System</p>
+            </div>
           </div>
-          <form onSubmit={(e) => { e.preventDefault(); handleLogin(loginData.user, loginData.pass, true); }} className="space-y-4">
-            <input type="text" value={loginData.user} onChange={e => setLoginData({...loginData, user: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-[1.5rem] p-5 text-white text-center font-black text-sm outline-none focus:border-emerald-500/50 backdrop-blur-md" placeholder="USUÁRIO" />
-            <input type="password" value={loginData.pass} onChange={e => setLoginData({...loginData, pass: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-[1.5rem] p-5 text-white text-center font-black text-sm outline-none focus:border-emerald-500/50 backdrop-blur-md" placeholder="SENHA" />
-            <button className="w-full bg-white text-zinc-950 font-black py-5 rounded-[1.5rem] shadow-xl uppercase tracking-[0.3em] active:scale-95 text-[9px]">Entrar</button>
+
+          <form 
+            onSubmit={(e) => { e.preventDefault(); handleLogin(loginData.user, loginData.pass, true); }} 
+            className="w-full space-y-4"
+          >
+            <div className="relative group">
+              <div className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-emerald-500 transition-colors">
+                <UserIcon size={18} />
+              </div>
+              <input 
+                type="text" 
+                value={loginData.user} 
+                onChange={e => setLoginData({...loginData, user: e.target.value})} 
+                className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 text-white font-black text-sm outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all backdrop-blur-xl" 
+                placeholder="USUÁRIO" 
+              />
+            </div>
+
+            <div className="relative group">
+              <div className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-emerald-500 transition-colors">
+                <Lock size={18} />
+              </div>
+              <input 
+                type="password" 
+                value={loginData.pass} 
+                onChange={e => setLoginData({...loginData, pass: e.target.value})} 
+                className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 text-white font-black text-sm outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all backdrop-blur-xl" 
+                placeholder="SENHA" 
+              />
+            </div>
+
+            <button className="w-full bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black py-5 rounded-2xl shadow-[0_15px_30px_rgba(16,185,129,0.2)] uppercase tracking-[0.3em] active:scale-95 text-xs transition-all mt-2">
+              Acessar Sistema
+            </button>
           </form>
+
+          <p className="text-zinc-600 text-[8px] font-black uppercase tracking-widest mt-4">
+            Authorized Personnel Only
+          </p>
         </div>
       </div>
     );

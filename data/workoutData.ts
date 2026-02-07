@@ -77,74 +77,67 @@ export const jessicaWorkouts: WorkoutRoutine[] = [
 export const henriqueWorkouts: WorkoutRoutine[] = [
   {
     id: 'h-seg',
-    title: 'SEG (Superior)',
-    description: 'Foco em peitoral e tríceps.',
+    title: 'SEG: Peito e Braços',
+    description: 'Foco em HIPERTROFIA. O Segredo: faça a descida bem devagar (3 segundos). Se ficar fácil, segure o elástico mais curto.',
     color: 'blue',
     exercises: [
-      { id: 'hs1', name: 'Flexão Clássica', muscleGroup: 'Peitoral', sets: 4, reps: '10-12', rest: 45 },
-      { id: 'hs2', name: 'Tríceps na Parede (Testa)', muscleGroup: 'Tríceps', sets: 4, reps: '10-12', rest: 30 },
-      { id: 'hs3', name: 'Mergulho no Banco (Dips)', muscleGroup: 'Tríceps', sets: 4, reps: '10-12', rest: 45 },
-      { id: 'hs4', name: 'Flexão Inclinada (Mãos no sofá)', muscleGroup: 'Peitoral', sets: 3, reps: '12', rest: 30 }
+      { id: 'hn1', name: 'Flexão no Chão (Joelhos)', muscleGroup: 'Peito', sets: 4, reps: '12-20', rest: 45, notes: 'Cotovelos a 45° do corpo (formato de "seta") para não pinçar o ombro.' },
+      { id: 'hn2', name: 'Fly com Elástico/Pano', muscleGroup: 'Peito', sets: 4, reps: '12-20', rest: 45, notes: 'Aperte bem um braço contra o outro no meio do peito.' },
+      { id: 'hn3', name: 'Rosca Direta (Elástico/Pano)', muscleGroup: 'Bíceps', sets: 4, reps: '12-20', rest: 45, notes: 'Pise no pano e puxe com força máxima para cima.' },
+      { id: 'hn4', name: 'Tríceps Francês (Elástico)', muscleGroup: 'Tríceps', sets: 4, reps: '12-20', rest: 45, notes: 'Cotovelo apontado para o teto e bem fechado próximo à cabeça.' },
+      { id: 'hn5', name: 'Remada Sentada (Pano/Elástico)', muscleGroup: 'Costas', sets: 4, reps: '12-20', rest: 45, notes: 'Passe o pano nos pés e puxe em direção ao umbigo.' }
     ]
   },
   {
     id: 'h-ter',
-    title: 'TER (Inferior)',
-    description: 'Pernas e glúteos intensos.',
+    title: 'TER: Pernas e Core',
+    description: 'Foco em QUEIMA METABÓLICA (Meta: 14% de gordura). Com o pano, faça mais força contra a própria resistência.',
     color: 'emerald',
     exercises: [
-      { id: 'ht1', name: 'Agachamento Búlgaro', muscleGroup: 'Pernas', sets: 4, reps: '15/15', rest: 45 },
-      { id: 'ht2', name: 'Agachamento Sumô', muscleGroup: 'Pernas', sets: 4, reps: '30', rest: 45 },
-      { id: 'ht3', name: 'Afundo Alternado', muscleGroup: 'Pernas', sets: 4, reps: '20', rest: 30 },
-      { id: 'ht4', name: 'Panturrilha Unilateral', muscleGroup: 'Panturrilha', sets: 4, reps: 'Falha', rest: 30 }
+      { id: 'hn6', name: 'Agachamento Livre', muscleGroup: 'Pernas', sets: 4, reps: '20-30', rest: 45, notes: 'Mantenha o peso nos calcanhares.' },
+      { id: 'hn7', name: 'Afundo Alternado', muscleGroup: 'Pernas', sets: 4, reps: '10/10 a 15/15', rest: 45 },
+      { id: 'hn8', name: 'Abdominal Crunch (Curto)', muscleGroup: 'Abdômen', sets: 4, reps: '20-30', rest: 45, notes: 'Foco total na contração abdominal.' },
+      { id: 'hn9', name: 'Elevação Pélvica', muscleGroup: 'Glúteo', sets: 4, reps: '20-30', rest: 45, notes: 'Suba o quadril e aperte o glúteo no topo.' },
+      { id: 'hn10', name: 'Prancha Isométrica', muscleGroup: 'CORE', sets: 4, reps: '45-60s', rest: 45 }
     ]
   },
   {
     id: 'h-qua',
-    title: 'QUA (Core/HIIT)',
-    description: 'Abdômen e queima calórica.',
-    color: 'orange',
+    title: 'QUA: Peito e Braços',
+    description: 'HIPERTROFIA. Lembre-se: Progressão de carga é a chave. Segure o elástico mais curto para mais resistência.',
+    color: 'blue',
     exercises: [
-      { id: 'hq1', name: 'Abdominal Canivete', muscleGroup: 'Abdômen', sets: 4, reps: '20', rest: 30 },
-      { id: 'hq2', name: 'Prancha Abdominal', muscleGroup: 'CORE', sets: 4, reps: '1 min', rest: 30 },
-      { id: 'hq3', name: 'Bicicleta Abdominal', muscleGroup: 'Abdômen', sets: 4, reps: '1 min', rest: 30 },
-      { id: 'hq4', name: 'Corrida Estacionária', muscleGroup: 'Cardio', sets: 5, reps: '1 min', rest: 30 }
+      { id: 'hn1', name: 'Flexão no Chão (Joelhos)', muscleGroup: 'Peito', sets: 4, reps: '12-20', rest: 45 },
+      { id: 'hn2', name: 'Fly com Elástico/Pano', muscleGroup: 'Peito', sets: 4, reps: '12-20', rest: 45 },
+      { id: 'hn3', name: 'Rosca Direta (Elástico/Pano)', muscleGroup: 'Bíceps', sets: 4, reps: '12-20', rest: 45 },
+      { id: 'hn4', name: 'Tríceps Francês (Elástico)', muscleGroup: 'Tríceps', sets: 4, reps: '12-20', rest: 45 },
+      { id: 'hn5', name: 'Remada Sentada (Pano/Elástico)', muscleGroup: 'Costas', sets: 4, reps: '12-20', rest: 45 }
     ]
   },
   {
     id: 'h-qui',
-    title: 'QUI (Full Body)',
-    description: 'Trabalho de corpo inteiro.',
-    color: 'purple',
+    title: 'QUI: Pernas e Core',
+    description: 'Foco em QUEIMA. Não pare! A consistência é o que vai reduzir esses 4% de gordura.',
+    color: 'emerald',
     exercises: [
-      { id: 'hqi1', name: 'Agachamento com Salto', muscleGroup: 'Pernas/Cardio', sets: 4, reps: '20', rest: 45 },
-      { id: 'hqi2', name: 'Flexão Aberta', muscleGroup: 'Peitoral', sets: 3, reps: '10-12', rest: 45 },
-      { id: 'hqi3', name: 'Ponte para Glúteo', muscleGroup: 'Glúteo', sets: 4, reps: '25', rest: 30 },
-      { id: 'hqi4', name: 'Polichinelos', muscleGroup: 'Cardio', sets: 4, reps: '1 min', rest: 30 }
+      { id: 'hn6', name: 'Agachamento Livre', muscleGroup: 'Pernas', sets: 4, reps: '20-30', rest: 45 },
+      { id: 'hn7', name: 'Afundo Alternado', muscleGroup: 'Pernas', sets: 4, reps: '10/10 a 15/15', rest: 45 },
+      { id: 'hn8', name: 'Abdominal Crunch (Curto)', muscleGroup: 'Abdômen', sets: 4, reps: '20-30', rest: 45 },
+      { id: 'hn9', name: 'Elevação Pélvica', muscleGroup: 'Glúteo', sets: 4, reps: '20-30', rest: 45 },
+      { id: 'hn10', name: 'Prancha Isométrica', muscleGroup: 'CORE', sets: 4, reps: '45-60s', rest: 45 }
     ]
   },
   {
     id: 'h-sex',
-    title: 'SEX (Exaustão)',
-    description: 'Isometria e alta intensidade.',
+    title: 'SEX: Queima Total (DIA DE CHOQUE) ⚡',
+    description: 'DIA DE CHOQUE! Descanso de apenas 30 segundos. Acelere o metabolismo para o final de semana.',
     color: 'red',
     exercises: [
-      { id: 'hsx1', name: 'Agachamento Isométrico', muscleGroup: 'Pernas', sets: 4, reps: 'Falha', rest: 30 },
-      { id: 'hsx2', name: 'Flexão Isométrica (90°)', muscleGroup: 'Peitoral', sets: 3, reps: '20-30s', rest: 30 },
-      { id: 'hsx3', name: 'Prancha Lateral', muscleGroup: 'CORE', sets: 3, reps: '45s/45s', rest: 15 },
-      { id: 'hsx4', name: 'Burpee Adaptado', muscleGroup: 'Cardio', sets: 4, reps: '10-12', rest: 45 }
-    ]
-  },
-  {
-    id: 'h-sab',
-    title: 'SÁB (HIIT/Queima)',
-    description: 'Finalização da semana.',
-    color: 'pink',
-    exercises: [
-      { id: 'hsb1', name: 'Mountain Climbers', muscleGroup: 'Cardio', sets: 5, reps: '45s', rest: 15 },
-      { id: 'hsb2', name: 'Agachamento Lateral', muscleGroup: 'Pernas', sets: 4, reps: '20', rest: 30 },
-      { id: 'hsb3', name: 'Abdominal Infra', muscleGroup: 'Abdômen', sets: 4, reps: '20', rest: 30 },
-      { id: 'hsb4', name: 'Trote ou Caminhada Rápida', muscleGroup: 'Cardio', sets: 1, reps: '20 min', rest: 0 }
+      { id: 'hn6', name: 'Agachamento Livre', muscleGroup: 'Pernas', sets: 4, reps: 'Máximas', rest: 30 },
+      { id: 'hn7', name: 'Afundo Alternado', muscleGroup: 'Pernas', sets: 4, reps: 'Máximas', rest: 30 },
+      { id: 'hn8', name: 'Abdominal Crunch (Curto)', muscleGroup: 'Abdômen', sets: 4, reps: 'Máximas', rest: 30 },
+      { id: 'hn9', name: 'Elevação Pélvica', muscleGroup: 'Glúteo', sets: 4, reps: 'Máximas', rest: 30 },
+      { id: 'hn10', name: 'Polichinelo "Baixo"', muscleGroup: 'Cardio', sets: 4, reps: 'Máximas', rest: 30, notes: 'Sem subir braços acima da linha do ombro.' }
     ]
   }
 ];
