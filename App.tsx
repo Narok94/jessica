@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { jessicaWorkouts, henriqueWorkouts } from './data/workoutData';
+import { jessicaWorkouts, henriqueWorkouts, mariaWorkouts } from './data/workoutData';
 import { AppTab, WorkoutRoutine, User, WorkoutHistoryEntry, SetPerformance } from './types';
 import { ExerciseItem } from './components/ExerciseItem';
 import { 
@@ -66,6 +66,7 @@ const App: React.FC = () => {
     const name = user.username.toLowerCase();
     if (name === 'henrique') return henriqueWorkouts;
     if (name === 'jessica') return jessicaWorkouts;
+    if (name === 'maria') return mariaWorkouts;
     return [];
   }, [user]);
 
@@ -91,7 +92,10 @@ const App: React.FC = () => {
 
   const handleLogin = (usernameInput: string, passwordInput: string, manual: boolean) => {
     const u = usernameInput.trim().toLowerCase();
-    if ((u === 'jessica' || u === 'henrique') && passwordInput === '9860') {
+    const isJessicaOrHenrique = (u === 'jessica' || u === 'henrique') && passwordInput === '9860';
+    const isMaria = u === 'maria' && passwordInput === '6354';
+
+    if (isJessicaOrHenrique || isMaria) {
       const storageKey = `tatugym_user_profile_${u}`;
       const savedUser = localStorage.getItem(storageKey);
       let userData: User;
@@ -118,7 +122,11 @@ const App: React.FC = () => {
       const activeSession = localStorage.getItem(`tatugym_active_session_${u}`);
       if (activeSession) {
         const parsed = JSON.parse(activeSession);
-        const workoutsSet = u === 'henrique' ? henriqueWorkouts : jessicaWorkouts;
+        let workoutsSet: WorkoutRoutine[] = [];
+        if (u === 'henrique') workoutsSet = henriqueWorkouts;
+        else if (u === 'jessica') workoutsSet = jessicaWorkouts;
+        else if (u === 'maria') workoutsSet = mariaWorkouts;
+
         const workout = workoutsSet.find(w => w.id === parsed.workoutId);
         if (workout) {
           setSelectedWorkout(workout);
@@ -780,7 +788,7 @@ const App: React.FC = () => {
                 value={loginData.pass} 
                 onChange={e => setLoginData({...loginData, pass: e.target.value})} 
                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 text-white font-black text-sm outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all backdrop-blur-xl" 
-                placeholder="CÓDIGO" 
+                placeholder="SENHA" 
               />
             </div>
 
