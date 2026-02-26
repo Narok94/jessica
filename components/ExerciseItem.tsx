@@ -214,34 +214,34 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
             </div>
           )}
 
-          <div className="flex flex-col sm:flex-row gap-3">
-             <div className="flex-1 bg-zinc-950/60 border border-white/5 rounded-[1.2rem] p-3 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${restTimeLeft !== null ? 'bg-emerald-500 text-zinc-950' : 'bg-zinc-900 text-zinc-500'}`}>
-                      <Timer size={20} />
+          <div className="flex flex-col gap-3">
+             <div className="bg-zinc-950/80 border border-white/10 rounded-[1.5rem] p-4 flex items-center justify-between shadow-xl">
+                <div className="flex items-center gap-4">
+                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${restTimeLeft !== null ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/30' : 'bg-zinc-900 text-zinc-600 border border-white/5'}`}>
+                      <Timer size={28} strokeWidth={2.5} />
                    </div>
                    <div>
-                      <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Descanso</p>
-                      <p className="text-base font-black text-white">{restTimeLeft !== null ? `${restTimeLeft}s` : `${exercise.rest}s`}</p>
+                      <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-0.5">Descanso</p>
+                      <p className="text-2xl font-black text-white leading-none">{restTimeLeft !== null ? `${restTimeLeft}s` : `${exercise.rest}s`}</p>
                    </div>
                 </div>
                 <div className="flex items-center gap-2">
                    {restTimeLeft !== null ? (
                       <>
-                       <button onClick={cancelRestTimer} className="w-10 h-10 bg-zinc-900 text-zinc-400 rounded-xl flex items-center justify-center border border-white/10 active:scale-90 transition-transform"><X size={18} /></button>
-                       <button onClick={startRestTimer} className="w-10 h-10 bg-emerald-500 text-zinc-950 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-90 transition-transform"><RotateCcw size={18} /></button>
+                       <button onClick={cancelRestTimer} className="w-12 h-12 bg-zinc-900 text-zinc-400 rounded-2xl flex items-center justify-center border border-white/10 active:scale-90 transition-transform hover:text-white hover:border-white/20"><X size={22} /></button>
+                       <button onClick={startRestTimer} className="w-12 h-12 bg-emerald-500 text-zinc-950 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-90 transition-transform hover:bg-emerald-400"><RotateCcw size={22} /></button>
                       </>
                    ) : (
-                     <button onClick={startRestTimer} className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 text-zinc-950 rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-emerald-500/10">
-                       <Play size={12} fill="currentColor" /> Iniciar Timer
+                     <button onClick={startRestTimer} className="flex items-center gap-3 px-6 py-4 bg-emerald-500 text-zinc-950 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-emerald-500/20 hover:bg-emerald-400">
+                       <Play size={16} fill="currentColor" /> Iniciar Timer
                      </button>
                    )}
                 </div>
              </div>
           </div>
 
-          <div className="space-y-3">
-            <div className="grid grid-cols-12 gap-2 text-[8px] font-black text-zinc-600 uppercase tracking-widest px-2">
+          <div className="space-y-4">
+            <div className="grid grid-cols-12 gap-3 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] px-3">
               <div className="col-span-1 text-center">Set</div>
               <div className="col-span-4 text-center">Peso (kg)</div>
               <div className="col-span-4 text-center">Reps</div>
@@ -250,22 +250,22 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
             </div>
 
             {performance.map((set, idx) => (
-              <div key={idx} className={`grid grid-cols-12 items-center gap-2 p-2 rounded-2xl border transition-all ${set.completed ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-zinc-800/40 border-white/5'}`}>
+              <div key={idx} className={`grid grid-cols-12 items-center gap-3 p-3 rounded-[1.8rem] border transition-all duration-300 ${set.completed ? 'bg-emerald-500/10 border-emerald-500/40 shadow-lg shadow-emerald-500/5' : 'bg-zinc-900/40 border-white/10 shadow-md'}`}>
                 {/* Set Number */}
                 <div className="col-span-1 flex items-center justify-center">
-                  <div className={`w-7 h-7 flex items-center justify-center rounded-lg text-[10px] font-black border transition-colors ${set.completed ? 'bg-emerald-500 text-zinc-950 border-emerald-400' : 'bg-zinc-900/80 text-zinc-500 border-white/5'}`}>
+                  <div className={`w-9 h-9 flex items-center justify-center rounded-xl text-xs font-black border transition-all duration-300 ${set.completed ? 'bg-emerald-500 text-zinc-950 border-emerald-400 scale-110' : 'bg-zinc-800/80 text-zinc-500 border-white/5'}`}>
                     {idx + 1}
                   </div>
                 </div>
 
                 {/* Weight Stepper */}
-                <div className="col-span-4 flex items-center bg-zinc-900/50 rounded-xl border border-white/5 overflow-hidden">
+                <div className={`col-span-4 flex items-center rounded-2xl border transition-all duration-300 overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}>
                   <button 
                     disabled={set.completed} 
                     onClick={() => adjustValue(idx, 'weight', -1)} 
-                    className="p-2 text-zinc-500 hover:text-white active:bg-zinc-800 disabled:opacity-30 transition-colors"
+                    className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
                   >
-                    <Minus size={14} strokeWidth={3} />
+                    <Minus size={16} strokeWidth={3} />
                   </button>
                   <input 
                     type="number" 
@@ -273,25 +273,25 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                     value={set.weight} 
                     disabled={set.completed} 
                     onChange={(e) => updateSet(idx, { weight: parseFloat(e.target.value) || 0 })} 
-                    className="w-full bg-transparent text-center text-xs font-black text-white outline-none"
+                    className="w-12 bg-transparent text-center text-sm font-black text-white outline-none"
                   />
                   <button 
                     disabled={set.completed} 
                     onClick={() => adjustValue(idx, 'weight', 1)} 
-                    className="p-2 text-zinc-500 hover:text-white active:bg-zinc-800 disabled:opacity-30 transition-colors"
+                    className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
                   >
-                    <Plus size={14} strokeWidth={3} />
+                    <Plus size={16} strokeWidth={3} />
                   </button>
                 </div>
 
                 {/* Reps Stepper */}
-                <div className="col-span-4 flex items-center bg-zinc-900/50 rounded-xl border border-white/5 overflow-hidden">
+                <div className={`col-span-4 flex items-center rounded-2xl border transition-all duration-300 overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}>
                   <button 
                     disabled={set.completed} 
                     onClick={() => adjustValue(idx, 'reps', -1)} 
-                    className="p-2 text-zinc-500 hover:text-white active:bg-zinc-800 disabled:opacity-30 transition-colors"
+                    className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
                   >
-                    <Minus size={14} strokeWidth={3} />
+                    <Minus size={16} strokeWidth={3} />
                   </button>
                   <input 
                     type="number" 
@@ -299,14 +299,14 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                     value={set.reps} 
                     disabled={set.completed} 
                     onChange={(e) => updateSet(idx, { reps: parseInt(e.target.value) || 0 })} 
-                    className="w-full bg-transparent text-center text-xs font-black text-white outline-none"
+                    className="w-12 bg-transparent text-center text-sm font-black text-white outline-none"
                   />
                   <button 
                     disabled={set.completed} 
                     onClick={() => adjustValue(idx, 'reps', 1)} 
-                    className="p-2 text-zinc-500 hover:text-white active:bg-zinc-800 disabled:opacity-30 transition-colors"
+                    className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
                   >
-                    <Plus size={14} strokeWidth={3} />
+                    <Plus size={16} strokeWidth={3} />
                   </button>
                 </div>
 
@@ -316,7 +316,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                     disabled={set.completed}
                     value={set.rpe}
                     onChange={(e) => updateSet(idx, { rpe: parseInt(e.target.value) })}
-                    className="bg-zinc-900 text-white font-black text-[10px] rounded-lg border border-white/5 p-1 outline-none appearance-none text-center min-w-[34px]"
+                    className={`w-full h-12 text-white font-black text-xs rounded-2xl border transition-all outline-none appearance-none text-center ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}
                   >
                     {[6,7,8,9,10].map(v => <option key={v} value={v}>{v}</option>)}
                   </select>
@@ -326,13 +326,13 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                 <div className="col-span-1 flex items-center justify-center">
                   <button 
                     onClick={() => updateSet(idx, { completed: !set.completed })} 
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
+                    className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 ${
                       set.completed 
-                      ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/20' 
-                      : 'bg-zinc-900 border border-white/10 text-zinc-700 hover:border-emerald-500/30'
+                      ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/30 scale-110' 
+                      : 'bg-zinc-800 border border-white/10 text-zinc-700 hover:border-emerald-500/50 hover:text-emerald-500/50'
                     }`}
                   >
-                    <Check size={18} strokeWidth={4} />
+                    <Check size={22} strokeWidth={4} />
                   </button>
                 </div>
               </div>

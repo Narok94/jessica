@@ -33,7 +33,11 @@ import {
   Lock,
   Sparkles,
   BarChart3,
-  MapPin
+  MapPin,
+  ChevronUp,
+  ChevronDown,
+  ClipboardList,
+  UserCircle2
 } from 'lucide-react';
 
 declare var confetti: any;
@@ -303,139 +307,134 @@ const App: React.FC = () => {
         };
     });
 
+    const getLastCompletedDate = (workoutId: string) => {
+      const entry = user.history.find(h => h.workoutId === workoutId);
+      if (!entry) return null;
+      return new Date(entry.date).toLocaleDateString('pt-BR');
+    };
+
+    const getHistoryCount = (workoutId: string) => {
+      return user.history.filter(h => h.workoutId === workoutId).length;
+    };
+
     return (
-      <div className="space-y-4 animate-slide-up pb-10">
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <h1 className="text-xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">
-              Olá, <span className="text-emerald-500">{user.name}</span>
-            </h1>
-            <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] mt-1 text-[9px]">{greeting}!</p>
-          </div>
-          <div className="flex gap-2">
-             <button 
-               onClick={handleManualCheckIn}
-               disabled={isCheckedInToday}
-               className={`px-6 py-2.5 rounded-xl flex items-center gap-2 transition-all font-black text-[10px] uppercase tracking-widest border ${
-                 isCheckedInToday 
-                 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 cursor-default' 
-                 : 'bg-emerald-500 border-emerald-400 text-zinc-950 hover:scale-105 shadow-lg shadow-emerald-500/20 active:scale-95'
-               }`}
-             >
-                {isCheckedInToday ? <Check size={14} strokeWidth={4} /> : <MapPin size={14} strokeWidth={3} />}
-                {isCheckedInToday ? 'Check-in OK' : 'Fazer Check-in'}
-             </button>
-             <div className="glass-card px-4 py-2.5 rounded-xl flex items-center gap-2">
-                <Flame size={14} className="text-orange-500" />
-                <span className="text-sm font-black text-white">{user.streak || 0}</span>
-             </div>
-          </div>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          <div className="lg:col-span-8 space-y-4">
-            <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-emerald-400 to-emerald-600 p-5 md:p-8 group cursor-pointer" onClick={() => { if(initialWorkouts[0]) { setSelectedWorkout(initialWorkouts[0]); setActiveTab(AppTab.WORKOUT); } }}>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 blur-[60px] rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-125"></div>
-              <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-1.5">
-                  <span className="bg-zinc-950 text-emerald-400 text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">Recomendado</span>
-                  <h2 className="text-2xl md:text-3xl font-black text-zinc-950 uppercase tracking-tight">{initialWorkouts[0]?.title || 'Treino A'}</h2>
-                  <div className="flex gap-3 text-zinc-900/70 font-black text-[10px] uppercase">
-                    <span className="flex items-center gap-1"><Clock size={12}/> ~45 min</span>
-                    <span className="flex items-center gap-1"><Activity size={12}/> {initialWorkouts[0]?.exercises.length} Exs</span>
-                  </div>
-                </div>
-                <div className="bg-zinc-950 text-white w-12 h-12 md:w-16 md:h-16 rounded-[1.5rem] flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
-                   <ArrowRight size={24} strokeWidth={3} />
+      <div className="space-y-6 animate-slide-up pb-10 max-w-2xl mx-auto">
+        {/* Main Training Header Card */}
+        <div className="glass-card rounded-[2rem] p-6 border border-white/10">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center border-2 border-blue-500/50">
+                <UserCircle2 size={40} className="text-blue-500" />
+              </div>
+              <div>
+                <h2 className="text-xl font-black text-white uppercase tracking-tight">Treino ABCD</h2>
+                <div className="flex items-center gap-2 text-zinc-500 text-[10px] font-bold mt-1">
+                  <Calendar size={12} />
+                  <span>14/07/2025 - 22/09/2025</span>
                 </div>
               </div>
             </div>
-
-            <div className="glass-card p-4 md:p-6 rounded-[2rem] space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.3em] flex items-center gap-1.5">
-                  <Calendar size={14} className="text-emerald-500" /> Consistência Semanal
-                </h3>
-              </div>
-              <div className="flex justify-between items-center max-w-lg mx-auto gap-1">
-                {weekActivity.map((day, i) => (
-                  <div key={i} className="flex flex-col items-center gap-2">
-                    <button 
-                      onClick={() => day.today && !day.active ? handleManualCheckIn() : null}
-                      disabled={!day.today || day.active}
-                      className={`w-9 h-11 md:w-12 md:h-14 rounded-[1rem] flex flex-col items-center justify-center transition-all duration-300 border ${
-                        day.active 
-                        ? 'bg-emerald-500 border-emerald-400 text-zinc-950 shadow-lg shadow-emerald-500/20 scale-105' 
-                        : day.today 
-                          ? 'bg-zinc-900 border-emerald-500/50 text-white animate-pulse' 
-                          : 'bg-zinc-900/40 border-white/5 text-zinc-600'
-                      }`}
-                    >
-                      <span className="text-[10px] md:text-xs font-black">{day.label}</span>
-                      {day.today && !day.active && <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-1.5"></div>}
-                    </button>
-                  </div>
-                ))}
-              </div>
-              {!isCheckedInToday && (
-                <p className="text-center text-[8px] font-black text-emerald-500/80 uppercase tracking-widest animate-fade">Clique no dia atual para marcar presença!</p>
-              )}
-            </div>
+            <button className="text-zinc-500 hover:text-white transition-colors">
+              <ChevronUp size={24} />
+            </button>
           </div>
-
-          <div className="lg:col-span-4 space-y-4">
-             <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
-                <div className="glass-card p-4 rounded-[1.5rem] flex flex-col justify-between h-24 md:h-28">
-                  <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Treinos</p>
-                  <div className="flex items-end justify-between">
-                    <span className="text-3xl font-black text-white">{user.totalWorkouts}</span>
-                    <Trophy className="text-emerald-500/20" size={24} />
-                  </div>
-                </div>
-                <div className="glass-card p-4 rounded-[1.5rem] flex flex-col justify-between h-24 md:h-28">
-                  <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">IMC</p>
-                  <div className="flex items-end justify-between">
-                    <span className="text-3xl font-black text-white">{imcInfo.val}</span>
-                    <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">{imcInfo.status}</span>
-                  </div>
-                </div>
-             </div>
-
-             <div className="bg-indigo-600/10 border border-indigo-500/20 p-4 rounded-[1.5rem] flex items-start gap-3 relative overflow-hidden">
-                <div className="w-10 h-10 rounded-lg bg-indigo-500 flex items-center justify-center text-white shadow-lg shrink-0">
-                  <Bot size={20} />
-                </div>
-                <div className="space-y-0.5">
-                  <p className="text-indigo-400 text-[8px] font-black uppercase tracking-widest">Personal AI</p>
-                  <p className="text-zinc-300 font-bold italic text-[10px] leading-tight line-clamp-2">"O resultado vem para quem não desiste."</p>
-                </div>
-             </div>
+          
+          <div className="flex flex-wrap gap-4 mt-6 pt-6 border-t border-white/5">
+            <div className="flex items-center gap-2 text-zinc-400 text-[10px] font-bold uppercase tracking-widest">
+              <Flame size={14} className="text-orange-500" />
+              <span>Redução de Gordura/Hipertrofia</span>
+            </div>
+            <div className="flex items-center gap-2 text-zinc-400 text-[10px] font-bold uppercase tracking-widest">
+              <UserIcon size={14} className="text-blue-500" />
+              <span>Iniciante</span>
+            </div>
           </div>
         </div>
 
-        <section className="space-y-3 pt-2">
-          <div className="flex items-center justify-between px-1">
-             <h2 className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.3em]">Minhas Sessões</h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {initialWorkouts.map((workout) => (
-              <div 
-                key={workout.id}
-                onClick={() => { setSelectedWorkout(workout); setActiveTab(AppTab.WORKOUT); }}
-                className="glass-card p-4 rounded-[1.5rem] border border-white/5 hover:border-emerald-500/20 transition-all cursor-pointer group hover:bg-white/5"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="w-9 h-9 rounded-xl bg-zinc-900 flex items-center justify-center text-zinc-600 group-hover:text-emerald-500 transition-colors">
-                    <Dumbbell size={18} />
+        {/* Workout Cards List */}
+        <div className="space-y-4">
+          {initialWorkouts.map((workout, index) => {
+            const lastDate = getLastCompletedDate(workout.id);
+            const historyCount = getHistoryCount(workout.id);
+            
+            return (
+              <div key={workout.id} className="glass-card rounded-[2rem] overflow-hidden border border-white/5">
+                <div className="p-6 space-y-4">
+                  <div>
+                    <h3 className="text-xl font-black text-white uppercase tracking-tight">Treino {index + 1}</h3>
+                    <p className="text-zinc-500 text-sm font-medium mt-1">{workout.title}</p>
                   </div>
-                  <ChevronRight size={14} className="text-zinc-700 group-hover:text-white" />
+
+                  {lastDate && (
+                    <p className="text-blue-400 text-[10px] font-bold uppercase tracking-widest">
+                      Último treino concluído em: {lastDate}
+                    </p>
+                  )}
+
+                  <div className="grid grid-cols-1 gap-3">
+                    <button className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-white/10 hover:bg-white/5 transition-all group">
+                      <ClipboardList size={16} className="text-blue-500" />
+                      <span className="text-zinc-400 text-[10px] font-black uppercase tracking-widest group-hover:text-white">Histórico</span>
+                      {historyCount > 0 && (
+                        <span className="bg-blue-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                          {historyCount}
+                        </span>
+                      )}
+                    </button>
+                  </div>
+
+                  <button 
+                    onClick={() => { setSelectedWorkout(workout); setActiveTab(AppTab.WORKOUT); }}
+                    className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-600/20 uppercase tracking-[0.2em] active:scale-[0.98] transition-all text-xs"
+                  >
+                    VER TREINO
+                  </button>
                 </div>
-                <h3 className="text-xs font-black text-white uppercase tracking-tight truncate">{workout.title}</h3>
-                <p className="text-[8px] font-bold text-zinc-600 uppercase mt-0.5">{workout.exercises.length} Exs</p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Weekly Consistency (Moved to bottom or kept as is) */}
+        <div className="glass-card p-6 rounded-[2rem] space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.3em] flex items-center gap-1.5">
+              <Calendar size={14} className="text-emerald-500" /> Consistência Semanal
+            </h3>
+            <div className="flex items-center gap-2">
+               <Flame size={14} className="text-orange-500" />
+               <span className="text-sm font-black text-white">{user.streak || 0}</span>
+            </div>
+          </div>
+          <div className="flex justify-between items-center max-w-lg mx-auto gap-1">
+            {weekActivity.map((day, i) => (
+              <div key={i} className="flex flex-col items-center gap-2">
+                <button 
+                  onClick={() => day.today && !day.active ? handleManualCheckIn() : null}
+                  disabled={!day.today || day.active}
+                  className={`w-9 h-11 md:w-12 md:h-14 rounded-[1rem] flex flex-col items-center justify-center transition-all duration-300 border ${
+                    day.active 
+                    ? 'bg-emerald-500 border-emerald-400 text-zinc-950 shadow-lg shadow-emerald-500/20 scale-105' 
+                    : day.today 
+                      ? 'bg-zinc-900 border-emerald-500/50 text-white animate-pulse' 
+                      : 'bg-zinc-900/40 border-white/5 text-zinc-600'
+                  }`}
+                >
+                  <span className="text-[10px] md:text-xs font-black">{day.label}</span>
+                  {day.today && !day.active && <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-1.5"></div>}
+                </button>
               </div>
             ))}
           </div>
-        </section>
+          {!isCheckedInToday && (
+            <button 
+              onClick={handleManualCheckIn}
+              className="w-full py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all"
+            >
+              Fazer Check-in Hoje
+            </button>
+          )}
+        </div>
       </div>
     );
   };
@@ -576,7 +575,7 @@ const App: React.FC = () => {
                     <div className="flex items-center gap-1.5 mt-0.5 text-zinc-500">
                         <Calendar size={10} />
                         <p className="text-[8px] font-black uppercase tracking-widest">
-                          {new Date(entry.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          {new Date(entry.date).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' })}
                         </p>
                     </div>
                   </div>
