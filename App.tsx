@@ -777,9 +777,14 @@ const App: React.FC = () => {
                               <div className="flex items-center gap-2 mt-1">
                                 <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{exercise.muscleGroup}</span>
                                 {exercise.videoUrl && (
-                                  <span className="flex items-center gap-1 text-[8px] font-black text-emerald-500 uppercase bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                                    <Video size={10} /> Vídeo OK
-                                  </span>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <span className="flex items-center gap-1 text-[8px] font-black text-emerald-500 uppercase bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                                      <Video size={10} /> Vídeo OK
+                                    </span>
+                                    <div className="w-12 h-8 rounded-lg overflow-hidden border border-white/10">
+                                      <video src={exercise.videoUrl} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+                                    </div>
+                                  </div>
                                 )}
                               </div>
                             </div>

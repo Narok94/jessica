@@ -218,6 +218,10 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
             <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-white/10 bg-zinc-950 shadow-inner">
               <video 
                 src={exercise.videoUrl} 
+                autoPlay 
+                muted 
+                loop 
+                playsInline 
                 controls 
                 className="w-full h-full object-cover"
               />
