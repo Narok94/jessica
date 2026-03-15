@@ -37,7 +37,10 @@ import {
   ChevronUp,
   ChevronDown,
   ClipboardList,
-  UserCircle2
+  UserCircle2,
+  ShieldCheck,
+  Upload,
+  Video
 } from 'lucide-react';
 
 declare var confetti: any;
@@ -57,6 +60,23 @@ const App: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [lastWorkoutVolume, setLastWorkoutVolume] = useState(0);
+  const [allWorkouts, setAllWorkouts] = useState<{
+    henrique: WorkoutRoutine[],
+    jessica: WorkoutRoutine[],
+    maria: WorkoutRoutine[]
+  }>(() => {
+    const saved = localStorage.getItem('tatugym_all_workouts');
+    if (saved) return JSON.parse(saved);
+    return {
+      henrique: henriqueWorkouts,
+      jessica: jessicaWorkouts,
+      maria: mariaWorkouts
+    };
+  });
+
+  useEffect(() => {
+    localStorage.setItem('tatugym_all_workouts', JSON.stringify(allWorkouts));
+  }, [allWorkouts]);
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
@@ -67,12 +87,9 @@ const App: React.FC = () => {
 
   const initialWorkouts = useMemo(() => {
     if (!user) return [];
-    const name = user.username.toLowerCase();
-    if (name === 'henrique') return henriqueWorkouts;
-    if (name === 'jessica') return jessicaWorkouts;
-    if (name === 'maria') return mariaWorkouts;
-    return [];
-  }, [user]);
+    const name = user.username.toLowerCase() as keyof typeof allWorkouts;
+    return allWorkouts[name] || [];
+  }, [user, allWorkouts]);
 
   useEffect(() => {
     const saved = localStorage.getItem('tatugym_remembered');
@@ -126,10 +143,7 @@ const App: React.FC = () => {
       const activeSession = localStorage.getItem(`tatugym_active_session_${u}`);
       if (activeSession) {
         const parsed = JSON.parse(activeSession);
-        let workoutsSet: WorkoutRoutine[] = [];
-        if (u === 'henrique') workoutsSet = henriqueWorkouts;
-        else if (u === 'jessica') workoutsSet = jessicaWorkouts;
-        else if (u === 'maria') workoutsSet = mariaWorkouts;
+        const workoutsSet = allWorkouts[u as keyof typeof allWorkouts] || [];
 
         const workout = workoutsSet.find(w => w.id === parsed.workoutId);
         if (workout) {
@@ -698,6 +712,112 @@ const App: React.FC = () => {
     </div>
   );
 
+  const updateExerciseVideo = (userName: string, workoutId: string, exerciseId: string, videoUrl: string) => {
+    setAllWorkouts(prev => {
+      const userKey = userName.toLowerCase() as keyof typeof allWorkouts;
+      const updatedWorkouts = prev[userKey].map(w => {
+        if (w.id === workoutId) {
+          return {
+            ...w,
+            exercises: w.exercises.map(e => {
+              if (e.id === exerciseId) {
+                return { ...e, videoUrl };
+              }
+              return e;
+            })
+          };
+        }
+        return w;
+      });
+      return { ...prev, [userKey]: updatedWorkouts };
+    });
+  };
+
+  const renderAdminView = () => {
+    const users = ['Henrique', 'Jessica', 'Maria'];
+    return (
+      <div className="space-y-8 animate-slide-up pb-20">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">
+            Painel <span className="text-emerald-500">Administrativo</span>
+          </h1>
+          <div className="bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-2xl flex items-center gap-2">
+            <ShieldCheck size={16} className="text-emerald-500" />
+            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Acesso Root</span>
+          </div>
+        </div>
+
+        <div className="space-y-10">
+          {users.map(userName => {
+            const userWorkouts = allWorkouts[userName.toLowerCase() as keyof typeof allWorkouts] || [];
+            return (
+              <div key={userName} className="space-y-4">
+                <div className="flex items-center gap-3 px-2">
+                  <div className="w-10 h-10 rounded-2xl bg-zinc-800 flex items-center justify-center text-white font-black text-sm border border-white/5">
+                    {userName.charAt(0)}
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-black text-white uppercase tracking-tight leading-none">{userName}</h2>
+                    <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mt-1">{userWorkouts.length} Planos de Treino</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {userWorkouts.map(workout => (
+                    <div key={workout.id} className="glass-card rounded-[2rem] overflow-hidden border border-white/5">
+                      <div className="p-6 border-b border-white/5 bg-zinc-900/30">
+                        <h3 className="text-sm font-black text-white uppercase tracking-tight">{workout.title}</h3>
+                        <p className="text-[10px] text-zinc-500 mt-1">{workout.description}</p>
+                      </div>
+                      <div className="p-4 space-y-3">
+                        {workout.exercises.map(exercise => (
+                          <div key={exercise.id} className="bg-zinc-950/50 rounded-2xl p-4 border border-white/5 flex items-center justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-black text-white truncate">{exercise.name}</p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{exercise.muscleGroup}</span>
+                                {exercise.videoUrl && (
+                                  <span className="flex items-center gap-1 text-[8px] font-black text-emerald-500 uppercase bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                                    <Video size={10} /> Vídeo OK
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            
+                            <label className="cursor-pointer group">
+                              <input 
+                                type="file" 
+                                accept="video/*" 
+                                className="hidden" 
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => {
+                                      updateExerciseVideo(userName, workout.id, exercise.id, reader.result as string);
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }
+                                }}
+                              />
+                              <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:bg-emerald-500 group-hover:text-zinc-950 transition-all border border-white/5">
+                                <Upload size={18} />
+                              </div>
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   const renderSettings = () => (
     <div className="space-y-5 animate-slide-up pb-10 max-w-2xl">
       <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Minha <span className="text-emerald-500">Conta</span></h1>
@@ -819,6 +939,9 @@ const App: React.FC = () => {
            <NavItem tab={AppTab.DASHBOARD} icon={LayoutDashboard} label="Dashboard" />
            <NavItem tab={AppTab.HISTORY} icon={History} label="Meus Treinos" />
            <NavItem tab={AppTab.AI_ASSISTANT} icon={Bot} label="Personal AI" />
+           {user?.username.toLowerCase() === 'henrique' && (
+             <NavItem tab={AppTab.ADMIN} icon={ShieldCheck} label="Admin Panel" />
+           )}
            <NavItem tab={AppTab.SETTINGS} icon={UserIcon} label="Meu Perfil" />
         </nav>
 
@@ -842,7 +965,8 @@ const App: React.FC = () => {
             (activeTab === AppTab.WORKOUT) ? renderWorkoutMode() : 
             activeTab === AppTab.HISTORY ? renderHistory() : 
             activeTab === AppTab.AI_ASSISTANT ? renderAIAssistant() :
-            activeTab === AppTab.SETTINGS ? renderSettings() : null
+            activeTab === AppTab.SETTINGS ? renderSettings() : 
+            activeTab === AppTab.ADMIN ? renderAdminView() : null
           )}
         </div>
       </main>
@@ -851,6 +975,9 @@ const App: React.FC = () => {
         <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2.5rem)] max-w-md glass-card border border-white/10 p-1 rounded-[1.8rem] flex md:hidden items-center justify-between shadow-2xl z-50">
           <button onClick={() => { setActiveTab(AppTab.DASHBOARD); setSelectedWorkout(null); setShowSummary(false); }} className={`p-3.5 rounded-full transition-all ${activeTab === AppTab.DASHBOARD || activeTab === AppTab.WORKOUT ? 'bg-emerald-500 text-zinc-950 shadow-lg' : 'text-zinc-600'}`}><LayoutDashboard size={18}/></button>
           <button onClick={() => { setActiveTab(AppTab.HISTORY); setSelectedWorkout(null); setShowSummary(false); }} className={`p-3.5 rounded-full transition-all ${activeTab === AppTab.HISTORY ? 'bg-emerald-500 text-zinc-950 shadow-lg' : 'text-zinc-600'}`}><History size={18}/></button>
+          {user?.username.toLowerCase() === 'henrique' && (
+            <button onClick={() => { setActiveTab(AppTab.ADMIN); setSelectedWorkout(null); setShowSummary(false); }} className={`p-3.5 rounded-full transition-all ${activeTab === AppTab.ADMIN ? 'bg-emerald-500 text-zinc-950 shadow-lg' : 'text-zinc-600'}`}><ShieldCheck size={18}/></button>
+          )}
           <button onClick={() => { setActiveTab(AppTab.AI_ASSISTANT); setSelectedWorkout(null); setShowSummary(false); }} className={`p-3.5 rounded-full transition-all ${activeTab === AppTab.AI_ASSISTANT ? 'bg-indigo-500 text-white shadow-lg' : 'text-zinc-600'}`}><Bot size={18}/></button>
           <button onClick={() => { setActiveTab(AppTab.SETTINGS); setSelectedWorkout(null); setShowSummary(false); }} className={`p-3.5 rounded-full transition-all ${activeTab === AppTab.SETTINGS ? 'bg-emerald-500 text-zinc-950 shadow-lg' : 'text-zinc-600'}`}><UserIcon size={18}/></button>
         </nav>

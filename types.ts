@@ -64,5 +64,6 @@ export enum AppTab {
   HISTORY = 'history',
   AI_ASSISTANT = 'ai',
   SETTINGS = 'settings',
-  ONBOARDING = 'onboarding'
+  ONBOARDING = 'onboarding',
+  ADMIN = 'admin'
 }
