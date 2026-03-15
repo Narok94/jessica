@@ -214,6 +214,18 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
             </div>
           )}
 
+          {exercise.image && (
+            <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-white/10 bg-zinc-950 shadow-inner">
+              <img 
+                src={exercise.image} 
+                alt={exercise.name} 
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/60 to-transparent pointer-events-none" />
+            </div>
+          )}
+
           <div className="flex flex-col gap-3">
              <div className="bg-zinc-950/80 border border-white/10 rounded-[1.5rem] p-4 flex items-center justify-between shadow-xl">
                 <div className="flex items-center gap-4">
