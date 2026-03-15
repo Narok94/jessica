@@ -782,7 +782,11 @@ const App: React.FC = () => {
                                       <Video size={10} /> Vídeo OK
                                     </span>
                                     <div className="w-12 h-8 rounded-lg overflow-hidden border border-white/10">
-                                      <video src={exercise.videoUrl} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+                                      {exercise.videoUrl.startsWith('data:image/') || exercise.videoUrl.toLowerCase().endsWith('.gif') ? (
+                                        <img src={exercise.videoUrl} className="w-full h-full object-cover" />
+                                      ) : (
+                                        <video src={exercise.videoUrl} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+                                      )}
                                     </div>
                                   </div>
                                 )}
@@ -792,7 +796,7 @@ const App: React.FC = () => {
                             <label className="cursor-pointer group">
                               <input 
                                 type="file" 
-                                accept="video/*" 
+                                accept="video/*,image/*" 
                                 className="hidden" 
                                 onChange={(e) => {
                                   const file = e.target.files?.[0];

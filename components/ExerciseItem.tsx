@@ -150,6 +150,18 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   const allSetsDone = performance.every(p => p.completed);
   const completedCount = performance.filter(p => p.completed).length;
 
+  const isImageUrl = (url?: string) => {
+    if (!url) return false;
+    return url.startsWith('data:image/') || 
+           url.toLowerCase().endsWith('.gif') || 
+           url.toLowerCase().endsWith('.jpg') || 
+           url.toLowerCase().endsWith('.jpeg') || 
+           url.toLowerCase().endsWith('.png') || 
+           url.toLowerCase().endsWith('.webp');
+  };
+
+  const [mediaError, setMediaError] = useState(false);
+
   return (
     <div className={`glass-card rounded-[2rem] border transition-all duration-500 mb-4 overflow-hidden relative ${
       isOpen 
@@ -214,29 +226,53 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
             </div>
           )}
 
-          {exercise.videoUrl && (
+          {exercise.videoUrl && !mediaError && (
             <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-white/10 bg-zinc-950 shadow-inner">
-              <video 
-                src={exercise.videoUrl} 
-                autoPlay 
-                muted 
-                loop 
-                playsInline 
-                controls 
-                className="w-full h-full object-cover"
-              />
+              {isImageUrl(exercise.videoUrl) ? (
+                <img 
+                  src={exercise.videoUrl} 
+                  alt={exercise.name} 
+                  className="w-full h-full object-cover"
+                  onError={() => setMediaError(true)}
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <video 
+                  src={exercise.videoUrl} 
+                  autoPlay 
+                  muted 
+                  loop 
+                  playsInline 
+                  controls 
+                  className="w-full h-full object-cover"
+                  onError={() => setMediaError(true)}
+                />
+              )}
             </div>
           )}
 
-          {exercise.image && !exercise.videoUrl && (
+          {exercise.image && !exercise.videoUrl && !mediaError && (
             <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-white/10 bg-zinc-950 shadow-inner">
               <img 
                 src={exercise.image} 
                 alt={exercise.name} 
                 className="w-full h-full object-cover"
+                onError={() => setMediaError(true)}
                 referrerPolicy="no-referrer"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/60 to-transparent pointer-events-none" />
+            </div>
+          )}
+
+          {mediaError && (
+            <div className="bg-zinc-900/50 border border-white/5 rounded-3xl p-8 flex flex-col items-center justify-center text-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-zinc-500">
+                <X size={24} />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Mídia Indisponível</p>
+                <p className="text-[8px] font-bold text-zinc-600 uppercase">O link do GIF ou vídeo parece estar quebrado</p>
+              </div>
             </div>
           )}
 
@@ -417,6 +453,8 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 ></iframe>
+              ) : isImageUrl(exercise.videoUrl) ? (
+                <img src={exercise.videoUrl} className="w-full h-full object-contain mx-auto" />
               ) : (
                 <video src={exercise.videoUrl} controls className="w-full h-full" autoPlay></video>
               )}
