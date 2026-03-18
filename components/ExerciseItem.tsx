@@ -17,7 +17,8 @@ import {
   Info,
   Trophy,
   PlayCircle,
-  ExternalLink
+  ExternalLink,
+  Search
 } from 'lucide-react';
 
 declare var confetti: any;
@@ -303,6 +304,14 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                 <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Mídia Indisponível</p>
                 <p className="text-[8px] font-bold text-zinc-600 uppercase">O link do GIF ou vídeo parece estar quebrado</p>
               </div>
+              <a 
+                href={`https://www.google.com/search?q=${encodeURIComponent(exercise.name + ' exercise gif')}&tbm=isch`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 px-6 py-3 bg-zinc-800 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl border border-white/10 hover:bg-zinc-700 hover:border-white/20 transition-all flex items-center gap-2 active:scale-95"
+              >
+                <Search size={14} strokeWidth={3} /> Buscar no Google
+              </a>
             </div>
           )}
 
