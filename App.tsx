@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Dumbbell, 
   LayoutDashboard, 
@@ -163,8 +164,19 @@ const AppContent: React.FC = () => {
     const LOGIN_IMAGE = "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop";
     
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col md:flex-row font-sans selection:bg-blue-500/30">
-        {/* Left Side - Image & Branding */}
+      <div className="min-h-screen bg-zinc-950 flex flex-col md:flex-row font-sans selection:bg-blue-500/30 relative overflow-hidden">
+        {/* Mobile Background Image (Visible only on small screens) */}
+        <div className="md:hidden absolute inset-0 z-0">
+          <img 
+            src={LOGIN_IMAGE} 
+            alt="Gym Background" 
+            className="w-full h-full object-cover opacity-20"
+            referrerPolicy="no-referrer"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-zinc-950/80 to-zinc-950"></div>
+        </div>
+
+        {/* Left Side - Image & Branding (Desktop) */}
         <div className="hidden md:flex md:w-3/5 relative overflow-hidden">
           <img 
             src={LOGIN_IMAGE} 
@@ -174,49 +186,101 @@ const AppContent: React.FC = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/40 to-transparent"></div>
           <div className="relative z-10 p-20 flex flex-col justify-between h-full">
-            <div className="flex items-center gap-4">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="flex items-center gap-4"
+            >
               <div className="p-4 bg-blue-600 rounded-2xl shadow-2xl shadow-blue-600/40">
                 <Dumbbell size={36} className="text-white" strokeWidth={3} />
               </div>
               <h1 className="text-4xl font-black text-white tracking-tighter italic uppercase">Tatu <span className="text-blue-500">Gym</span></h1>
-            </div>
+            </motion.div>
             
             <div className="space-y-8 max-w-xl">
-              <div className="space-y-4">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="space-y-4"
+              >
                 <span className="px-4 py-2 bg-blue-600/10 border border-blue-500/20 rounded-full text-blue-500 text-[10px] font-black uppercase tracking-[0.4em]">Alta Performance</span>
                 <h2 className="text-7xl font-black text-white leading-[0.9] tracking-tighter uppercase italic">
                   TRANSFORME <br /> 
                   SUA <span className="text-blue-500">ROTINA</span> <br />
                   EM RESULTADO.
                 </h2>
-              </div>
-              <p className="text-zinc-400 font-bold uppercase tracking-[0.3em] text-xs leading-relaxed opacity-80">
+              </motion.div>
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 0.4 }}
+                className="text-zinc-400 font-bold uppercase tracking-[0.3em] text-xs leading-relaxed opacity-80"
+              >
                 A plataforma definitiva para quem busca o próximo nível. <br />
                 Treinos personalizados, acompanhamento em tempo real e IA.
-              </p>
+              </motion.p>
             </div>
           </div>
         </div>
 
         {/* Right Side - Login Form */}
-        <div className="flex-1 flex items-center justify-center p-8 bg-zinc-950 relative">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-600/5 via-transparent to-transparent opacity-50"></div>
+        <div className="flex-1 flex items-center justify-center p-6 md:p-8 relative z-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-600/5 via-transparent to-transparent opacity-50 pointer-events-none"></div>
           
-          <div className="w-full max-w-md space-y-12 relative z-10">
-            <div className="md:hidden flex flex-col items-center gap-4 mb-12">
-               <div className="p-5 bg-blue-600 rounded-[2.5rem] shadow-2xl shadow-blue-600/30">
-                  <Dumbbell size={48} className="text-white" strokeWidth={3} />
-               </div>
-               <h1 className="text-4xl font-black text-white tracking-tighter italic uppercase">Tatu <span className="text-blue-500">Gym</span></h1>
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="w-full max-w-md space-y-8 md:space-y-12"
+          >
+            <div className="md:hidden flex flex-col items-center gap-4 mb-8">
+               <motion.div 
+                 initial={{ rotate: -10, scale: 0.8 }}
+                 animate={{ rotate: 0, scale: 1 }}
+                 transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                 className="p-5 bg-blue-600 rounded-[2.5rem] shadow-2xl shadow-blue-600/30"
+               >
+                  <Dumbbell size={42} className="text-white" strokeWidth={3} />
+               </motion.div>
+               <motion.h1 
+                 initial={{ opacity: 0, y: 10 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ delay: 0.2 }}
+                 className="text-4xl font-black text-white tracking-tighter italic uppercase"
+               >
+                 Tatu <span className="text-blue-500">Gym</span>
+               </motion.h1>
             </div>
 
-            <div className="space-y-3">
-              <h3 className="text-4xl font-black text-white tracking-tighter uppercase italic">Acesso</h3>
-              <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] text-[10px]">Entre com suas credenciais para treinar.</p>
+            <div className="space-y-3 text-center md:text-left">
+              <motion.h3 
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase italic"
+              >
+                Acesso
+              </motion.h3>
+              <motion.p 
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-zinc-500 font-bold uppercase tracking-[0.2em] text-[10px]"
+              >
+                Entre com suas credenciais para treinar.
+              </motion.p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-8">
-              <div className="space-y-5">
+            <motion.form 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              onSubmit={handleLogin} 
+              className="space-y-6 md:space-y-8"
+            >
+              <div className="space-y-4 md:space-y-5">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Usuário</label>
                   <div className="relative group">
@@ -225,7 +289,7 @@ const AppContent: React.FC = () => {
                       type="text" 
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl p-5 pl-14 text-white font-bold outline-none focus:border-blue-500/50 focus:bg-zinc-900/60 transition-all placeholder:text-zinc-700"
+                      className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl p-4 md:p-5 pl-14 text-white font-bold outline-none focus:border-blue-500/50 focus:bg-zinc-900/60 transition-all placeholder:text-zinc-700 backdrop-blur-sm"
                       placeholder="Seu nome de usuário"
                       required
                     />
@@ -240,7 +304,7 @@ const AppContent: React.FC = () => {
                       type="password" 
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl p-5 pl-14 text-white font-bold outline-none focus:border-blue-500/50 focus:bg-zinc-900/60 transition-all placeholder:text-zinc-700"
+                      className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl p-4 md:p-5 pl-14 text-white font-bold outline-none focus:border-blue-500/50 focus:bg-zinc-900/60 transition-all placeholder:text-zinc-700 backdrop-blur-sm"
                       placeholder="••••••••"
                       required
                     />
@@ -251,7 +315,7 @@ const AppContent: React.FC = () => {
               <div className="flex items-center justify-between px-1">
                 <label className="flex items-center gap-3 cursor-pointer group">
                   <div className={`w-6 h-6 rounded-xl border flex items-center justify-center transition-all duration-300 ${rememberMe ? 'bg-blue-600 border-blue-600 shadow-lg shadow-blue-600/30' : 'border-white/10 bg-white/5 group-hover:border-white/20'}`}>
-                    {rememberMe && <Check size={16} className="text-white" strokeWidth={4} />}
+                    {rememberMe && <Check size={14} className="text-white" strokeWidth={4} />}
                   </div>
                   <input 
                     type="checkbox" 
@@ -259,27 +323,34 @@ const AppContent: React.FC = () => {
                     checked={rememberMe}
                     onChange={() => setRememberMe(!rememberMe)}
                   />
-                  <span className="text-[11px] font-black text-zinc-500 uppercase tracking-widest group-hover:text-zinc-300 transition-colors">Lembrar acesso</span>
+                  <span className="text-[10px] md:text-[11px] font-black text-zinc-500 uppercase tracking-widest group-hover:text-zinc-300 transition-colors">Lembrar</span>
                 </label>
                 
                 <button type="button" className="text-[10px] font-black text-blue-500 uppercase tracking-widest hover:text-blue-400 transition-colors">Esqueci a senha</button>
               </div>
 
-              <button 
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-6 rounded-2xl shadow-2xl shadow-blue-600/30 uppercase tracking-[0.4em] active:scale-[0.98] transition-all text-xs flex items-center justify-center gap-4 group"
+                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 md:py-6 rounded-2xl shadow-2xl shadow-blue-600/30 uppercase tracking-[0.4em] transition-all text-xs flex items-center justify-center gap-4 group"
               >
                 INICIAR SESSÃO <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-              </button>
-            </form>
+              </motion.button>
+            </motion.form>
 
-            <div className="pt-10 border-t border-white/5 text-center">
-               <p className="text-zinc-600 text-[10px] font-bold uppercase tracking-[0.2em] leading-relaxed">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              className="pt-8 md:pt-10 border-t border-white/5 text-center"
+            >
+               <p className="text-zinc-600 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] leading-relaxed">
                  Acesso restrito a membros autorizados.<br />
                  <span className="text-zinc-700">© 2025 Tatu Gym Pro. Todos os direitos reservados.</span>
                </p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     );
