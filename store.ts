@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import confetti from 'canvas-confetti';
 import { User, WorkoutRoutine, AppTab, SetPerformance, WorkoutHistoryEntry, Badge } from './types';
-import { jessicaWorkouts, henriqueWorkouts, mariaWorkouts } from './data/workoutData';
+import { jessicaWorkouts, henriqueWorkouts, mariaWorkouts, flaviaWorkouts } from './data/workoutData';
 
 interface AppState {
   user: User | null;
@@ -22,6 +22,7 @@ interface AppState {
     henrique: WorkoutRoutine[];
     jessica: WorkoutRoutine[];
     maria: WorkoutRoutine[];
+    flavia: WorkoutRoutine[];
   };
 
   // Actions
@@ -64,7 +65,8 @@ export const useStore = create<AppState>((set, get) => ({
   allWorkouts: {
     henrique: henriqueWorkouts,
     jessica: jessicaWorkouts,
-    maria: mariaWorkouts
+    maria: mariaWorkouts,
+    flavia: flaviaWorkouts
   },
   addToast: undefined,
 

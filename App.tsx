@@ -112,6 +112,12 @@ const AppContent: React.FC = () => {
     const lowerUser = username.toLowerCase();
     
     if (allWorkouts[lowerUser as keyof typeof allWorkouts]) {
+      // Password check for Flavia
+      if (lowerUser === 'flavia' && password !== '6087') {
+        if (addToast) addToast('Senha incorreta para Flavia.', 'error');
+        return;
+      }
+
       let userData: User;
       try {
         const profile = localStorage.getItem(`tatugym_user_profile_${lowerUser}`);
@@ -120,7 +126,9 @@ const AppContent: React.FC = () => {
         } else {
           userData = {
             username: lowerUser,
-            name: username.charAt(0).toUpperCase() + username.slice(1),
+            name: lowerUser === 'flavia' ? 'Flávia Reis' : username.charAt(0).toUpperCase() + username.slice(1),
+            age: lowerUser === 'flavia' ? 41 : undefined,
+            goal: lowerUser === 'flavia' ? 'Saúde/ Tônus muscular' : undefined,
             totalWorkouts: 0,
             history: [],
             weights: {},
@@ -134,7 +142,9 @@ const AppContent: React.FC = () => {
         console.error('Error parsing profile:', error);
         userData = {
           username: lowerUser,
-          name: username.charAt(0).toUpperCase() + username.slice(1),
+          name: lowerUser === 'flavia' ? 'Flávia Reis' : username.charAt(0).toUpperCase() + username.slice(1),
+          age: lowerUser === 'flavia' ? 41 : undefined,
+          goal: lowerUser === 'flavia' ? 'Saúde/ Tônus muscular' : undefined,
           totalWorkouts: 0,
           history: [],
           weights: {},
