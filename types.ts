@@ -31,6 +31,7 @@ export interface WorkoutHistoryEntry {
   date: string; // ISO string
   workoutId: string;
   workoutTitle: string;
+  duration?: number; // in seconds
   exercises: {
     exerciseId: string;
     name: string;
