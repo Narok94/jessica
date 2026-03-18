@@ -334,8 +334,9 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                     <input 
                       type="number" 
                       inputMode="decimal" 
-                      value={set.weight} 
+                      value={set.weight === 0 ? '' : set.weight} 
                       disabled={set.completed} 
+                      onFocus={(e) => e.target.select()}
                       onChange={(e) => updateSet(idx, { weight: parseFloat(e.target.value) || 0 })} 
                       className="w-10 md:w-12 bg-transparent text-center text-sm font-black text-white outline-none"
                     />
@@ -351,7 +352,6 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
 
                 {/* Reps Stepper */}
                 <div className="col-span-5 md:col-span-4 flex flex-col gap-1">
-                  <span className="md:hidden text-[7px] font-black text-zinc-600 uppercase tracking-widest text-center">Reps</span>
                   <div className={`flex items-center rounded-2xl border transition-all duration-300 overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}>
                     <button 
                       disabled={set.completed} 
@@ -363,8 +363,9 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                     <input 
                       type="number" 
                       inputMode="numeric" 
-                      value={set.reps} 
+                      value={set.reps === 0 ? '' : set.reps} 
                       disabled={set.completed} 
+                      onFocus={(e) => e.target.select()}
                       onChange={(e) => updateSet(idx, { reps: parseInt(e.target.value) || 0 })} 
                       className="w-10 md:w-12 bg-transparent text-center text-sm font-black text-white outline-none"
                     />

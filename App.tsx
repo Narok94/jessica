@@ -149,14 +149,22 @@ const App: React.FC = () => {
       const activeSession = localStorage.getItem(`tatugym_active_session_${u}`);
       if (activeSession) {
         const parsed = JSON.parse(activeSession);
-        const workoutsSet = allWorkouts[u as keyof typeof allWorkouts] || [];
+        const sessionTime = new Date(parsed.timestamp).getTime();
+        const now = new Date().getTime();
+        const fiveMinutes = 5 * 60 * 1000;
 
-        const workout = workoutsSet.find(w => w.id === parsed.workoutId);
-        if (workout) {
-          setSelectedWorkout(workout);
-          setCurrentSessionProgress(parsed.progress);
-          setActiveTab(AppTab.WORKOUT);
+        if (now - sessionTime < fiveMinutes) {
+          const workoutsSet = allWorkouts[u as keyof typeof allWorkouts] || [];
+          const workout = workoutsSet.find(w => w.id === parsed.workoutId);
+          if (workout) {
+            setSelectedWorkout(workout);
+            setCurrentSessionProgress(parsed.progress);
+            setActiveTab(AppTab.WORKOUT);
+          } else {
+            setActiveTab(userData.isProfileComplete ? AppTab.DASHBOARD : AppTab.ONBOARDING);
+          }
         } else {
+          localStorage.removeItem(`tatugym_active_session_${u}`);
           setActiveTab(userData.isProfileComplete ? AppTab.DASHBOARD : AppTab.ONBOARDING);
         }
       } else {
@@ -802,11 +810,29 @@ const App: React.FC = () => {
       <div className="glass-card p-8 rounded-[2.5rem] space-y-6">
         <div className="space-y-2 text-left">
           <label className="text-[8px] font-black text-zinc-500 uppercase ml-4 tracking-[0.4em]">Peso (kg)</label>
-          <input type="number" inputMode="decimal" step="0.1" value={user?.weight || ''} onChange={e => handleUpdateProfile({ weight: parseFloat(e.target.value) || 0 })} className="w-full bg-zinc-900/60 border border-white/10 rounded-[1.5rem] p-5 text-white font-black text-xl outline-none focus:border-emerald-500/50 text-center" placeholder="0.0" />
+          <input 
+            type="number" 
+            inputMode="decimal" 
+            step="0.1" 
+            value={user?.weight || ''} 
+            onFocus={(e) => e.target.select()}
+            onChange={e => handleUpdateProfile({ weight: parseFloat(e.target.value) || 0 })} 
+            className="w-full bg-zinc-900/60 border border-white/10 rounded-[1.5rem] p-5 text-white font-black text-xl outline-none focus:border-emerald-500/50 text-center" 
+            placeholder="0.0" 
+          />
         </div>
         <div className="space-y-2 text-left">
           <label className="text-[8px] font-black text-zinc-500 uppercase ml-4 tracking-[0.4em]">Altura (m)</label>
-          <input type="number" inputMode="decimal" step="0.01" value={user?.height || ''} onChange={e => handleUpdateProfile({ height: parseFloat(e.target.value) || 0 })} className="w-full bg-zinc-900/60 border border-white/10 rounded-[1.5rem] p-5 text-white font-black text-xl outline-none focus:border-emerald-500/50 text-center" placeholder="1.75" />
+          <input 
+            type="number" 
+            inputMode="decimal" 
+            step="0.01" 
+            value={user?.height || ''} 
+            onFocus={(e) => e.target.select()}
+            onChange={e => handleUpdateProfile({ height: parseFloat(e.target.value) || 0 })} 
+            className="w-full bg-zinc-900/60 border border-white/10 rounded-[1.5rem] p-5 text-white font-black text-xl outline-none focus:border-emerald-500/50 text-center" 
+            placeholder="1.75" 
+          />
         </div>
       </div>
       <button onClick={() => { if (!user?.weight || !user?.height) return alert('Insira seus dados.'); handleUpdateProfile({ isProfileComplete: true }); setActiveTab(AppTab.DASHBOARD); }} className="w-full bg-white text-zinc-950 font-black py-5 rounded-[1.8rem] shadow-xl uppercase tracking-[0.4em] active:scale-95 text-xs transition-all hover:bg-emerald-500">Continuar</button>
