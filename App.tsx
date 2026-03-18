@@ -146,10 +146,29 @@ const App: React.FC = () => {
       localStorage.setItem(`tatugym_active_session_${user.username.toLowerCase()}`, JSON.stringify({
         workoutId: selectedWorkout.id,
         progress: currentSessionProgress,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        isWorkoutActive,
+        workoutStartTime
       }));
     }
-  }, [selectedWorkout, currentSessionProgress, user, showSummary]);
+  }, [selectedWorkout, currentSessionProgress, user, showSummary, isWorkoutActive, workoutStartTime]);
+
+  // Auto-save progress every 30 seconds during active workout to keep timestamp fresh
+  useEffect(() => {
+    if (!isWorkoutActive || !user || !selectedWorkout || showSummary) return;
+    
+    const interval = setInterval(() => {
+      localStorage.setItem(`tatugym_active_session_${user.username.toLowerCase()}`, JSON.stringify({
+        workoutId: selectedWorkout.id,
+        progress: currentSessionProgress,
+        timestamp: new Date().toISOString(),
+        isWorkoutActive,
+        workoutStartTime
+      }));
+    }, 30000);
+    
+    return () => clearInterval(interval);
+  }, [isWorkoutActive, user, selectedWorkout, currentSessionProgress, showSummary, workoutStartTime]);
 
   const handleLogin = (usernameInput: string, passwordInput: string, manual: boolean) => {
     const u = usernameInput.trim().toLowerCase();
@@ -193,6 +212,8 @@ const App: React.FC = () => {
           if (workout) {
             setSelectedWorkout(workout);
             setCurrentSessionProgress(parsed.progress);
+            setIsWorkoutActive(parsed.isWorkoutActive || false);
+            setWorkoutStartTime(parsed.workoutStartTime || null);
             setActiveTab(AppTab.WORKOUT);
           } else {
             setActiveTab(userData.isProfileComplete ? AppTab.DASHBOARD : AppTab.ONBOARDING);
