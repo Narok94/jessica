@@ -177,6 +177,11 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
           100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
         .animate-success { animation: success-pulse 1.2s cubic-bezier(0.66, 0, 0, 1); }
+        @keyframes bounce-subtle {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-2px); }
+        }
+        .animate-bounce-subtle { animation: bounce-subtle 2s infinite; }
       `}</style>
       
       {isFinishing && <div className="absolute inset-0 animate-success pointer-events-none rounded-[2rem]" />}
@@ -194,21 +199,38 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
         className="p-5 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="flex-1 min-w-0 pr-4">
-          <div className="flex items-center gap-2.5 mb-1">
-             <h3 className={`text-lg font-black tracking-tight leading-none truncate transition-all duration-300 ${allSetsDone ? 'text-emerald-500 line-through' : 'text-white'}`}>
-              {exercise.name}
-            </h3>
-            {allSetsDone && <CheckCircle2 size={20} className="text-emerald-500 shrink-0 animate-[bounce_0.6s_infinite]" />}
-          </div>
-          <div className="flex items-center gap-3">
-            <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full border transition-colors ${allSetsDone ? 'bg-emerald-500/20 border-emerald-500/30' : 'bg-zinc-800/80 border-white/5'}`}>
-                <span className={`text-[10px] font-black ${allSetsDone ? 'text-emerald-400' : 'text-emerald-500'}`}>{completedCount}</span>
-                <span className="text-[9px] font-black text-zinc-500 uppercase">/ {exercise.sets} séries</span>
+        <div className="flex items-center gap-4 flex-1 min-w-0">
+          {/* Small GIF Preview Thumbnail */}
+          {(exercise.image || exercise.videoUrl) && !isOpen && (
+            <div className="w-12 h-12 rounded-xl overflow-hidden border border-white/10 bg-zinc-800 shrink-0 relative group">
+              <img 
+                src={exercise.image || exercise.videoUrl} 
+                alt="" 
+                className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Play size={10} className="text-white fill-white opacity-40" />
+              </div>
             </div>
-            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-              {exercise.reps} reps
-            </p>
+          )}
+          
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2.5 mb-1">
+               <h3 className={`text-lg font-black tracking-tight leading-none truncate transition-all duration-300 ${allSetsDone ? 'text-emerald-500 line-through' : 'text-white'}`}>
+                {exercise.name}
+              </h3>
+              {allSetsDone && <CheckCircle2 size={20} className="text-emerald-500 shrink-0 animate-[bounce_0.6s_infinite]" />}
+            </div>
+            <div className="flex items-center gap-3">
+              <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full border transition-colors ${allSetsDone ? 'bg-emerald-500/20 border-emerald-500/30' : 'bg-zinc-800/80 border-white/5'}`}>
+                  <span className={`text-[10px] font-black ${allSetsDone ? 'text-emerald-400' : 'text-emerald-500'}`}>{completedCount}</span>
+                  <span className="text-[9px] font-black text-zinc-500 uppercase">/ {exercise.sets} séries</span>
+              </div>
+              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                {exercise.reps} reps
+              </p>
+            </div>
           </div>
         </div>
         
@@ -227,7 +249,11 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
           )}
 
           {exercise.videoUrl && !mediaError && (
-            <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-white/10 bg-zinc-950 shadow-inner">
+            <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-white/10 bg-zinc-950 shadow-inner group">
+              <div className="absolute top-4 left-4 z-10 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[8px] font-black text-white uppercase tracking-[0.2em]">Demonstração</span>
+              </div>
               {isImageUrl(exercise.videoUrl) ? (
                 <img 
                   src={exercise.videoUrl} 
@@ -253,6 +279,10 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
 
           {exercise.image && !exercise.videoUrl && !mediaError && (
             <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-white/10 bg-zinc-950 shadow-inner">
+              <div className="absolute top-4 left-4 z-10 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[8px] font-black text-white uppercase tracking-[0.2em]">Demonstração</span>
+              </div>
               <img 
                 src={exercise.image} 
                 alt={exercise.name} 
@@ -321,7 +351,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                 </div>
 
                 {/* Weight Stepper */}
-                <div className="col-span-5 md:col-span-4 flex flex-col gap-1">
+                <div className="col-span-7 md:col-span-4 flex flex-col gap-1">
                   <span className="md:hidden text-[7px] font-black text-zinc-600 uppercase tracking-widest text-center">Peso (kg)</span>
                   <div className={`flex items-center rounded-2xl border transition-all duration-300 overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}>
                     <button 
@@ -350,8 +380,8 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                   </div>
                 </div>
 
-                {/* Reps Stepper */}
-                <div className="col-span-5 md:col-span-4 flex flex-col gap-1">
+                {/* Reps Stepper (Hidden on mobile as per request "Retirar a rep") */}
+                <div className="hidden md:flex col-span-4 flex-col gap-1">
                   <div className={`flex items-center rounded-2xl border transition-all duration-300 overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}>
                     <button 
                       disabled={set.completed} 
@@ -379,8 +409,8 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                   </div>
                 </div>
 
-                {/* RPE Selector */}
-                <div className="col-span-6 md:col-span-2 flex items-center justify-center">
+                {/* RPE Selector (Subtle on mobile) */}
+                <div className="col-span-0 md:col-span-2 hidden md:flex items-center justify-center">
                   <div className="w-full relative">
                     <select 
                       disabled={set.completed}
@@ -390,24 +420,20 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                     >
                       {[6,7,8,9,10].map(v => <option key={v} value={v}>RPE {v}</option>)}
                     </select>
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-600 md:hidden">
-                      <ChevronDown size={12} />
-                    </div>
                   </div>
                 </div>
 
                 {/* Completion Check */}
-                <div className="col-span-6 md:col-span-1 flex items-center justify-center">
+                <div className="col-span-3 md:col-span-1 flex items-center justify-center">
                   <button 
                     onClick={() => updateSet(idx, { completed: !set.completed })} 
-                    className={`w-full md:w-11 h-12 md:h-11 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
                       set.completed 
-                      ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/30 scale-105 md:scale-110' 
+                      ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/30 scale-110' 
                       : 'bg-zinc-800 border border-white/10 text-zinc-700 hover:border-emerald-500/50 hover:text-emerald-500/50'
                     }`}
                   >
                     <Check size={22} strokeWidth={4} />
-                    <span className="md:hidden ml-2 text-[10px] font-black uppercase">Concluir</span>
                   </button>
                 </div>
               </div>

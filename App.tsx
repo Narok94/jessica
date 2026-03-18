@@ -72,12 +72,46 @@ const App: React.FC = () => {
     maria: WorkoutRoutine[]
   }>(() => {
     const saved = localStorage.getItem('tatugym_all_workouts');
-    if (saved) return JSON.parse(saved);
-    return {
+    const initial = {
       henrique: henriqueWorkouts,
       jessica: jessicaWorkouts,
       maria: mariaWorkouts
     };
+    
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Merge logic: ensure GIFs from initial data are present in saved data
+        Object.keys(initial).forEach(userKey => {
+          const key = userKey as keyof typeof initial;
+          if (parsed[key]) {
+            parsed[key] = parsed[key].map((workout: WorkoutRoutine, wIdx: number) => {
+              const initialWorkout = initial[key].find(w => w.id === workout.id);
+              if (!initialWorkout) return workout;
+              return {
+                ...workout,
+                exercises: workout.exercises.map((exercise) => {
+                  const initialExercise = initialWorkout.exercises.find(e => e.id === exercise.id);
+                  if (!initialExercise) return exercise;
+                  return {
+                    ...exercise,
+                    image: exercise.image || initialExercise.image,
+                    videoUrl: exercise.videoUrl || initialExercise.videoUrl
+                  };
+                })
+              };
+            });
+          } else {
+            parsed[key] = initial[key];
+          }
+        });
+        return parsed;
+      } catch (e) {
+        console.error("Error parsing saved workouts", e);
+        return initial;
+      }
+    }
+    return initial;
   });
 
   useEffect(() => {
