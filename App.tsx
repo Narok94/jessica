@@ -679,22 +679,21 @@ const App: React.FC = () => {
               />
             ))}
           </div>
-        </div>
 
-        <div className="fixed bottom-24 md:bottom-0 left-0 right-0 p-5 md:p-8 md:left-[240px] z-[60] pointer-events-none">
-           <div className="max-w-4xl mx-auto pointer-events-auto">
-              <button 
-                onClick={handleFinishWorkout} 
-                disabled={!isWorkoutActive || completedSets === 0} 
-                className={`w-full font-black py-5 md:py-6 rounded-[1.8rem] shadow-2xl uppercase tracking-[0.4em] active:scale-95 flex items-center justify-center gap-3 text-[10px] transition-all border-b-4 ${
-                  isWorkoutActive && completedSets > 0 
-                  ? 'bg-emerald-500 text-zinc-950 border-emerald-700 shadow-emerald-500/30' 
-                  : 'bg-zinc-800 text-zinc-600 border-zinc-900 opacity-50 cursor-not-allowed'
-                }`}
-              >
-                <CheckCircle2 size={20} strokeWidth={4} /> Finalizar Sessão
-              </button>
-           </div>
+          {/* Finish Session Button at the end of the list */}
+          <div className="pt-8 pb-20">
+            <button 
+              onClick={handleFinishWorkout} 
+              disabled={!isWorkoutActive || completedSets === 0} 
+              className={`w-full font-black py-5 md:py-6 rounded-[1.8rem] shadow-2xl uppercase tracking-[0.4em] active:scale-95 flex items-center justify-center gap-3 text-[10px] transition-all border-b-4 ${
+                isWorkoutActive && completedSets > 0 
+                ? 'bg-emerald-500 text-zinc-950 border-emerald-700 shadow-emerald-500/30' 
+                : 'bg-zinc-800 text-zinc-600 border-zinc-900 opacity-50 cursor-not-allowed'
+              }`}
+            >
+              <CheckCircle2 size={20} strokeWidth={4} /> Finalizar Sessão
+            </button>
+          </div>
         </div>
       </div>
     );

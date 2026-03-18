@@ -351,7 +351,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                 </div>
 
                 {/* Weight Stepper */}
-                <div className="col-span-7 md:col-span-4 flex flex-col gap-1">
+                <div className="col-span-5 md:col-span-4 flex flex-col gap-1">
                   <span className="md:hidden text-[7px] font-black text-zinc-600 uppercase tracking-widest text-center">Peso (kg)</span>
                   <div className={`flex items-center rounded-2xl border transition-all duration-300 overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}>
                     <button 
@@ -380,37 +380,25 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                   </div>
                 </div>
 
-                {/* Reps Stepper (Hidden on mobile as per request "Retirar a rep") */}
-                <div className="hidden md:flex col-span-4 flex-col gap-1">
+                {/* Reps Input (Simple numeric field as requested) */}
+                <div className="col-span-3 md:col-span-4 flex flex-col gap-1">
+                  <span className="md:hidden text-[7px] font-black text-zinc-600 uppercase tracking-widest text-center">Reps</span>
                   <div className={`flex items-center rounded-2xl border transition-all duration-300 overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}>
-                    <button 
-                      disabled={set.completed} 
-                      onClick={() => adjustValue(idx, 'reps', -1)} 
-                      className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
-                    >
-                      <Minus size={16} strokeWidth={3} />
-                    </button>
                     <input 
                       type="number" 
                       inputMode="numeric" 
+                      placeholder="0"
                       value={set.reps === 0 ? '' : set.reps} 
                       disabled={set.completed} 
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => updateSet(idx, { reps: parseInt(e.target.value) || 0 })} 
-                      className="w-10 md:w-12 bg-transparent text-center text-sm font-black text-white outline-none"
+                      className="w-full bg-transparent text-center text-sm font-black text-white outline-none px-2"
                     />
-                    <button 
-                      disabled={set.completed} 
-                      onClick={() => adjustValue(idx, 'reps', 1)} 
-                      className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
-                    >
-                      <Plus size={16} strokeWidth={3} />
-                    </button>
                   </div>
                 </div>
 
                 {/* RPE Selector (Subtle on mobile) */}
-                <div className="col-span-0 md:col-span-2 hidden md:flex items-center justify-center">
+                <div className="hidden md:flex md:col-span-2 items-center justify-center">
                   <div className="w-full relative">
                     <select 
                       disabled={set.completed}
@@ -424,16 +412,16 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                 </div>
 
                 {/* Completion Check */}
-                <div className="col-span-3 md:col-span-1 flex items-center justify-center">
+                <div className="col-span-2 md:col-span-1 flex items-center justify-center">
                   <button 
                     onClick={() => updateSet(idx, { completed: !set.completed })} 
-                    className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                    className={`w-10 h-10 md:w-11 md:h-11 rounded-2xl flex items-center justify-center transition-all duration-300 ${
                       set.completed 
-                      ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/30 scale-110' 
+                      ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/30 scale-105' 
                       : 'bg-zinc-800 border border-white/10 text-zinc-700 hover:border-emerald-500/50 hover:text-emerald-500/50'
                     }`}
                   >
-                    <Check size={22} strokeWidth={4} />
+                    <Check size={20} strokeWidth={4} />
                   </button>
                 </div>
               </div>
