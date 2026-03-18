@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { Exercise, SetPerformance } from '../types';
+import { getExerciseGifUrl } from '../src/utils/exerciseUtils';
 import { 
   ChevronDown, 
   Timer, 
@@ -39,7 +40,28 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   const [restTimeLeft, setRestTimeLeft] = useState<number | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
+  const [mediaError, setMediaError] = useState(false);
+  const [currentMediaUrl, setCurrentMediaUrl] = useState<string>('');
   const timerRef = useRef<number | null>(null);
+
+  // Determina a URL da mídia (GitHub primeiro, depois a original)
+  useEffect(() => {
+    const githubUrl = getExerciseGifUrl(exercise.name);
+    setCurrentMediaUrl(githubUrl);
+  }, [exercise.name]);
+
+  const handleMediaError = () => {
+    // Se o link do GitHub falhar, tenta o link original da base de dados
+    if (currentMediaUrl.includes('raw.githubusercontent.com')) {
+      if (exercise.videoUrl || exercise.image) {
+        setCurrentMediaUrl(exercise.videoUrl || exercise.image || '');
+      } else {
+        setMediaError(true);
+      }
+    } else {
+      setMediaError(true);
+    }
+  };
   
   const [performance, setPerformance] = useState<SetPerformance[]>(() => {
     if (initialPerformance && initialPerformance.length > 0) return initialPerformance;
@@ -158,8 +180,6 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
            url.toLowerCase().endsWith('.webp');
   };
 
-  const [mediaError, setMediaError] = useState(false);
-
   return (
     <div className={`glass-card rounded-[2rem] border transition-all duration-500 mb-4 overflow-hidden relative ${
       isOpen 
@@ -199,12 +219,13 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
       >
         <div className="flex items-center gap-4 flex-1 min-w-0">
           {/* Small GIF Preview Thumbnail */}
-          {(exercise.image || exercise.videoUrl) && !isOpen && (
+          {(currentMediaUrl || exercise.image || exercise.videoUrl) && !isOpen && (
             <div className="w-12 h-12 rounded-xl overflow-hidden border border-white/10 bg-zinc-800 shrink-0 relative group">
               <img 
-                src={exercise.image || exercise.videoUrl} 
+                src={currentMediaUrl || exercise.image || exercise.videoUrl} 
                 alt="" 
                 className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity"
+                onError={handleMediaError}
                 referrerPolicy="no-referrer"
               />
               <div className="absolute inset-0 flex items-center justify-center">
@@ -246,49 +267,32 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
             </div>
           )}
 
-          {exercise.videoUrl && !mediaError && (
+          {currentMediaUrl && !mediaError && (
             <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-white/10 bg-zinc-950 shadow-inner group">
               <div className="absolute top-4 left-4 z-10 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[8px] font-black text-white uppercase tracking-[0.2em]">Demonstração</span>
               </div>
-              {isImageUrl(exercise.videoUrl) ? (
+              {isImageUrl(currentMediaUrl) ? (
                 <img 
-                  src={exercise.videoUrl} 
+                  src={currentMediaUrl} 
                   alt={exercise.name} 
                   className="w-full h-full object-cover"
-                  onError={() => setMediaError(true)}
+                  onError={handleMediaError}
                   referrerPolicy="no-referrer"
                 />
               ) : (
                 <video 
-                  src={exercise.videoUrl} 
+                  src={currentMediaUrl} 
                   autoPlay 
                   muted 
                   loop 
                   playsInline 
                   controls 
                   className="w-full h-full object-cover"
-                  onError={() => setMediaError(true)}
+                  onError={handleMediaError}
                 />
               )}
-            </div>
-          )}
-
-          {exercise.image && !exercise.videoUrl && !mediaError && (
-            <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-white/10 bg-zinc-950 shadow-inner">
-              <div className="absolute top-4 left-4 z-10 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[8px] font-black text-white uppercase tracking-[0.2em]">Demonstração</span>
-              </div>
-              <img 
-                src={exercise.image} 
-                alt={exercise.name} 
-                className="w-full h-full object-cover"
-                onError={() => setMediaError(true)}
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/60 to-transparent pointer-events-none" />
             </div>
           )}
 
@@ -478,18 +482,18 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                </button>
             </div>
             <div className="aspect-video w-full bg-black">
-              {exercise.videoUrl?.includes('embed') || exercise.videoUrl?.includes('youtube') || exercise.videoUrl?.includes('youtu.be') ? (
+              {currentMediaUrl?.includes('embed') || currentMediaUrl?.includes('youtube') || currentMediaUrl?.includes('youtu.be') ? (
                 <iframe 
-                  src={getEmbedUrl(exercise.videoUrl)} 
+                  src={getEmbedUrl(currentMediaUrl)} 
                   className="w-full h-full"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 ></iframe>
-              ) : isImageUrl(exercise.videoUrl) ? (
-                <img src={exercise.videoUrl} className="w-full h-full object-contain mx-auto" />
+              ) : isImageUrl(currentMediaUrl) ? (
+                <img src={currentMediaUrl} className="w-full h-full object-contain mx-auto" onError={handleMediaError} />
               ) : (
-                <video src={exercise.videoUrl} controls className="w-full h-full" autoPlay></video>
+                <video src={currentMediaUrl} controls className="w-full h-full" autoPlay onError={handleMediaError}></video>
               )}
             </div>
             <div className="p-6 bg-zinc-900/50">
