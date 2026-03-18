@@ -43,18 +43,23 @@ export const getWorkoutAdvice = async (workout: WorkoutRoutine, userGoal: string
   }
 };
 
-// Chat with the personal trainer AI
-export const chatWithPersonal = async (history: {role: string, parts: {text: string}[]}[], message: string) => {
-  // Use ai.chats.create to start/continue a conversation with history
-  const chat = ai.chats.create({
-    model: 'gemini-3-flash-preview',
-    // In @google/genai, history is passed to create for stateful chats
-    history: history as any,
-    config: {
-      systemInstruction: "Você é um personal trainer de elite chamado Tatu. Seja motivador, técnico e direto. Seu tom é profissional mas amigável, focado em ajudar o usuário a extrair o máximo de cada treino."
-    }
-  });
+export const generateChatResponse = async (message: string, history: { role: 'user' | 'model', text: string }[]) => {
+  try {
+    const chat = ai.chats.create({
+      model: 'gemini-3-flash-preview',
+      config: {
+        systemInstruction: "Você é um personal trainer de elite chamado Tatu. Seja motivador, técnico e direto. Seu tom é profissional mas amigável, focado em ajudar o usuário a extrair o máximo de cada treino."
+      }
+    });
 
-  const result = await chat.sendMessage({ message });
-  return result.text || "";
+    // Convert history to the format expected by the SDK if needed, 
+    // but for simple cases we can just send the message.
+    // The SDK's chat.sendMessage handles the turn.
+    
+    const result = await chat.sendMessage({ message });
+    return result.text || "Desculpe, não consegui processar sua mensagem.";
+  } catch (error) {
+    console.error("Gemini Chat Error:", error);
+    return "Tive um problema ao me conectar. Tente novamente em instantes.";
+  }
 };

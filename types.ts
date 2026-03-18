@@ -57,6 +57,23 @@ export interface User {
   isProfileComplete: boolean;
   weights?: Record<string, number>; 
   history: WorkoutHistoryEntry[];
+  badges?: Badge[];
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  unlockedAt: string;
+}
+
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  icon: any;
+  requirement: (user: User) => boolean;
 }
 
 export enum AppTab {
@@ -64,7 +81,6 @@ export enum AppTab {
   WORKOUT = 'workout',
   HISTORY = 'history',
   AI_ASSISTANT = 'ai',
-  SETTINGS = 'settings',
-  ONBOARDING = 'onboarding',
+  PROFILE = 'profile',
   ADMIN = 'admin'
 }
