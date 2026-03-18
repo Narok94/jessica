@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
 import { useStore } from '../../store';
-import { Bot, Send, Sparkles } from 'lucide-react';
+import { Bot, Send, Sparkles, LogOut } from 'lucide-react';
 import { Skeleton } from '../ui/Skeleton';
 import { generateChatResponse } from '../../services/geminiService';
 
 export const AIAssistantView: React.FC = () => {
-  const { chatMessages, setChatMessages, isChatLoading, setIsChatLoading, user } = useStore();
+  const { chatMessages, setChatMessages, isChatLoading, setIsChatLoading, user, logout } = useStore();
   const [chatInput, setChatInput] = useState('');
 
   const handleSendMessage = async () => {
@@ -30,9 +30,18 @@ export const AIAssistantView: React.FC = () => {
 
   return (
     <div className="flex flex-col h-[calc(100vh-10rem)] animate-slide-up pb-10">
-       <header className="mb-4">
-          <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Tatu <span className="text-indigo-500">Expert</span></h1>
-          <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] mt-1 text-[9px]">Sua consultoria 24h.</p>
+       <header className="mb-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Tatu <span className="text-indigo-500">Expert</span></h1>
+            <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] mt-1 text-[9px]">Sua consultoria 24h.</p>
+          </div>
+          <button 
+            onClick={() => logout()} 
+            className="w-12 h-12 bg-zinc-900/40 rounded-2xl flex items-center justify-center text-rose-500 border border-white/5 hover:bg-rose-500/10 transition-all backdrop-blur-md"
+            title="Sair"
+          >
+            <LogOut size={20} />
+          </button>
        </header>
        <div className="flex-1 overflow-y-auto space-y-4 px-1 scrollbar-hide mb-4">
           {chatMessages.length === 0 && (

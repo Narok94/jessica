@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { useStore } from '../../store';
-import { History, Calendar, Clock } from 'lucide-react';
+import { History, Calendar, Clock, LogOut } from 'lucide-react';
 
 export const HistoryView: React.FC = () => {
-  const { user } = useStore();
+  const { user, logout } = useStore();
 
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
@@ -18,9 +18,18 @@ export const HistoryView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-slide-up pb-10">
-      <header>
-        <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Meus <span className="text-emerald-500">Treinos</span></h1>
-        <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] mt-1 text-[9px]">Histórico de progresso.</p>
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Meus <span className="text-emerald-500">Treinos</span></h1>
+          <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] mt-1 text-[9px]">Histórico de progresso.</p>
+        </div>
+        <button 
+          onClick={() => logout()} 
+          className="w-12 h-12 bg-zinc-900/40 rounded-2xl flex items-center justify-center text-rose-500 border border-white/5 hover:bg-rose-500/10 transition-all backdrop-blur-md"
+          title="Sair"
+        >
+          <LogOut size={20} />
+        </button>
       </header>
       
       {user?.history.length === 0 ? (

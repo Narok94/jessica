@@ -12,13 +12,14 @@ import {
   Dumbbell,
   Target,
   Zap,
-  Award
+  Award,
+  LogOut
 } from 'lucide-react';
 import { AppTab } from '../../types';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 export const DashboardView: React.FC = () => {
-  const { user, allWorkouts, setActiveTab, setSelectedWorkout, handleManualCheckIn } = useStore();
+  const { user, allWorkouts, setActiveTab, setSelectedWorkout, handleManualCheckIn, logout } = useStore();
   
   if (!user) return null;
 
@@ -76,14 +77,23 @@ export const DashboardView: React.FC = () => {
             <Target size={12} className="text-blue-500" /> Seu progresso é sua prioridade
           </p>
         </div>
-        <div className="flex items-center gap-3 bg-zinc-900/40 p-3 rounded-2xl border border-white/5 backdrop-blur-md">
-          <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
-            <Flame size={24} className="text-orange-500 animate-pulse" />
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 bg-zinc-900/40 p-3 rounded-2xl border border-white/5 backdrop-blur-md">
+            <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
+              <Flame size={24} className="text-orange-500 animate-pulse" />
+            </div>
+            <div>
+              <span className="block text-xl font-black text-white leading-none">{user.streak || 0}</span>
+              <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">DIAS SEGUIDOS</span>
+            </div>
           </div>
-          <div>
-            <span className="block text-xl font-black text-white leading-none">{user.streak || 0}</span>
-            <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">DIAS SEGUIDOS</span>
-          </div>
+          <button 
+            onClick={() => logout()} 
+            className="w-12 h-12 bg-zinc-900/40 rounded-2xl flex items-center justify-center text-rose-500 border border-white/5 hover:bg-rose-500/10 transition-all backdrop-blur-md"
+            title="Sair"
+          >
+            <LogOut size={20} />
+          </button>
         </div>
       </div>
 

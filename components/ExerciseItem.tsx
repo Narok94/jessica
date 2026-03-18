@@ -305,7 +305,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                 <p className="text-[8px] font-bold text-zinc-600 uppercase">O link do GIF ou vídeo parece estar quebrado</p>
               </div>
               <a 
-                href={`https://www.google.com/search?q=${encodeURIComponent(exercise.name + ' exercise gif')}&tbm=isch`}
+                href={`https://www.google.com/search?q=${encodeURIComponent(exercise.name + ' ' + exercise.muscleGroup + ' exercise gif')}&tbm=isch`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-2 px-6 py-3 bg-zinc-800 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl border border-white/10 hover:bg-zinc-700 hover:border-white/20 transition-all flex items-center gap-2 active:scale-95"

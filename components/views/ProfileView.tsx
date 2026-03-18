@@ -4,14 +4,12 @@ import { useStore } from '../../store';
 import { UserCircle2, ShieldCheck, TrendingUp, Trophy, Award, Rocket, Flame, LogOut } from 'lucide-react';
 
 export const ProfileView: React.FC = () => {
-  const { user, updateUserProfile, setIsLoggedIn, setUser, setActiveTab } = useStore();
+  const { user, logout } = useStore();
 
   if (!user) return null;
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUser(null);
-    localStorage.removeItem('tatugym_remembered');
+    logout();
   };
 
   const badgeIcons: Record<string, any> = {

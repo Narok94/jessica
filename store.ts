@@ -43,6 +43,7 @@ interface AppState {
   triggerConfetti: () => void;
   addToast?: (message: string, type: 'success' | 'error' | 'info') => void;
   setAddToast: (fn: (message: string, type: 'success' | 'error' | 'info') => void) => void;
+  logout: () => void;
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -80,6 +81,19 @@ export const useStore = create<AppState>((set, get) => ({
   setChatMessages: (chatMessages) => set({ chatMessages }),
   setIsChatLoading: (isChatLoading) => set({ isChatLoading }),
   setAddToast: (fn) => set({ addToast: fn }),
+
+  logout: () => {
+    set({ 
+      user: null, 
+      isLoggedIn: false, 
+      activeTab: AppTab.DASHBOARD,
+      selectedWorkout: null,
+      isWorkoutActive: false,
+      currentSessionProgress: {},
+      workoutStartTime: null
+    });
+    localStorage.removeItem('tatugym_remembered');
+  },
 
   updateUserProfile: (newData) => {
     const { user } = get();
