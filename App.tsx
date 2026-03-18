@@ -163,8 +163,12 @@ const App: React.FC = () => {
         setActiveTab(userData.isProfileComplete ? AppTab.DASHBOARD : AppTab.ONBOARDING);
       }
       
-      if (manual && loginData.remember) {
-        localStorage.setItem('tatugym_remembered', JSON.stringify({ user: usernameInput, pass: passwordInput }));
+      if (manual) {
+        if (loginData.remember) {
+          localStorage.setItem('tatugym_remembered', JSON.stringify({ user: usernameInput, pass: passwordInput }));
+        } else {
+          localStorage.removeItem('tatugym_remembered');
+        }
       }
     } else if (manual) {
       alert('Dados incorretos.');
@@ -554,7 +558,7 @@ const App: React.FC = () => {
     const progressPercent = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
 
     return (
-      <div className="space-y-6 animate-slide-up pb-32">
+      <div className="space-y-6 animate-slide-up pb-64">
         <header className="flex items-center justify-between">
           <button onClick={exitWorkout} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-all text-[9px] font-black uppercase tracking-widest bg-zinc-900/60 px-4 py-2 rounded-xl border border-white/5 active:scale-95">
             <ChevronLeft size={16}/> Voltar
@@ -611,7 +615,10 @@ const App: React.FC = () => {
         <div className={`space-y-6 transition-all duration-500 ${!isWorkoutActive ? 'opacity-30 pointer-events-none grayscale' : 'opacity-100'}`}>
           <div className="bg-zinc-900/50 p-4 rounded-[1.5rem] border border-white/5">
              <div className="flex items-center justify-between mb-2 px-1">
-                <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Conclusão do Treino</span>
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Progresso do Treino</span>
+                  <span className="text-[10px] font-bold text-white mt-0.5">{completedSets} de {totalSets} séries concluídas</span>
+                </div>
                 <span className="text-sm font-black text-emerald-500">{progressPercent}%</span>
              </div>
              <div className="h-2.5 w-full bg-zinc-950 rounded-full overflow-hidden border border-white/5">
@@ -632,7 +639,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 p-5 md:p-8 md:left-[240px] z-50 pointer-events-none">
+        <div className="fixed bottom-24 md:bottom-0 left-0 right-0 p-5 md:p-8 md:left-[240px] z-[60] pointer-events-none">
            <div className="max-w-4xl mx-auto pointer-events-auto">
               <button 
                 onClick={handleFinishWorkout} 
@@ -1012,6 +1019,22 @@ const App: React.FC = () => {
                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 text-white font-black text-sm outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all backdrop-blur-xl" 
                 placeholder="SENHA" 
               />
+            </div>
+
+            <div className="flex items-center justify-between px-2">
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <div className="relative">
+                  <input 
+                    type="checkbox" 
+                    checked={loginData.remember} 
+                    onChange={e => setLoginData({...loginData, remember: e.target.checked})}
+                    className="peer sr-only" 
+                  />
+                  <div className="w-5 h-5 border-2 border-white/10 rounded-md bg-white/5 peer-checked:bg-emerald-500 peer-checked:border-emerald-500 transition-all"></div>
+                  <Check size={14} className="absolute inset-0 m-auto text-zinc-950 opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={4} />
+                </div>
+                <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest group-hover:text-zinc-300 transition-colors">Lembrar de mim</span>
+              </label>
             </div>
 
             <button className="w-full bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black py-5 rounded-2xl shadow-[0_15px_30px_rgba(16,185,129,0.2)] uppercase tracking-[0.3em] active:scale-95 text-xs transition-all mt-2">

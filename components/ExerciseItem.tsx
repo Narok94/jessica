@@ -303,7 +303,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
           </div>
 
           <div className="space-y-4">
-            <div className="grid grid-cols-12 gap-3 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] px-3">
+            <div className="hidden md:grid grid-cols-12 gap-3 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] px-3">
               <div className="col-span-1 text-center">Set</div>
               <div className="col-span-4 text-center">Peso (kg)</div>
               <div className="col-span-4 text-center">Reps</div>
@@ -312,89 +312,101 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
             </div>
 
             {performance.map((set, idx) => (
-              <div key={idx} className={`grid grid-cols-12 items-center gap-3 p-3 rounded-[1.8rem] border transition-all duration-300 ${set.completed ? 'bg-emerald-500/10 border-emerald-500/40 shadow-lg shadow-emerald-500/5' : 'bg-zinc-900/40 border-white/10 shadow-md'}`}>
+              <div key={idx} className={`grid grid-cols-12 items-center gap-2 md:gap-3 p-3 rounded-[1.8rem] border transition-all duration-300 ${set.completed ? 'bg-emerald-500/10 border-emerald-500/40 shadow-lg shadow-emerald-500/5' : 'bg-zinc-900/40 border-white/10 shadow-md'}`}>
                 {/* Set Number */}
-                <div className="col-span-1 flex items-center justify-center">
+                <div className="col-span-2 md:col-span-1 flex items-center justify-center">
                   <div className={`w-9 h-9 flex items-center justify-center rounded-xl text-xs font-black border transition-all duration-300 ${set.completed ? 'bg-emerald-500 text-zinc-950 border-emerald-400 scale-110' : 'bg-zinc-800/80 text-zinc-500 border-white/5'}`}>
                     {idx + 1}
                   </div>
                 </div>
 
                 {/* Weight Stepper */}
-                <div className={`col-span-4 flex items-center rounded-2xl border transition-all duration-300 overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}>
-                  <button 
-                    disabled={set.completed} 
-                    onClick={() => adjustValue(idx, 'weight', -1)} 
-                    className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
-                  >
-                    <Minus size={16} strokeWidth={3} />
-                  </button>
-                  <input 
-                    type="number" 
-                    inputMode="decimal" 
-                    value={set.weight} 
-                    disabled={set.completed} 
-                    onChange={(e) => updateSet(idx, { weight: parseFloat(e.target.value) || 0 })} 
-                    className="w-12 bg-transparent text-center text-sm font-black text-white outline-none"
-                  />
-                  <button 
-                    disabled={set.completed} 
-                    onClick={() => adjustValue(idx, 'weight', 1)} 
-                    className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
-                  >
-                    <Plus size={16} strokeWidth={3} />
-                  </button>
+                <div className="col-span-5 md:col-span-4 flex flex-col gap-1">
+                  <span className="md:hidden text-[7px] font-black text-zinc-600 uppercase tracking-widest text-center">Peso (kg)</span>
+                  <div className={`flex items-center rounded-2xl border transition-all duration-300 overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}>
+                    <button 
+                      disabled={set.completed} 
+                      onClick={() => adjustValue(idx, 'weight', -1)} 
+                      className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
+                    >
+                      <Minus size={16} strokeWidth={3} />
+                    </button>
+                    <input 
+                      type="number" 
+                      inputMode="decimal" 
+                      value={set.weight} 
+                      disabled={set.completed} 
+                      onChange={(e) => updateSet(idx, { weight: parseFloat(e.target.value) || 0 })} 
+                      className="w-10 md:w-12 bg-transparent text-center text-sm font-black text-white outline-none"
+                    />
+                    <button 
+                      disabled={set.completed} 
+                      onClick={() => adjustValue(idx, 'weight', 1)} 
+                      className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
+                    >
+                      <Plus size={16} strokeWidth={3} />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Reps Stepper */}
-                <div className={`col-span-4 flex items-center rounded-2xl border transition-all duration-300 overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}>
-                  <button 
-                    disabled={set.completed} 
-                    onClick={() => adjustValue(idx, 'reps', -1)} 
-                    className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
-                  >
-                    <Minus size={16} strokeWidth={3} />
-                  </button>
-                  <input 
-                    type="number" 
-                    inputMode="numeric" 
-                    value={set.reps} 
-                    disabled={set.completed} 
-                    onChange={(e) => updateSet(idx, { reps: parseInt(e.target.value) || 0 })} 
-                    className="w-12 bg-transparent text-center text-sm font-black text-white outline-none"
-                  />
-                  <button 
-                    disabled={set.completed} 
-                    onClick={() => adjustValue(idx, 'reps', 1)} 
-                    className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
-                  >
-                    <Plus size={16} strokeWidth={3} />
-                  </button>
+                <div className="col-span-5 md:col-span-4 flex flex-col gap-1">
+                  <span className="md:hidden text-[7px] font-black text-zinc-600 uppercase tracking-widest text-center">Reps</span>
+                  <div className={`flex items-center rounded-2xl border transition-all duration-300 overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}>
+                    <button 
+                      disabled={set.completed} 
+                      onClick={() => adjustValue(idx, 'reps', -1)} 
+                      className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
+                    >
+                      <Minus size={16} strokeWidth={3} />
+                    </button>
+                    <input 
+                      type="number" 
+                      inputMode="numeric" 
+                      value={set.reps} 
+                      disabled={set.completed} 
+                      onChange={(e) => updateSet(idx, { reps: parseInt(e.target.value) || 0 })} 
+                      className="w-10 md:w-12 bg-transparent text-center text-sm font-black text-white outline-none"
+                    />
+                    <button 
+                      disabled={set.completed} 
+                      onClick={() => adjustValue(idx, 'reps', 1)} 
+                      className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
+                    >
+                      <Plus size={16} strokeWidth={3} />
+                    </button>
+                  </div>
                 </div>
 
                 {/* RPE Selector */}
-                <div className="col-span-2 flex items-center justify-center">
-                  <select 
-                    disabled={set.completed}
-                    value={set.rpe}
-                    onChange={(e) => updateSet(idx, { rpe: parseInt(e.target.value) })}
-                    className={`w-full h-12 text-white font-black text-xs rounded-2xl border transition-all outline-none appearance-none text-center ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}
-                  >
-                    {[6,7,8,9,10].map(v => <option key={v} value={v}>{v}</option>)}
-                  </select>
+                <div className="col-span-6 md:col-span-2 flex items-center justify-center">
+                  <div className="w-full relative">
+                    <select 
+                      disabled={set.completed}
+                      value={set.rpe}
+                      onChange={(e) => updateSet(idx, { rpe: parseInt(e.target.value) })}
+                      className={`w-full h-12 text-white font-black text-xs rounded-2xl border transition-all outline-none appearance-none text-center ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}
+                    >
+                      {[6,7,8,9,10].map(v => <option key={v} value={v}>RPE {v}</option>)}
+                    </select>
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-600 md:hidden">
+                      <ChevronDown size={12} />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Completion Check */}
-                <div className="col-span-1 flex items-center justify-center">
+                <div className="col-span-6 md:col-span-1 flex items-center justify-center">
                   <button 
                     onClick={() => updateSet(idx, { completed: !set.completed })} 
-                    className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                    className={`w-full md:w-11 h-12 md:h-11 rounded-2xl flex items-center justify-center transition-all duration-300 ${
                       set.completed 
-                      ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/30 scale-110' 
+                      ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/30 scale-105 md:scale-110' 
                       : 'bg-zinc-800 border border-white/10 text-zinc-700 hover:border-emerald-500/50 hover:text-emerald-500/50'
                     }`}
                   >
                     <Check size={22} strokeWidth={4} />
+                    <span className="md:hidden ml-2 text-[10px] font-black uppercase">Concluir</span>
                   </button>
                 </div>
               </div>
