@@ -71,32 +71,38 @@ const AppContent: React.FC = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      const remembered = localStorage.getItem('tatugym_remembered');
-      if (remembered) {
-        const userData = JSON.parse(remembered);
-        const profile = localStorage.getItem(`tatugym_user_profile_${userData.username.toLowerCase()}`);
-        const finalUser = profile ? JSON.parse(profile) : userData;
-        setUser(finalUser);
-        setIsLoggedIn(true);
-        
-        // Restore active session if exists and recent (within 5 mins)
-        const activeSession = localStorage.getItem(`tatugym_active_session_${finalUser.username.toLowerCase()}`);
-        if (activeSession) {
-          const session = JSON.parse(activeSession);
-          if (Date.now() - session.timestamp < 300000) {
-            const workout = allWorkouts[finalUser.username.toLowerCase() as keyof typeof allWorkouts]?.find(w => w.id === session.workoutId);
-            if (workout) {
-              setSelectedWorkout(workout);
-              setCurrentSessionProgress(session.progress);
-              setWorkoutStartTime(session.startTime);
-              setIsWorkoutActive(true);
-              setActiveTab(AppTab.WORKOUT);
-              if (addToast) addToast('Sessão de treino restaurada!', 'info');
+      try {
+        const remembered = localStorage.getItem('tatugym_remembered');
+        if (remembered) {
+          const userData = JSON.parse(remembered);
+          const profile = localStorage.getItem(`tatugym_user_profile_${userData.username.toLowerCase()}`);
+          const finalUser = profile ? JSON.parse(profile) : userData;
+          setUser(finalUser);
+          setIsLoggedIn(true);
+          
+          // Restore active session if exists and recent (within 5 mins)
+          const activeSession = localStorage.getItem(`tatugym_active_session_${finalUser.username.toLowerCase()}`);
+          if (activeSession) {
+            const session = JSON.parse(activeSession);
+            if (Date.now() - session.timestamp < 300000) {
+              const workout = allWorkouts[finalUser.username.toLowerCase() as keyof typeof allWorkouts]?.find(w => w.id === session.workoutId);
+              if (workout) {
+                setSelectedWorkout(workout);
+                setCurrentSessionProgress(session.progress);
+                setWorkoutStartTime(session.startTime);
+                setIsWorkoutActive(true);
+                setActiveTab(AppTab.WORKOUT);
+                if (addToast) addToast('Sessão de treino restaurada!', 'info');
+              }
             }
           }
         }
+      } catch (error) {
+        console.error('Error loading remembered user:', error);
+        localStorage.removeItem('tatugym_remembered');
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     }, 1500);
   }, []);
 
@@ -105,12 +111,26 @@ const AppContent: React.FC = () => {
     const lowerUser = username.toLowerCase();
     
     if (allWorkouts[lowerUser as keyof typeof allWorkouts]) {
-      const profile = localStorage.getItem(`tatugym_user_profile_${lowerUser}`);
       let userData: User;
-      
-      if (profile) {
-        userData = JSON.parse(profile);
-      } else {
+      try {
+        const profile = localStorage.getItem(`tatugym_user_profile_${lowerUser}`);
+        if (profile) {
+          userData = JSON.parse(profile);
+        } else {
+          userData = {
+            username: lowerUser,
+            name: username.charAt(0).toUpperCase() + username.slice(1),
+            totalWorkouts: 0,
+            history: [],
+            weights: {},
+            checkIns: [],
+            streak: 0,
+            badges: [],
+            isProfileComplete: true
+          };
+        }
+      } catch (error) {
+        console.error('Error parsing profile:', error);
         userData = {
           username: lowerUser,
           name: username.charAt(0).toUpperCase() + username.slice(1),

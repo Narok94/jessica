@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import confetti from 'canvas-confetti';
 import { Exercise, SetPerformance } from '../types';
 import { 
   ChevronDown, 
@@ -20,8 +21,6 @@ import {
   ExternalLink,
   Search
 } from 'lucide-react';
-
-declare var confetti: any;
 
 interface ExerciseItemProps {
   exercise: Exercise;
@@ -131,15 +130,13 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   };
 
   const triggerLocalConfetti = () => {
-    if (typeof confetti !== 'undefined') {
-      confetti({
-        particleCount: 50,
-        spread: 80,
-        origin: { y: 0.7 },
-        colors: ['#10b981', '#34d399', '#ffffff'],
-        disableForReducedMotion: true
-      });
-    }
+    confetti({
+      particleCount: 50,
+      spread: 80,
+      origin: { y: 0.7 },
+      colors: ['#10b981', '#34d399', '#ffffff'],
+      disableForReducedMotion: true
+    });
   };
 
   const adjustValue = (index: number, key: 'weight' | 'reps' | 'rpe', delta: number) => {

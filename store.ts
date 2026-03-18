@@ -1,5 +1,6 @@
 
 import { create } from 'zustand';
+import confetti from 'canvas-confetti';
 import { User, WorkoutRoutine, AppTab, SetPerformance, WorkoutHistoryEntry, Badge } from './types';
 import { jessicaWorkouts, henriqueWorkouts, mariaWorkouts } from './data/workoutData';
 
@@ -120,16 +121,12 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   triggerConfetti: () => {
-    // @ts-ignore
-    if (typeof confetti !== 'undefined') {
-      // @ts-ignore
-      confetti({ 
-        particleCount: 150, 
-        spread: 80, 
-        origin: { y: 0.6 }, 
-        colors: ['#10b981', '#6366f1', '#fbbf24'] 
-      });
-    }
+    confetti({ 
+      particleCount: 150, 
+      spread: 80, 
+      origin: { y: 0.6 }, 
+      colors: ['#10b981', '#6366f1', '#fbbf24'] 
+    });
   },
 
   checkAchievements: () => {
