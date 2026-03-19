@@ -53,6 +53,16 @@ export const normalizeExerciseName = (name: string): string => {
     "Crucifixo Banco Halteres": "crucifixo-com-halteres-em-banco-plano",
     "Remada Alta Kettlebell": "remada-alta-com-kettlebell",
     "Extensão Lombar Livre": "extensao-lombar",
+    "Remada unilateral": "remada-unilateral-com-halteres",
+    "Remada curvada": "remada-curvada-com-barra",
+    "Desenvolvimento halteres": "desenvolvimento-com-halteres",
+    "Supino reto halteres": "supino-reto-com-halteres",
+    "Supino inclinado halteres": "supino-inclinado-com-halteres",
+    "Triceps testa": "triceps-testa-com-barra-w",
+    "Triceps frances": "triceps-frances-com-halteres",
+    "Stiff": "stiff-com-barra",
+    "Levantamento terra": "levantamento-terra",
+    "Puxada aberta": "puxada-aberta-no-pulley",
   };
 
   if (manualMapping[name]) return manualMapping[name];
@@ -80,7 +90,7 @@ export const getExerciseGifUrl = (exerciseName: string): string => {
 /**
  * Retorna uma lista de URLs possíveis para o GIF (para fallback)
  */
-export const getExerciseGifUrlVariations = (exerciseName: string): string[] => {
+export const getExerciseGifUrlVariations = (exerciseName: string, originalUrl?: string): string[] => {
   const normalized = normalizeExerciseName(exerciseName);
   const original = exerciseName.trim();
   const originalWithHifens = original.replace(/\s+/g, "-");
@@ -114,6 +124,11 @@ export const getExerciseGifUrlVariations = (exerciseName: string): string[] => {
       });
     });
   });
+
+  // Adiciona a URL original se fornecida e se não estiver já na lista
+  if (originalUrl && !urls.includes(originalUrl)) {
+    urls.push(originalUrl);
+  }
   
   return urls;
 };

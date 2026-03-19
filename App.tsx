@@ -114,41 +114,36 @@ const AppContent: React.FC = () => {
     const lowerUser = username.toLowerCase();
     
     if (allWorkouts[lowerUser as keyof typeof allWorkouts] || lowerUser === 'professor') {
-      // Password check for Flavia
-      if (lowerUser === 'flavia' && password !== '6087') {
-        if (addToast) addToast('Senha incorreta para Flavia.', 'error');
-        return;
-      }
-
-      // Password check for Professor
-      if (lowerUser === 'professor' && password !== 'admin') {
-        if (addToast) addToast('Senha incorreta para Professor.', 'error');
-        return;
-      }
-
-      let userData: User;
+      let userData: User | null = null;
       try {
         const profile = localStorage.getItem(`tatugym_user_profile_${lowerUser}`);
         if (profile) {
           userData = JSON.parse(profile);
-        } else {
-          userData = {
-            username: lowerUser,
-            name: lowerUser === 'flavia' ? 'Flávia Reis' : lowerUser === 'professor' ? 'Professor Tatu' : username.charAt(0).toUpperCase() + username.slice(1),
-            age: lowerUser === 'flavia' ? 41 : undefined,
-            goal: lowerUser === 'flavia' ? 'Saúde/ Tônus muscular' : undefined,
-            totalWorkouts: 0,
-            history: [],
-            weights: {},
-            checkIns: [],
-            streak: 0,
-            badges: [],
-            isProfileComplete: true,
-            role: lowerUser === 'professor' ? 'teacher' : 'student'
-          };
         }
       } catch (error) {
         console.error('Error parsing profile:', error);
+      }
+
+      // Password check logic
+      if (userData?.password) {
+        if (password !== userData.password) {
+          if (addToast) addToast('Senha incorreta.', 'error');
+          return;
+        }
+      } else {
+        // Fallback for hardcoded users if no profile exists yet
+        if (lowerUser === 'flavia' && password !== '6087') {
+          if (addToast) addToast('Senha incorreta para Flavia.', 'error');
+          return;
+        }
+        if (lowerUser === 'professor' && password !== 'admin') {
+          if (addToast) addToast('Senha incorreta para Professor.', 'error');
+          return;
+        }
+      }
+
+      // If no profile exists, create default one
+      if (!userData) {
         userData = {
           username: lowerUser,
           name: lowerUser === 'flavia' ? 'Flávia Reis' : lowerUser === 'professor' ? 'Professor Tatu' : username.charAt(0).toUpperCase() + username.slice(1),

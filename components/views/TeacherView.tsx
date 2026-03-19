@@ -1,89 +1,194 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Users, 
   Plus, 
-  Trash2, 
-  Save, 
-  ChevronRight, 
   Search, 
+  ChevronRight, 
   Dumbbell, 
-  Clock, 
-  Repeat, 
-  FileText,
+  Trash2, 
+  Edit2, 
+  Save, 
+  X, 
+  User as UserIcon,
+  Database,
   ArrowLeft,
-  Settings,
-  Edit2
+  Check,
+  Calendar,
+  History as HistoryIcon,
+  PlusCircle,
+  MoreVertical,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { useStore } from '../../store';
-import { WorkoutRoutine, Exercise } from '../../types';
+import { User, WorkoutRoutine, Exercise, AppTab } from '../../types';
 import { exerciseDatabase, BaseExercise } from '../../data/exerciseDatabase';
+import { GifImage } from '../ui/GifImage';
 
 export const TeacherView: React.FC = () => {
-  const { allWorkouts, setAllWorkouts, addToast } = useStore();
+  const { allWorkouts, setAllWorkouts, user: currentUser, addToast } = useStore();
+  const [activeSubTab, setActiveSubTab] = useState<'students' | 'database'>('students');
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isAddingStudent, setIsAddingStudent] = useState(false);
+  const [newStudentData, setNewStudentData] = useState({
+    username: '',
+    name: '',
+    password: '',
+    age: ''
+  });
+
   const [editingWorkout, setEditingWorkout] = useState<WorkoutRoutine | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [pickerSearch, setPickerSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [isDatabaseView, setIsDatabaseView] = useState(false);
-  const [isNewStudentModalOpen, setIsNewStudentModalOpen] = useState(false);
-  const [newStudentName, setNewStudentName] = useState('');
+  const [isAddingWorkout, setIsAddingWorkout] = useState(false);
+  const [newWorkoutData, setNewWorkoutData] = useState<Partial<WorkoutRoutine>>({
+    title: '',
+    description: '',
+    exercises: [],
+    color: 'blue'
+  });
 
-  const students = Object.keys(allWorkouts);
-  const categories = Array.from(new Set(exerciseDatabase.map(ex => ex.muscleGroup)));
+  const [isExercisePickerOpen, setIsExercisePickerOpen] = useState(false);
+  const [exerciseSearch, setExerciseSearch] = useState('');
 
-  const handleAddStudent = () => {
-    if (!newStudentName.trim()) return;
-    const studentKey = newStudentName.trim().toLowerCase();
-    if (allWorkouts[studentKey]) {
-      if (addToast) addToast('Aluno já existe!', 'error');
+  // Get all students from localStorage profiles + allWorkouts keys
+  const [students, setStudents] = useState<User[]>([]);
+
+  useEffect(() => {
+    const loadStudents = () => {
+      const studentList: User[] = [];
+      const usernames = Object.keys(allWorkouts);
+      
+      usernames.forEach(username => {
+        const profile = localStorage.getItem(`tatugym_user_profile_${username.toLowerCase()}`);
+        if (profile) {
+          try {
+            const userData = JSON.parse(profile);
+            if (userData.role === 'student') {
+              studentList.push(userData);
+            }
+          } catch (e) {
+            console.error('Error parsing student profile:', e);
+          }
+        } else {
+          // Fallback if no profile but has workouts
+          studentList.push({
+            username,
+            name: username.charAt(0).toUpperCase() + username.slice(1),
+            role: 'student',
+            streak: 0,
+            totalWorkouts: 0,
+            checkIns: [],
+            history: [],
+            isProfileComplete: false
+          });
+        }
+      });
+      setStudents(studentList);
+    };
+
+    loadStudents();
+  }, [allWorkouts]);
+
+  const handleAddStudent = (e: React.FormEvent) => {
+    e.preventDefault();
+    const lowerUsername = newStudentData.username.toLowerCase();
+    
+    if (allWorkouts[lowerUsername]) {
+      if (addToast) addToast('Usuário já existe.', 'error');
       return;
     }
 
-    const updatedAllWorkouts = { ...allWorkouts, [studentKey]: [] };
-    setAllWorkouts(updatedAllWorkouts);
-    setNewStudentName('');
-    setIsNewStudentModalOpen(false);
-    if (addToast) addToast(`Aluno ${newStudentName} adicionado!`, 'success');
+    const newUser: User = {
+      username: lowerUsername,
+      name: newStudentData.name,
+      password: newStudentData.password,
+      age: parseInt(newStudentData.age) || undefined,
+      role: 'student',
+      streak: 0,
+      totalWorkouts: 0,
+      checkIns: [],
+      history: [],
+      isProfileComplete: true
+    };
+
+    // Save profile
+    localStorage.setItem(`tatugym_user_profile_${lowerUsername}`, JSON.stringify(newUser));
+    
+    // Add to allWorkouts
+    const updatedWorkouts = { ...allWorkouts, [lowerUsername]: [] };
+    setAllWorkouts(updatedWorkouts);
+
+    setIsAddingStudent(false);
+    setNewStudentData({ username: '', name: '', password: '', age: '' });
+    if (addToast) addToast('Aluno adicionado com sucesso!', 'success');
   };
 
-  const handleSaveWorkout = () => {
+  const handleDeleteStudent = (username: string) => {
+    if (confirm(`Tem certeza que deseja excluir o aluno ${username}?`)) {
+      const updatedWorkouts = { ...allWorkouts };
+      delete updatedWorkouts[username.toLowerCase()];
+      setAllWorkouts(updatedWorkouts);
+      localStorage.removeItem(`tatugym_user_profile_${username.toLowerCase()}`);
+      if (addToast) addToast('Aluno removido.', 'info');
+    }
+  };
+
+  const handleAddWorkout = () => {
+    if (!selectedStudent) return;
+    
+    const workout: WorkoutRoutine = {
+      id: Math.random().toString(36).substr(2, 9),
+      title: newWorkoutData.title || 'Novo Treino',
+      description: newWorkoutData.description || '',
+      exercises: newWorkoutData.exercises || [],
+      color: newWorkoutData.color || 'blue'
+    };
+
+    const updatedWorkouts = {
+      ...allWorkouts,
+      [selectedStudent.toLowerCase()]: [...(allWorkouts[selectedStudent.toLowerCase()] || []), workout]
+    };
+    
+    setAllWorkouts(updatedWorkouts);
+    setIsAddingWorkout(false);
+    setNewWorkoutData({ title: '', description: '', exercises: [], color: 'blue' });
+    if (addToast) addToast('Treino criado!', 'success');
+  };
+
+  const handleUpdateWorkout = () => {
     if (!selectedStudent || !editingWorkout) return;
 
-    const updatedAllWorkouts = { ...allWorkouts };
-    const studentWorkouts = [...(updatedAllWorkouts[selectedStudent as keyof typeof allWorkouts] || [])];
-    
-    const index = studentWorkouts.findIndex(w => w.id === editingWorkout.id);
-    if (index >= 0) {
-      studentWorkouts[index] = editingWorkout;
-    } else {
-      studentWorkouts.push(editingWorkout);
-    }
+    const updatedList = allWorkouts[selectedStudent.toLowerCase()].map(w => 
+      w.id === editingWorkout.id ? editingWorkout : w
+    );
 
-    updatedAllWorkouts[selectedStudent as keyof typeof allWorkouts] = studentWorkouts;
-    setAllWorkouts(updatedAllWorkouts);
+    const updatedWorkouts = {
+      ...allWorkouts,
+      [selectedStudent.toLowerCase()]: updatedList
+    };
+
+    setAllWorkouts(updatedWorkouts);
     setEditingWorkout(null);
-    if (addToast) addToast('Treino salvo com sucesso!', 'success');
+    if (addToast) addToast('Treino atualizado!', 'success');
   };
 
   const handleDeleteWorkout = (workoutId: string) => {
     if (!selectedStudent) return;
-    if (!window.confirm('Tem certeza que deseja excluir este treino?')) return;
-
-    const updatedAllWorkouts = { ...allWorkouts };
-    updatedAllWorkouts[selectedStudent as keyof typeof allWorkouts] = 
-      updatedAllWorkouts[selectedStudent as keyof typeof allWorkouts].filter(w => w.id !== workoutId);
-    
-    setAllWorkouts(updatedAllWorkouts);
-    if (addToast) addToast('Treino excluído.', 'info');
+    if (confirm('Excluir este treino?')) {
+      const updatedList = allWorkouts[selectedStudent.toLowerCase()].filter(w => w.id !== workoutId);
+      const updatedWorkouts = {
+        ...allWorkouts,
+        [selectedStudent.toLowerCase()]: updatedList
+      };
+      setAllWorkouts(updatedWorkouts);
+      if (addToast) addToast('Treino removido.', 'info');
+    }
   };
 
-  const handleAddExercise = (baseEx: BaseExercise) => {
-    if (!editingWorkout) return;
-    const newExercise: Exercise = {
+  const addExerciseToWorkout = (baseEx: BaseExercise) => {
+    const newEx: Exercise = {
       id: Math.random().toString(36).substr(2, 9),
       name: baseEx.name,
       muscleGroup: baseEx.muscleGroup,
@@ -92,582 +197,496 @@ export const TeacherView: React.FC = () => {
       rest: baseEx.defaultRest,
       image: baseEx.image
     };
-    setEditingWorkout({
-      ...editingWorkout,
-      exercises: [...editingWorkout.exercises, newExercise]
-    });
-    setIsPickerOpen(false);
-    if (addToast) addToast(`${baseEx.name} adicionado!`, 'success');
+
+    if (editingWorkout) {
+      setEditingWorkout({
+        ...editingWorkout,
+        exercises: [...editingWorkout.exercises, newEx]
+      });
+    } else if (isAddingWorkout) {
+      setNewWorkoutData({
+        ...newWorkoutData,
+        exercises: [...(newWorkoutData.exercises || []), newEx]
+      });
+    }
+    setIsExercisePickerOpen(false);
   };
 
-  const handleUpdateExercise = (exerciseId: string, updates: Partial<Exercise>) => {
-    if (!editingWorkout) return;
-    setEditingWorkout({
-      ...editingWorkout,
-      exercises: editingWorkout.exercises.map(ex => 
-        ex.id === exerciseId ? { ...ex, ...updates } : ex
-      )
-    });
+  const removeExerciseFromWorkout = (exId: string) => {
+    if (editingWorkout) {
+      setEditingWorkout({
+        ...editingWorkout,
+        exercises: editingWorkout.exercises.filter(e => e.id !== exId)
+      });
+    } else if (isAddingWorkout) {
+      setNewWorkoutData({
+        ...newWorkoutData,
+        exercises: (newWorkoutData.exercises || []).filter(e => e.id !== exId)
+      });
+    }
   };
 
-  const handleRemoveExercise = (exerciseId: string) => {
-    if (!editingWorkout) return;
-    setEditingWorkout({
-      ...editingWorkout,
-      exercises: editingWorkout.exercises.filter(ex => ex.id !== exerciseId)
-    });
-  };
+  const filteredStudents = students.filter(s => 
+    s.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    s.username.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  if (isDatabaseView) {
+  const filteredExercises = exerciseDatabase.filter(e => 
+    e.name.toLowerCase().includes(exerciseSearch.toLowerCase()) ||
+    e.muscleGroup.toLowerCase().includes(exerciseSearch.toLowerCase())
+  );
+
+  if (selectedStudent) {
+    const studentWorkouts = allWorkouts[selectedStudent.toLowerCase()] || [];
+    const studentProfile = students.find(s => s.username.toLowerCase() === selectedStudent.toLowerCase());
+
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="space-y-6 animate-slide-up pb-20">
+        <header className="flex items-center gap-4">
           <button 
-            onClick={() => setIsDatabaseView(false)}
-            className="p-2 hover:bg-white/5 rounded-xl transition-colors text-zinc-400"
+            onClick={() => setSelectedStudent(null)}
+            className="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
           >
-            <ArrowLeft size={24} />
+            <ArrowLeft size={20} />
           </button>
-          <h2 className="text-xl font-black uppercase italic tracking-tighter">
-            Base de <span className="text-blue-500">Exercícios</span>
-          </h2>
-          <div className="w-10" />
-        </div>
-
-        <div className="relative group">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-blue-500 transition-all" size={20} />
-          <input 
-            type="text" 
-            placeholder="BUSCAR EXERCÍCIO..."
-            value={pickerSearch}
-            onChange={(e) => setPickerSearch(e.target.value)}
-            className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl p-5 pl-14 text-white font-black outline-none focus:border-blue-500/50 transition-all placeholder:text-zinc-700"
-          />
-        </div>
-
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          <button 
-            onClick={() => setSelectedCategory(null)}
-            className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all ${!selectedCategory ? 'bg-blue-600 text-white' : 'bg-white/5 text-zinc-500 hover:bg-white/10'}`}
-          >
-            Todos
-          </button>
-          {categories.map(cat => (
-            <button 
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all ${selectedCategory === cat ? 'bg-blue-600 text-white' : 'bg-white/5 text-zinc-500 hover:bg-white/10'}`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 gap-4">
-          {exerciseDatabase
-            .filter(ex => 
-              (!selectedCategory || ex.muscleGroup === selectedCategory) &&
-              (ex.name.toLowerCase().includes(pickerSearch.toLowerCase()) || ex.muscleGroup.toLowerCase().includes(pickerSearch.toLowerCase()))
-            )
-            .map((ex) => (
-              <div 
-                key={ex.name}
-                className="glass-card p-6 rounded-3xl border border-white/5 flex items-center justify-between group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-zinc-900 flex items-center justify-center overflow-hidden border border-white/5">
-                    {ex.image ? (
-                      <img 
-                        src={ex.image} 
-                        alt={ex.name} 
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                    ) : (
-                      <Dumbbell size={24} className="text-zinc-500 group-hover:text-blue-500 transition-all" />
-                    )}
-                  </div>
-                  <div>
-                    <h4 className="font-black uppercase italic tracking-tight">{ex.name}</h4>
-                    <div className="flex gap-3 mt-1">
-                      <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{ex.muscleGroup}</span>
-                      <span className="text-[9px] font-bold text-blue-500/50 uppercase tracking-widest">{ex.defaultSets}x{ex.defaultReps}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (editingWorkout) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <button 
-            onClick={() => setEditingWorkout(null)}
-            className="p-2 hover:bg-white/5 rounded-xl transition-colors text-zinc-400"
-          >
-            <ArrowLeft size={24} />
-          </button>
-          <h2 className="text-xl font-black uppercase italic tracking-tighter">
-            Editando: <span className="text-blue-500">{editingWorkout.title}</span>
-          </h2>
-          <button 
-            onClick={handleSaveWorkout}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl font-black text-xs uppercase tracking-widest transition-all"
-          >
-            <Save size={18} /> Salvar
-          </button>
-        </div>
-
-        <div className="glass-card p-6 rounded-3xl space-y-4">
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Título do Treino</label>
-            <input 
-              type="text"
-              value={editingWorkout.title}
-              onChange={(e) => setEditingWorkout({ ...editingWorkout, title: e.target.value })}
-              className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl p-4 text-white font-bold outline-none focus:border-blue-500/50 transition-all"
-            />
+          <div>
+            <h2 className="text-2xl font-black text-white uppercase tracking-tighter italic leading-none">
+              {studentProfile?.name || selectedStudent}
+            </h2>
+            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] mt-1">Gerenciar treinos do aluno</p>
           </div>
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Descrição</label>
-            <textarea 
-              value={editingWorkout.description}
-              onChange={(e) => setEditingWorkout({ ...editingWorkout, description: e.target.value })}
-              className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl p-4 text-white font-bold outline-none focus:border-blue-500/50 transition-all min-h-[100px]"
-            />
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="glass-card p-4 rounded-3xl border border-white/5 bg-zinc-900/20">
+            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Treinos Concluídos</p>
+            <p className="text-2xl font-black text-white">{studentProfile?.totalWorkouts || 0}</p>
+          </div>
+          <div className="glass-card p-4 rounded-3xl border border-white/5 bg-zinc-900/20">
+            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Sequência Atual</p>
+            <p className="text-2xl font-black text-orange-500">{studentProfile?.streak || 0} dias</p>
+          </div>
+          <div className="glass-card p-4 rounded-3xl border border-white/5 bg-zinc-900/20">
+            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Último Acesso</p>
+            <p className="text-sm font-black text-white uppercase">
+              {studentProfile?.checkIns?.length ? new Date(studentProfile.checkIns[studentProfile.checkIns.length - 1]).toLocaleDateString('pt-BR') : 'Nunca'}
+            </p>
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-black uppercase tracking-widest text-zinc-400">Exercícios</h3>
+            <h3 className="text-sm font-black text-white uppercase tracking-widest">Planilhas de Treino</h3>
             <button 
-              onClick={() => setIsPickerOpen(true)}
-              className="flex items-center gap-2 text-blue-500 hover:text-blue-400 font-black text-xs uppercase tracking-widest transition-colors"
+              onClick={() => setIsAddingWorkout(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 rounded-xl text-[10px] font-black text-white uppercase tracking-widest hover:bg-blue-500 transition-all"
             >
-              <Plus size={18} /> Adicionar da Base
+              <Plus size={14} /> Novo Treino
             </button>
           </div>
 
-          <div className="space-y-4">
-            {editingWorkout.exercises.map((ex, idx) => (
-              <motion.div 
-                key={ex.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="glass-card p-4 rounded-2xl border border-white/5 space-y-4"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="w-6 h-6 rounded-full bg-blue-600/20 text-blue-500 flex items-center justify-center text-[10px] font-black">
-                      {idx + 1}
-                    </span>
-                    {ex.image && (
-                      <div className="w-10 h-10 rounded-lg overflow-hidden bg-zinc-900 border border-white/5">
-                        <img 
-                          src={ex.image} 
-                          alt={ex.name} 
-                          className="w-full h-full object-cover"
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
-                    )}
+          <div className="grid grid-cols-1 gap-4">
+            {studentWorkouts.map((workout, idx) => (
+              <div key={workout.id} className="glass-card rounded-3xl border border-white/5 overflow-hidden group">
+                <div className="p-5 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl bg-${workout.color}-500/10 flex items-center justify-center border border-${workout.color}-500/20`}>
+                      <Dumbbell size={24} className={`text-${workout.color}-500`} />
+                    </div>
+                    <div>
+                      <h4 className="font-black text-white uppercase tracking-tight italic">Treino {String.fromCharCode(65 + idx)}: {workout.title}</h4>
+                      <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{workout.exercises.length} exercícios</p>
+                    </div>
                   </div>
-                  <button 
-                    onClick={() => handleRemoveExercise(ex.id)}
-                    className="text-red-500/50 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={() => setEditingWorkout(workout)}
+                      className="p-3 rounded-xl bg-zinc-900 text-zinc-400 hover:text-blue-500 transition-colors"
+                    >
+                      <Edit2 size={18} />
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteWorkout(workout.id)}
+                      className="p-3 rounded-xl bg-zinc-900 text-zinc-400 hover:text-rose-500 transition-colors"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </div>
+              </div>
+            ))}
 
+            {studentWorkouts.length === 0 && (
+              <div className="p-12 text-center border-2 border-dashed border-white/5 rounded-3xl">
+                <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest">Nenhum treino atribuído.</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Workout Editor Modal */}
+        {(isAddingWorkout || editingWorkout) && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <div className="bg-zinc-950 w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-[2.5rem] border border-white/10 flex flex-col shadow-2xl">
+              <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">
+                  {editingWorkout ? 'Editar Treino' : 'Novo Treino'}
+                </h3>
+                <button 
+                  onClick={() => { setIsAddingWorkout(false); setEditingWorkout(null); }}
+                  className="p-2 text-zinc-500 hover:text-white"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest ml-1">Nome do Exercício</label>
+                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Título</label>
                     <input 
                       type="text"
-                      value={ex.name}
-                      onChange={(e) => handleUpdateExercise(ex.id, { name: e.target.value })}
-                      className="w-full bg-zinc-950/40 border border-white/5 rounded-xl p-3 text-sm text-white font-bold outline-none focus:border-blue-500/50 transition-all"
+                      value={editingWorkout ? editingWorkout.title : newWorkoutData.title}
+                      onChange={(e) => editingWorkout ? setEditingWorkout({...editingWorkout, title: e.target.value}) : setNewWorkoutData({...newWorkoutData, title: e.target.value})}
+                      className="w-full bg-zinc-900 border border-white/5 rounded-2xl p-4 text-white font-bold outline-none focus:border-blue-500/50"
+                      placeholder="Ex: Peito e Tríceps"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest ml-1">Grupo Muscular</label>
-                    <input 
-                      type="text"
-                      value={ex.muscleGroup}
-                      onChange={(e) => handleUpdateExercise(ex.id, { muscleGroup: e.target.value })}
-                      className="w-full bg-zinc-950/40 border border-white/5 rounded-xl p-3 text-sm text-white font-bold outline-none focus:border-blue-500/50 transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="space-y-2">
-                    <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest ml-1">Séries</label>
-                    <div className="relative">
-                      <Repeat className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" size={14} />
-                      <input 
-                        type="number"
-                        value={ex.sets}
-                        onChange={(e) => handleUpdateExercise(ex.id, { sets: parseInt(e.target.value) || 0 })}
-                        className="w-full bg-zinc-950/40 border border-white/5 rounded-xl p-3 pl-9 text-sm text-white font-bold outline-none focus:border-blue-500/50 transition-all"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest ml-1">Reps</label>
-                    <div className="relative">
-                      <Dumbbell className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" size={14} />
-                      <input 
-                        type="text"
-                        value={ex.reps}
-                        onChange={(e) => handleUpdateExercise(ex.id, { reps: e.target.value })}
-                        className="w-full bg-zinc-950/40 border border-white/5 rounded-xl p-3 pl-9 text-sm text-white font-bold outline-none focus:border-blue-500/50 transition-all"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest ml-1">Descanso (s)</label>
-                    <div className="relative">
-                      <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" size={14} />
-                      <input 
-                        type="number"
-                        value={ex.rest}
-                        onChange={(e) => handleUpdateExercise(ex.id, { rest: parseInt(e.target.value) || 0 })}
-                        className="w-full bg-zinc-950/40 border border-white/5 rounded-xl p-3 pl-9 text-sm text-white font-bold outline-none focus:border-blue-500/50 transition-all"
-                      />
+                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Cor</label>
+                    <div className="flex gap-2">
+                      {['blue', 'emerald', 'purple', 'orange', 'rose'].map(color => (
+                        <button
+                          key={color}
+                          onClick={() => editingWorkout ? setEditingWorkout({...editingWorkout, color}) : setNewWorkoutData({...newWorkoutData, color})}
+                          className={`w-10 h-10 rounded-xl bg-${color}-500 transition-all ${
+                            (editingWorkout ? editingWorkout.color : newWorkoutData.color) === color ? 'ring-4 ring-white/20 scale-110' : 'opacity-40 hover:opacity-100'
+                          }`}
+                        />
+                      ))}
                     </div>
                   </div>
                 </div>
-              </motion.div>
-            ))}
-          </div>
 
-          <button 
-            onClick={() => setIsPickerOpen(true)}
-            className="w-full p-4 rounded-2xl bg-blue-600/10 border border-blue-500/30 text-blue-500 font-black uppercase italic tracking-tighter flex items-center justify-center gap-2 hover:bg-blue-600/20 transition-all"
-          >
-            <Plus size={20} />
-            Adicionar Exercício
-          </button>
-        </div>
-
-        <AnimatePresence>
-          {isPickerOpen && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setIsPickerOpen(false)}
-                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-              />
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="relative w-full max-w-2xl bg-zinc-950 border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
-              >
-                <div className="p-6 border-b border-white/5 space-y-4">
+                <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-black uppercase italic tracking-tighter">Base de Exercícios</h3>
-                    <button onClick={() => setIsPickerOpen(false)} className="text-zinc-500 hover:text-white transition-colors">
-                      <Plus size={24} className="rotate-45" />
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600" size={18} />
-                    <input 
-                      type="text"
-                      placeholder="Buscar exercício..."
-                      value={pickerSearch}
-                      onChange={(e) => setPickerSearch(e.target.value)}
-                      className="w-full bg-zinc-900 border border-white/5 rounded-xl p-3 pl-11 text-sm text-white font-bold outline-none focus:border-blue-500/50 transition-all"
-                    />
-                  </div>
-                  <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                    <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Exercícios</h4>
                     <button 
-                      onClick={() => setSelectedCategory(null)}
-                      className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all ${!selectedCategory ? 'bg-blue-600 text-white' : 'bg-white/5 text-zinc-500 hover:bg-white/10'}`}
+                      onClick={() => setIsExercisePickerOpen(true)}
+                      className="text-[10px] font-black text-blue-500 uppercase tracking-widest flex items-center gap-1"
                     >
-                      Todos
+                      <Plus size={14} /> Adicionar
                     </button>
-                    {categories.map(cat => (
-                      <button 
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
-                        className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all ${selectedCategory === cat ? 'bg-blue-600 text-white' : 'bg-white/5 text-zinc-500 hover:bg-white/10'}`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
                   </div>
-                </div>
 
-                <div className="flex-1 overflow-y-auto p-4 space-y-2">
-                  {exerciseDatabase
-                    .filter(ex => 
-                      (!selectedCategory || ex.muscleGroup === selectedCategory) &&
-                      (ex.name.toLowerCase().includes(pickerSearch.toLowerCase()) || ex.muscleGroup.toLowerCase().includes(pickerSearch.toLowerCase()))
-                    )
-                    .map(ex => (
-                      <button 
-                        key={ex.name}
-                        onClick={() => handleAddExercise(ex)}
-                        className="w-full p-4 rounded-2xl bg-white/5 hover:bg-blue-600/10 border border-white/5 hover:border-blue-500/30 flex items-center justify-between group transition-all"
-                      >
-                        <div className="flex items-center gap-4">
-                          {ex.image && (
-                            <div className="w-12 h-12 rounded-lg overflow-hidden bg-zinc-900 border border-white/5">
-                              <img 
-                                src={ex.image} 
-                                alt={ex.name} 
-                                className="w-full h-full object-cover"
-                                referrerPolicy="no-referrer"
-                              />
+                  <div className="space-y-3">
+                    {(editingWorkout ? editingWorkout.exercises : newWorkoutData.exercises || []).map((ex, idx) => (
+                      <div key={ex.id} className="bg-zinc-900/50 p-4 rounded-2xl border border-white/5 flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-4 flex-1">
+                          <GifImage exerciseName={ex.name} originalUrl={ex.image} className="w-12 h-12 rounded-lg object-cover bg-zinc-800" />
+                          <div className="flex-1">
+                            <p className="text-xs font-black text-white uppercase tracking-tight">{ex.name}</p>
+                            <div className="flex gap-3 mt-1">
+                              <div className="flex items-center gap-1">
+                                <span className="text-[8px] font-black text-zinc-500 uppercase">Séries:</span>
+                                <input 
+                                  type="number"
+                                  value={ex.sets}
+                                  onChange={(e) => {
+                                    const val = parseInt(e.target.value);
+                                    const updateEx = (exercises: Exercise[]) => exercises.map(item => item.id === ex.id ? {...item, sets: val} : item);
+                                    if (editingWorkout) setEditingWorkout({...editingWorkout, exercises: updateEx(editingWorkout.exercises)});
+                                    else setNewWorkoutData({...newWorkoutData, exercises: updateEx(newWorkoutData.exercises || [])});
+                                  }}
+                                  className="w-8 bg-transparent text-[10px] font-black text-blue-500 outline-none"
+                                />
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <span className="text-[8px] font-black text-zinc-500 uppercase">Reps:</span>
+                                <input 
+                                  type="text"
+                                  value={ex.reps}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    const updateEx = (exercises: Exercise[]) => exercises.map(item => item.id === ex.id ? {...item, reps: val} : item);
+                                    if (editingWorkout) setEditingWorkout({...editingWorkout, exercises: updateEx(editingWorkout.exercises)});
+                                    else setNewWorkoutData({...newWorkoutData, exercises: updateEx(newWorkoutData.exercises || [])});
+                                  }}
+                                  className="w-12 bg-transparent text-[10px] font-black text-blue-500 outline-none"
+                                />
+                              </div>
                             </div>
-                          )}
-                          <div className="text-left">
-                            <h4 className="font-black uppercase italic tracking-tight group-hover:text-blue-500 transition-colors">{ex.name}</h4>
-                            <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{ex.muscleGroup}</span>
                           </div>
                         </div>
-                        <Plus size={18} className="text-zinc-600 group-hover:text-blue-500 transition-colors" />
-                      </button>
+                        <button 
+                          onClick={() => removeExerciseFromWorkout(ex.id)}
+                          className="p-2 text-zinc-600 hover:text-rose-500 transition-colors"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     ))}
+                  </div>
                 </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
-      </div>
-    );
-  }
+              </div>
 
-  if (selectedStudent) {
-    const studentWorkouts = allWorkouts[selectedStudent as keyof typeof allWorkouts] || [];
-    
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <button 
-            onClick={() => setSelectedStudent(null)}
-            className="p-2 hover:bg-white/5 rounded-xl transition-colors text-zinc-400"
-          >
-            <ArrowLeft size={24} />
-          </button>
-          <div className="text-center">
-            <h2 className="text-xl font-black uppercase italic tracking-tighter">
-              Treinos de <span className="text-blue-500">{selectedStudent.charAt(0).toUpperCase() + selectedStudent.slice(1)}</span>
-            </h2>
-            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Gerencie a rotina do aluno</p>
+              <div className="p-6 border-t border-white/5 bg-zinc-900/20">
+                <button 
+                  onClick={editingWorkout ? handleUpdateWorkout : handleAddWorkout}
+                  className="w-full py-4 bg-blue-600 rounded-2xl text-white font-black uppercase tracking-[0.3em] shadow-xl shadow-blue-600/20 flex items-center justify-center gap-2"
+                >
+                  <Save size={18} /> {editingWorkout ? 'Salvar Alterações' : 'Criar Treino'}
+                </button>
+              </div>
+            </div>
           </div>
-          <button 
-            onClick={() => setEditingWorkout({
-              id: Math.random().toString(36).substr(2, 9),
-              title: 'Novo Treino',
-              description: '',
-              exercises: [],
-              color: 'blue'
-            })}
-            className="p-2 bg-blue-600/20 text-blue-500 rounded-xl hover:bg-blue-600/30 transition-all"
-          >
-            <Plus size={24} />
-          </button>
-        </div>
+        )}
 
-        <div className="grid grid-cols-1 gap-4">
-          {studentWorkouts.length === 0 ? (
-            <div className="text-center py-20 glass-card rounded-3xl border-dashed border-white/10">
-              <Dumbbell size={48} className="mx-auto text-zinc-800 mb-4" />
-              <p className="text-zinc-500 font-bold uppercase tracking-widest text-xs">Nenhum treino cadastrado.</p>
+        {/* Exercise Picker Modal */}
+        {isExercisePickerOpen && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+            <div className="bg-zinc-950 w-full max-w-lg max-h-[80vh] overflow-hidden rounded-[2.5rem] border border-white/10 flex flex-col">
+              <div className="p-6 border-b border-white/5">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-black text-white uppercase tracking-tighter italic">Escolher Exercício</h3>
+                  <button onClick={() => setIsExercisePickerOpen(false)} className="text-zinc-500 hover:text-white"><X size={24} /></button>
+                </div>
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600" size={18} />
+                  <input 
+                    type="text"
+                    value={exerciseSearch}
+                    onChange={(e) => setExerciseSearch(e.target.value)}
+                    className="w-full bg-zinc-900 border border-white/5 rounded-xl p-3 pl-12 text-sm text-white outline-none focus:border-blue-500/50"
+                    placeholder="Buscar exercício..."
+                  />
+                </div>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                {filteredExercises.map((ex, i) => (
+                  <button
+                    key={i}
+                    onClick={() => addExerciseToWorkout(ex)}
+                    className="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-white/5 transition-colors text-left group"
+                  >
+                    <GifImage exerciseName={ex.name} originalUrl={ex.image} className="w-12 h-12 rounded-lg object-cover bg-zinc-900" />
+                    <div className="flex-1">
+                      <p className="text-xs font-black text-white uppercase tracking-tight group-hover:text-blue-400 transition-colors">{ex.name}</p>
+                      <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{ex.muscleGroup}</p>
+                    </div>
+                    <PlusCircle size={20} className="text-zinc-700 group-hover:text-blue-500 transition-colors" />
+                  </button>
+                ))}
+              </div>
             </div>
-          ) : (
-            studentWorkouts.map((workout) => (
-              <motion.div 
-                key={workout.id}
-                whileHover={{ scale: 1.01 }}
-                className="glass-card p-6 rounded-3xl border border-white/5 flex items-center justify-between group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-500">
-                    <FileText size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-black uppercase italic tracking-tight">{workout.title}</h3>
-                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-                      {workout.exercises.length} Exercícios
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => setEditingWorkout(workout)}
-                    className="p-3 hover:bg-blue-600/10 text-blue-500 rounded-xl transition-all"
-                  >
-                    <Edit2 size={20} />
-                  </button>
-                  <button 
-                    onClick={() => handleDeleteWorkout(workout.id)}
-                    className="p-3 hover:bg-red-500/10 text-red-500 rounded-xl transition-all"
-                  >
-                    <Trash2 size={20} />
-                  </button>
-                </div>
-              </motion.div>
-            ))
-          )}
-        </div>
+          </div>
+        )}
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <div className="space-y-2">
-        <h2 className="text-4xl font-black uppercase italic tracking-tighter leading-none">
-          ÁREA DO <span className="text-blue-500">PROFESSOR</span>
-        </h2>
-        <p className="text-xs font-bold text-zinc-500 uppercase tracking-[0.3em]">Gerencie seus alunos e treinos</p>
-      </div>
-
-      <div className="relative group">
-        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-blue-500 transition-all" size={20} />
-        <input 
-          type="text" 
-          placeholder="BUSCAR ALUNO..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl p-5 pl-14 text-white font-black outline-none focus:border-blue-500/50 transition-all placeholder:text-zinc-700"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 gap-4">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <Users size={18} className="text-blue-500" />
-            <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400">Seus Alunos</h3>
-          </div>
+    <div className="space-y-8 animate-slide-up pb-20">
+      <header className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-black text-white uppercase tracking-tighter italic leading-none">
+            ÁREA DO <span className="text-blue-500">PROFESSOR</span>
+          </h2>
+          <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Gestão de alunos e treinos</p>
+        </div>
+        <div className="flex bg-zinc-900/40 p-1 rounded-2xl border border-white/5">
           <button 
-            onClick={() => setIsNewStudentModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600/10 text-blue-500 rounded-xl hover:bg-blue-600/20 transition-all text-[10px] font-black uppercase tracking-widest"
+            onClick={() => setActiveSubTab('students')}
+            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeSubTab === 'students' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-zinc-500 hover:text-zinc-300'}`}
           >
-            <Plus size={14} />
-            Novo Aluno
+            Alunos
+          </button>
+          <button 
+            onClick={() => setActiveSubTab('database')}
+            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeSubTab === 'database' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-zinc-500 hover:text-zinc-300'}`}
+          >
+            Base
           </button>
         </div>
+      </header>
 
-        {students
-          .filter(s => s.toLowerCase().includes(searchTerm.toLowerCase()))
-          .map((student) => (
-          <motion.button
-            key={student}
-            whileHover={{ scale: 1.02, x: 5 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setSelectedStudent(student)}
-            className="glass-card p-6 rounded-3xl border border-white/5 flex items-center justify-between group text-left"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-zinc-900 flex items-center justify-center text-zinc-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
-                <UserIcon size={28} />
-              </div>
-              <div>
-                <h4 className="text-lg font-black uppercase italic tracking-tight">{student.charAt(0).toUpperCase() + student.slice(1)}</h4>
-                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-                  {allWorkouts[student as keyof typeof allWorkouts]?.length || 0} Treinos Ativos
-                </p>
-              </div>
+      {activeSubTab === 'students' ? (
+        <div className="space-y-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600" size={20} />
+              <input 
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl p-5 pl-14 text-white font-bold outline-none focus:border-blue-500/50 backdrop-blur-sm"
+                placeholder="BUSCAR ALUNO..."
+              />
             </div>
-            <div className="p-3 bg-white/5 rounded-xl group-hover:bg-blue-600/20 group-hover:text-blue-500 transition-all">
-              <ChevronRight size={20} />
-            </div>
-          </motion.button>
-        ))}
-      </div>
-
-      <AnimatePresence>
-        {isNewStudentModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsNewStudentModalOpen(false)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            />
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="relative w-full max-w-md glass-card p-8 rounded-[2.5rem] border border-white/10 shadow-2xl"
+            <button 
+              onClick={() => setIsAddingStudent(true)}
+              className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-600/20 flex items-center justify-center gap-3 transition-all"
             >
-              <h3 className="text-2xl font-black uppercase italic tracking-tighter mb-6">
-                Novo <span className="text-blue-500">Aluno</span>
-              </h3>
-              
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Nome Completo</label>
-                  <input 
-                    type="text"
-                    value={newStudentName}
-                    onChange={(e) => setNewStudentName(e.target.value)}
-                    placeholder="Ex: João Silva"
-                    className="w-full bg-zinc-950/40 border border-white/5 rounded-2xl p-5 text-white font-bold outline-none focus:border-blue-500/50 transition-all"
-                    autoFocus
-                  />
-                </div>
+              <Plus size={20} /> NOVO ALUNO
+            </button>
+          </div>
 
-                <div className="flex gap-3 pt-4">
-                  <button 
-                    onClick={() => setIsNewStudentModalOpen(false)}
-                    className="flex-1 py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
-                  >
-                    Cancelar
-                  </button>
-                  <button 
-                    onClick={handleAddStudent}
-                    className="flex-1 py-4 bg-blue-600 hover:bg-blue-700 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20"
-                  >
-                    Criar Aluno
-                  </button>
+          <div className="grid grid-cols-1 gap-4">
+            {filteredStudents.map((student) => (
+              <div 
+                key={student.username}
+                className="glass-card rounded-[2.5rem] border border-white/5 hover:border-blue-500/30 transition-all group overflow-hidden"
+              >
+                <div className="p-6 flex items-center justify-between">
+                  <div className="flex items-center gap-5">
+                    <div className="w-16 h-16 rounded-2xl bg-zinc-900 flex items-center justify-center border border-white/5 group-hover:scale-110 transition-transform duration-500">
+                      <UserIcon size={32} className="text-zinc-700 group-hover:text-blue-500 transition-colors" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black text-white uppercase tracking-tight italic">{student.name}</h3>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">@{student.username}</span>
+                        <div className="w-1 h-1 bg-zinc-800 rounded-full"></div>
+                        <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">{allWorkouts[student.username.toLowerCase()]?.length || 0} TREINOS</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={() => setSelectedStudent(student.username)}
+                      className="bg-zinc-900/50 hover:bg-blue-600 text-zinc-600 hover:text-white w-12 h-12 rounded-2xl flex items-center justify-center transition-all border border-white/5"
+                    >
+                      <ChevronRight size={24} />
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteStudent(student.username)}
+                      className="bg-zinc-900/50 hover:bg-rose-500/20 text-zinc-600 hover:text-rose-500 w-12 h-12 rounded-2xl flex items-center justify-center transition-all border border-white/5"
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+            ))}
 
-      <div className="glass-card p-8 rounded-[2.5rem] border border-white/5 bg-gradient-to-br from-blue-600/10 to-transparent">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="p-3 bg-blue-600 rounded-2xl">
-            <Settings size={24} className="text-white" />
+            {filteredStudents.length === 0 && (
+              <div className="p-20 text-center border-2 border-dashed border-white/5 rounded-[3rem]">
+                <Users size={48} className="text-zinc-800 mx-auto mb-4" />
+                <p className="text-zinc-600 text-xs font-black uppercase tracking-[0.2em]">Nenhum aluno encontrado.</p>
+              </div>
+            )}
           </div>
-          <h3 className="text-xl font-black uppercase italic tracking-tighter">Configurações Rápidas</h3>
         </div>
-        <p className="text-zinc-400 text-xs font-bold uppercase tracking-widest leading-relaxed mb-6">
-          Ajuste as permissões globais ou adicione novos alunos à sua base de dados.
-        </p>
-        <button 
-          onClick={() => setIsDatabaseView(true)}
-          className="w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all"
-        >
-          Gerenciar Base de Dados
-        </button>
-      </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="relative">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600" size={20} />
+            <input 
+              type="text"
+              value={exerciseSearch}
+              onChange={(e) => setExerciseSearch(e.target.value)}
+              className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl p-5 pl-14 text-white font-bold outline-none focus:border-blue-500/50 backdrop-blur-sm"
+              placeholder="BUSCAR NA BASE DE EXERCÍCIOS..."
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filteredExercises.map((ex, i) => (
+              <div key={i} className="glass-card p-4 rounded-3xl border border-white/5 flex items-center gap-4 bg-zinc-900/20">
+                <GifImage exerciseName={ex.name} originalUrl={ex.image} className="w-20 h-20 rounded-2xl object-cover bg-zinc-950 border border-white/5" />
+                <div>
+                  <h4 className="font-black text-white uppercase tracking-tight italic">{ex.name}</h4>
+                  <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mt-1">{ex.muscleGroup}</p>
+                  <div className="flex gap-3 mt-2">
+                    <div className="flex flex-col">
+                      <span className="text-[7px] font-black text-zinc-600 uppercase">Séries</span>
+                      <span className="text-[10px] font-bold text-zinc-400">{ex.defaultSets}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[7px] font-black text-zinc-600 uppercase">Reps</span>
+                      <span className="text-[10px] font-bold text-zinc-400">{ex.defaultReps}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[7px] font-black text-zinc-600 uppercase">Descanso</span>
+                      <span className="text-[10px] font-bold text-zinc-400">{ex.defaultRest}s</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Add Student Modal */}
+      {isAddingStudent && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-zinc-950 w-full max-w-md rounded-[2.5rem] border border-white/10 p-8 space-y-8 shadow-2xl"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Novo Aluno</h3>
+              <button onClick={() => setIsAddingStudent(false)} className="text-zinc-500 hover:text-white"><X size={24} /></button>
+            </div>
+
+            <form onSubmit={handleAddStudent} className="space-y-5">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Nome Completo</label>
+                <input 
+                  type="text"
+                  required
+                  value={newStudentData.name}
+                  onChange={(e) => setNewStudentData({...newStudentData, name: e.target.value})}
+                  className="w-full bg-zinc-900 border border-white/5 rounded-2xl p-4 text-white font-bold outline-none focus:border-blue-500/50"
+                  placeholder="Ex: João Silva"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Usuário (Login)</label>
+                <input 
+                  type="text"
+                  required
+                  value={newStudentData.username}
+                  onChange={(e) => setNewStudentData({...newStudentData, username: e.target.value})}
+                  className="w-full bg-zinc-900 border border-white/5 rounded-2xl p-4 text-white font-bold outline-none focus:border-blue-500/50"
+                  placeholder="Ex: joaosilva"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Senha</label>
+                <input 
+                  type="password"
+                  required
+                  value={newStudentData.password}
+                  onChange={(e) => setNewStudentData({...newStudentData, password: e.target.value})}
+                  className="w-full bg-zinc-900 border border-white/5 rounded-2xl p-4 text-white font-bold outline-none focus:border-blue-500/50"
+                  placeholder="••••••••"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Idade (Opcional)</label>
+                <input 
+                  type="number"
+                  value={newStudentData.age}
+                  onChange={(e) => setNewStudentData({...newStudentData, age: e.target.value})}
+                  className="w-full bg-zinc-900 border border-white/5 rounded-2xl p-4 text-white font-bold outline-none focus:border-blue-500/50"
+                  placeholder="Ex: 25"
+                />
+              </div>
+
+              <button 
+                type="submit"
+                className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-[0.4em] rounded-2xl shadow-xl shadow-blue-600/20 transition-all mt-4"
+              >
+                CADASTRAR ALUNO
+              </button>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };
-
-const UserIcon = ({ size }: { size: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-    <circle cx="12" cy="7" r="4" />
-  </svg>
-);
