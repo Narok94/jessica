@@ -98,20 +98,64 @@ export const getExerciseGifUrlVariations = (exerciseName: string, originalUrl?: 
   const variations = [
     normalized,
     original,
-    originalWithHifens,
+    original.replace(/\s+/g, "-"),
+    original.replace(/\s+/g, "_"),
     original.toLowerCase(),
-    original.toLowerCase().replace(/\s+/g, "-")
+    original.toLowerCase().replace(/\s+/g, "-"),
+    original.toLowerCase().replace(/\s+/g, "_"),
+    original.replace(/\./g, ""),
+    original.replace(/\./g, "").replace(/\s+/g, "-"),
+    original.replace(/\./g, "").replace(/\s+/g, "_"),
+    original.toLowerCase().replace(/\./g, "").replace(/\s+/g, "-"),
+    original.toLowerCase().replace(/\./g, "").replace(/\s+/g, "_"),
   ];
+
+  // Adiciona variações de primeiras palavras
+  const words = original.split(/\s+/);
+  if (words.length > 0) {
+    variations.push(words[0].toLowerCase());
+  }
+  if (words.length > 1) {
+    variations.push(words[0] + "-" + words[1]);
+    variations.push(words[0].toLowerCase() + "-" + words[1].toLowerCase());
+    variations.push(words[0] + "_" + words[1]);
+    variations.push(words[0].toLowerCase() + "_" + words[1].toLowerCase());
+  }
+  
+  // Variação simplificada (remove termos comuns)
+  const simplified = original.replace(/\s+(aberta|fechada|pronada|supinada|neutra|com|no|na|de|do|da|barra|halter|halteres|maquina|cross|polia|corda|triangulo|reta|w)\s+/gi, " ");
+  if (simplified !== original) {
+    variations.push(simplified.replace(/\s+/g, "-").toLowerCase());
+    variations.push(simplified.replace(/\s+/g, "_").toLowerCase());
+  }
+
+  // Variação que remove termos do final
+  const cleanEnd = original.replace(/\s+(barra|halter|halteres|maquina|cross|polia|corda|triangulo|reta|w|aberta|fechada|pronada|supinada|neutra)$/gi, "");
+  if (cleanEnd !== original) {
+    variations.push(cleanEnd.replace(/\s+/g, "-").toLowerCase());
+    variations.push(cleanEnd.replace(/\s+/g, "_").toLowerCase());
+  }
+
+  // Variação com pontos
+  variations.push(original.replace(/\s+/g, "."));
+  variations.push(original.toLowerCase().replace(/\s+/g, "."));
+  variations.push(original.replace(/\s+/g, ".").toLowerCase());
+
+  // Variação sem espaços
+  variations.push(original.replace(/\s+/g, "").toLowerCase());
+  variations.push(original.replace(/\s+/g, ""));
 
   // Remove duplicatas e gera URLs
   const uniqueVariations = Array.from(new Set(variations));
   
   // Tenta tanto jsDelivr quanto GitHub Raw em diferentes pastas e extensões
   const urls: string[] = [];
-  const extensions = ['.gif', '.GIF', '.mp4', '.MP4'];
-  const folders = ['', 'gifs/'];
+  const extensions = ['.gif', '.GIF', '.mp4', '.MP4', '.webp', '.WEBP'];
+  const folders = ['', 'assets/', 'gifs/', 'assets/gifs/', 'exercises/', 'Exercises/'];
   
-  uniqueVariations.forEach(v => {
+  const finalVariations = Array.from(new Set(uniqueVariations));
+
+  finalVariations.forEach(v => {
     const encoded = encodeURIComponent(v);
     
     folders.forEach(folder => {
