@@ -51,8 +51,8 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   }, [exercise.name]);
 
   const handleMediaError = () => {
-    // Se o link do GitHub falhar, tenta o link original da base de dados
-    if (currentMediaUrl.includes('raw.githubusercontent.com')) {
+    // Se o link do GitHub/jsDelivr falhar, tenta o link original da base de dados
+    if (currentMediaUrl.includes('githubusercontent.com') || currentMediaUrl.includes('jsdelivr.net')) {
       if (exercise.videoUrl || exercise.image) {
         setCurrentMediaUrl(exercise.videoUrl || exercise.image || '');
       } else {

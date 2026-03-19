@@ -27,13 +27,20 @@ export const normalizeExerciseName = (name: string): string => {
     "Biceps concentrado": "biceps-concentrado-unilateral-no-cross",
     "Biceps polia alta": "biceps-polia-alta-dupla",
     "Rosca concentrada": "rosca-concentrada",
-    "Rosca martelo": "rosca-com-halteres", // Geralmente martelo é com halteres
+    "Rosca martelo": "rosca-com-halteres",
     "Rosca Scott": "rosca-de-biceps-com-halteres-no-banco-scott",
     "Cadeira extensora": "cadeira-extensora",
     "Cadeira flexora": "cadeira-flexora",
     "Leg press": "leg-press-45",
     "Agachamento livre": "agachamento-livre",
     "Panturrilha em pe": "panturrilha-em-pe",
+    // Adicionando mapeamentos para os exercícios que falharam no print
+    "Pulley anterior aberta": "pulley-anterior-aberta",
+    "Remada articulada neutra": "remada-articulada-neutra",
+    "Crucifixo inverso máquina pronada": "crucifixo-inverso-maquina-pronada",
+    "Remada baixa peg. neutra": "remada-baixa-peg-neutra",
+    "Puxada anterior": "pulley-anterior-aberta",
+    "Puxada frente": "pulley-anterior-aberta",
   };
 
   if (manualMapping[name]) return manualMapping[name];
@@ -44,7 +51,7 @@ export const normalizeExerciseName = (name: string): string => {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") // Remove acentos
     .replace(/\s+/g, "-")           // Espaços para hifens
-    .replace(/[^a-z0-9-]/g, "")     // Remove caracteres especiais
+    .replace(/[^a-z0-9-()]/g, "")   // Remove caracteres especiais, mas mantém parênteses
     .replace(/-+/g, "-")            // Remove hifens duplos
     .trim();
 };
@@ -54,9 +61,8 @@ export const normalizeExerciseName = (name: string): string => {
  */
 export const getExerciseGifUrl = (exerciseName: string): string => {
   const normalized = normalizeExerciseName(exerciseName);
-  // Se o nome normalizado contém espaços ou maiúsculas (caso do manualMapping), 
-  // precisamos garantir que a URL seja construída corretamente.
-  // O GitHub raw URL aceita espaços como %20.
   const urlFriendlyName = encodeURIComponent(normalized);
-  return `https://raw.githubusercontent.com/Narok94/tatu-gym-assets/main/${urlFriendlyName}.gif`;
+  
+  // Usando jsDelivr como proxy para o GitHub - costuma ser mais estável e rápido para carregar assets
+  return `https://cdn.jsdelivr.net/gh/Narok94/tatu-gym-assets@main/${urlFriendlyName}.gif`;
 };
