@@ -1,7 +1,6 @@
 
 /**
  * Normaliza o nome do exercício para o padrão de arquivo do GitHub
- * Ex: "Supino Reto" -> "supino-reto"
  */
 export const normalizeExerciseName = (name: string): string => {
   // Mapeamento manual para nomes que não seguem o padrão ou têm typos no repositório
@@ -34,13 +33,26 @@ export const normalizeExerciseName = (name: string): string => {
     "Leg press": "leg-press-45",
     "Agachamento livre": "agachamento-livre",
     "Panturrilha em pe": "panturrilha-em-pe",
-    // Adicionando mapeamentos para os exercícios que falharam no print
     "Pulley anterior aberta": "pulley-anterior-aberta",
     "Remada articulada neutra": "remada-articulada-neutra",
     "Crucifixo inverso máquina pronada": "crucifixo-inverso-maquina-pronada",
     "Remada baixa peg. neutra": "remada-baixa-peg-neutra",
     "Puxada anterior": "pulley-anterior-aberta",
     "Puxada frente": "pulley-anterior-aberta",
+    "Supino inclinado iso articulado deitado (shua)": "supino-inclinado-iso-articulado-deitado-shua",
+    "Elevação lateral c/ halter 0º-180º neutra": "elevacao-lateral-c-halter-0-180-neutra",
+    "Abdomen Infra (Pingus)": "abdomen-infra",
+    "Agachamento Livre Banco": "agachamento-livre-banco",
+    "Cadeira Adutora": "cadeira-adutora",
+    "Afundo": "afundo",
+    "Panturrilha em pé inclinado": "panturrilha-em-pe-inclinado",
+    "Abdomen Reto": "abdomen-reto",
+    "Elevação Frontal Halteres": "elevacao-frontal-com-halteres",
+    "Supino Máquina": "supino-maquina",
+    "Desenvolvimento Máquina": "desenvolvimento-maquina",
+    "Crucifixo Banco Halteres": "crucifixo-com-halteres-em-banco-plano",
+    "Remada Alta Kettlebell": "remada-alta-com-kettlebell",
+    "Extensão Lombar Livre": "extensao-lombar",
   };
 
   if (manualMapping[name]) return manualMapping[name];
@@ -62,9 +74,7 @@ export const normalizeExerciseName = (name: string): string => {
 export const getExerciseGifUrl = (exerciseName: string): string => {
   const normalized = normalizeExerciseName(exerciseName);
   const urlFriendlyName = encodeURIComponent(normalized);
-  
-  // Usando jsDelivr como proxy para o GitHub - costuma ser mais estável e rápido para carregar assets
-  return `https://cdn.jsdelivr.net/gh/Narok94/tatu-gym-assets@main/${urlFriendlyName}.gif`;
+  return `https://raw.githubusercontent.com/Narok94/tatu-gym-assets/main/${urlFriendlyName}.gif`;
 };
 
 /**
@@ -86,12 +96,23 @@ export const getExerciseGifUrlVariations = (exerciseName: string): string[] => {
   // Remove duplicatas e gera URLs
   const uniqueVariations = Array.from(new Set(variations));
   
-  // Tenta tanto jsDelivr quanto GitHub Raw
+  // Tenta tanto jsDelivr quanto GitHub Raw em diferentes pastas e extensões
   const urls: string[] = [];
+  const extensions = ['.gif', '.GIF', '.mp4', '.MP4'];
+  const folders = ['', 'gifs/'];
+  
   uniqueVariations.forEach(v => {
     const encoded = encodeURIComponent(v);
-    urls.push(`https://cdn.jsdelivr.net/gh/Narok94/tatu-gym-assets@main/${encoded}.gif`);
-    urls.push(`https://raw.githubusercontent.com/Narok94/tatu-gym-assets/main/${encoded}.gif`);
+    
+    folders.forEach(folder => {
+      extensions.forEach(ext => {
+        const filename = `${encoded}${ext}`;
+        // GitHub Raw
+        urls.push(`https://raw.githubusercontent.com/Narok94/tatu-gym-assets/main/${folder}${filename}`);
+        // jsDelivr
+        urls.push(`https://cdn.jsdelivr.net/gh/Narok94/tatu-gym-assets@main/${folder}${filename}`);
+      });
+    });
   });
   
   return urls;
