@@ -66,3 +66,33 @@ export const getExerciseGifUrl = (exerciseName: string): string => {
   // Usando jsDelivr como proxy para o GitHub - costuma ser mais estável e rápido para carregar assets
   return `https://cdn.jsdelivr.net/gh/Narok94/tatu-gym-assets@main/${urlFriendlyName}.gif`;
 };
+
+/**
+ * Retorna uma lista de URLs possíveis para o GIF (para fallback)
+ */
+export const getExerciseGifUrlVariations = (exerciseName: string): string[] => {
+  const normalized = normalizeExerciseName(exerciseName);
+  const original = exerciseName.trim();
+  const originalWithHifens = original.replace(/\s+/g, "-");
+
+  const variations = [
+    normalized,
+    original,
+    originalWithHifens,
+    original.toLowerCase(),
+    original.toLowerCase().replace(/\s+/g, "-")
+  ];
+
+  // Remove duplicatas e gera URLs
+  const uniqueVariations = Array.from(new Set(variations));
+  
+  // Tenta tanto jsDelivr quanto GitHub Raw
+  const urls: string[] = [];
+  uniqueVariations.forEach(v => {
+    const encoded = encodeURIComponent(v);
+    urls.push(`https://cdn.jsdelivr.net/gh/Narok94/tatu-gym-assets@main/${encoded}.gif`);
+    urls.push(`https://raw.githubusercontent.com/Narok94/tatu-gym-assets/main/${encoded}.gif`);
+  });
+  
+  return urls;
+};

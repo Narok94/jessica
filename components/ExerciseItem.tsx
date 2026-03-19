@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { Exercise, SetPerformance } from '../types';
-import { getExerciseGifUrl } from '../src/utils/exerciseUtils';
+import { getExerciseGifUrl, getExerciseGifUrlVariations } from '../src/utils/exerciseUtils';
 import { 
   ChevronDown, 
   Timer, 
@@ -42,24 +42,37 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   const [showVideo, setShowVideo] = useState(false);
   const [mediaError, setMediaError] = useState(false);
   const [currentMediaUrl, setCurrentMediaUrl] = useState<string>('');
+  const [variationIndex, setVariationIndex] = useState(0);
+  const variationsRef = useRef<string[]>([]);
   const timerRef = useRef<number | null>(null);
 
   // Determina a URL da mídia (GitHub primeiro, depois a original)
   useEffect(() => {
-    const githubUrl = getExerciseGifUrl(exercise.name);
-    setCurrentMediaUrl(githubUrl);
+    const variations = getExerciseGifUrlVariations(exercise.name);
+    variationsRef.current = variations;
+    setVariationIndex(0);
+    setCurrentMediaUrl(variations[0]);
+    setMediaError(false);
   }, [exercise.name]);
 
   const handleMediaError = () => {
-    // Se o link do GitHub/jsDelivr falhar, tenta o link original da base de dados
-    if (currentMediaUrl.includes('githubusercontent.com') || currentMediaUrl.includes('jsdelivr.net')) {
+    const nextIndex = variationIndex + 1;
+    if (nextIndex < variationsRef.current.length) {
+      setVariationIndex(nextIndex);
+      setCurrentMediaUrl(variationsRef.current[nextIndex]);
+    } else {
+      // Se todas as variações do GitHub falharem, tenta o link original da base de dados
       if (exercise.videoUrl || exercise.image) {
-        setCurrentMediaUrl(exercise.videoUrl || exercise.image || '');
+        const originalMedia = exercise.videoUrl || exercise.image || '';
+        // Evita loop se o original for um dos que já tentamos
+        if (!variationsRef.current.includes(originalMedia) && currentMediaUrl !== originalMedia) {
+          setCurrentMediaUrl(originalMedia);
+        } else {
+          setMediaError(true);
+        }
       } else {
         setMediaError(true);
       }
-    } else {
-      setMediaError(true);
     }
   };
   
