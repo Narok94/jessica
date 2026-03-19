@@ -1,116 +1,87 @@
 
+import { getExerciseGifUrl } from '../src/utils/exerciseUtils';
+
 export interface BaseExercise {
   name: string;
   muscleGroup: string;
   defaultSets: number;
   defaultReps: string;
   defaultRest: number;
+  image?: string;
 }
 
 export const exerciseDatabase: BaseExercise[] = [
   // PEITO
-  { name: 'Supino Reto Barra', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '10-12', defaultRest: 90 },
-  { name: 'Supino Inclinado Barra', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '10-12', defaultRest: 90 },
-  { name: 'Supino Declinado Barra', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '10-12', defaultRest: 90 },
-  { name: 'Supino Reto Halteres', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '10-12', defaultRest: 90 },
-  { name: 'Supino Inclinado Halteres', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '10-12', defaultRest: 90 },
-  { name: 'Crucifixo Reto Halteres', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Crucifixo Inclinado Halteres', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Crossover Polia Alta', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Crossover Polia Baixa', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Peck Deck (Voador)', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Flexão de Braços', muscleGroup: 'Peito', defaultSets: 3, defaultReps: 'Máx', defaultRest: 60 },
-  { name: 'Dips (Paralelas) - Foco Peito', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '8-12', defaultRest: 90 },
+  { name: 'Supino Máquina', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Supino Máquina') },
+  { name: 'Supino Reto Barra', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '10-12', defaultRest: 90, image: getExerciseGifUrl('Supino Reto Barra') },
+  { name: 'Supino Inclinado Barra', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '10-12', defaultRest: 90, image: getExerciseGifUrl('Supino Inclinado Barra') },
+  { name: 'Supino Inclinado iso articulado deitado (shua)', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Supino inclinado iso articulado deitado (shua)') },
+  { name: 'Crucifixo Máquina', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Crucifixo Máquina') },
+  { name: 'Crucifixo Banco Halteres', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Crucifixo Banco Halteres') },
+  { name: 'Flexão de Braços', muscleGroup: 'Peito', defaultSets: 3, defaultReps: 'Máx', defaultRest: 60, image: getExerciseGifUrl('Flexão de Braços') },
+  { name: 'Peck Deck (Voador)', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Peck Deck') },
+  { name: 'Supino Reto Halteres', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '10-12', defaultRest: 90, image: getExerciseGifUrl('Supino Reto Halteres') },
+  { name: 'Supino Inclinado Halteres', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '10-12', defaultRest: 90, image: getExerciseGifUrl('Supino Inclinado Halteres') },
+
+  { name: 'Supino Máquina', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Supino Máquina') },
+  { name: 'Crucifixo máquina', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Crucifixo máquina') },
+  { name: 'Supino inclinado iso articulado deitado (shua)', muscleGroup: 'Peito', defaultSets: 3, defaultReps: '10-12', defaultRest: 90, image: getExerciseGifUrl('Supino inclinado iso articulado deitado (shua)') },
 
   // COSTAS
-  { name: 'Puxada Frontal Aberta', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
-  { name: 'Puxada Frontal Supinada', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
-  { name: 'Puxada Triângulo', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
-  { name: 'Remada Curvada Barra', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '8-12', defaultRest: 90 },
-  { name: 'Remada Cavalinho', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '8-12', defaultRest: 90 },
-  { name: 'Remada Baixa Triângulo', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
-  { name: 'Remada Unilateral (Serrote)', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
-  { name: 'Pull Down Corda', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Barra Fixa (Pull Up)', muscleGroup: 'Costas', defaultSets: 3, defaultReps: 'Máx', defaultRest: 90 },
-  { name: 'Levantamento Terra', muscleGroup: 'Costas/Pernas', defaultSets: 3, defaultReps: '5-8', defaultRest: 120 },
-  { name: 'Lombar no Banco Romano', muscleGroup: 'Lombar', defaultSets: 3, defaultReps: '15', defaultRest: 60 },
+  { name: 'Puxada anterior', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Puxada anterior') },
+  { name: 'Puxada frente', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Puxada frente') },
+  { name: 'Pulley anterior aberta', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Pulley anterior aberta') },
+  { name: 'Puxada supinada', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Puxada supinada') },
+  { name: 'Remada articulada neutra', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Remada articulada neutra') },
+  { name: 'Remada baixa peg. neutra', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Remada baixa peg. neutra') },
+  { name: 'Remada baixa', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Remada baixa') },
+  { name: 'Puxada Triângulo', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '10-12', defaultRest: 60, image: getExerciseGifUrl('Puxada Triângulo') },
+  { name: 'Remada Curvada Barra', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '8-12', defaultRest: 90, image: getExerciseGifUrl('Remada Curvada Barra') },
+  { name: 'Remada Cavalinho', muscleGroup: 'Costas', defaultSets: 3, defaultReps: '8-12', defaultRest: 90, image: getExerciseGifUrl('Remada Cavalinho') },
 
   // OMBROS
-  { name: 'Desenvolvimento Barra Militar', muscleGroup: 'Ombros', defaultSets: 3, defaultReps: '8-10', defaultRest: 90 },
-  { name: 'Desenvolvimento Halteres Sentado', muscleGroup: 'Ombros', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
-  { name: 'Desenvolvimento Arnold', muscleGroup: 'Ombros', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
-  { name: 'Elevação Lateral Halteres', muscleGroup: 'Ombros', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Elevação Lateral Polia', muscleGroup: 'Ombros', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Elevação Frontal Halteres', muscleGroup: 'Ombros', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Elevação Frontal Barra', muscleGroup: 'Ombros', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Crucifixo Inverso Halteres', muscleGroup: 'Ombros', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Crucifixo Inverso Peck Deck', muscleGroup: 'Ombros', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Encolhimento Halteres', muscleGroup: 'Trapézio', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Remada Alta Barra', muscleGroup: 'Trapézio/Ombros', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
+  { name: 'Elevação lateral', muscleGroup: 'Ombros', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Elevação lateral') },
+  { name: 'Elevação frontal', muscleGroup: 'Ombros', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Elevação frontal') },
+  { name: 'Elevação lateral c/ halter 0º-180º neutra', muscleGroup: 'Ombros', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Elevação lateral c/ halter 0º-180º neutra') },
+  { name: 'Desenvolvimento Máquina', muscleGroup: 'Ombros', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Desenvolvimento Máquina') },
+  { name: 'Crucifixo inverso máquina pronada', muscleGroup: 'Ombros', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Crucifixo inverso máquina pronada') },
+  { name: 'Remada Alta Kettlebell', muscleGroup: 'Trapézio/Ombros', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Remada Alta Kettlebell') },
+  { name: 'Desenvolvimento Arnold', muscleGroup: 'Ombros', defaultSets: 3, defaultReps: '10-12', defaultRest: 60, image: getExerciseGifUrl('Desenvolvimento Arnold') },
 
   // BÍCEPS
-  { name: 'Rosca Direta Barra W', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
-  { name: 'Rosca Direta Barra Reta', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
-  { name: 'Rosca Alternada Halteres', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
-  { name: 'Rosca Martelo Halteres', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
-  { name: 'Rosca Concentrada', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '12', defaultRest: 60 },
-  { name: 'Rosca Scott Barra W', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
-  { name: 'Rosca Inversa Barra', muscleGroup: 'Antebraço', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Rosca Punho', muscleGroup: 'Antebraço', defaultSets: 3, defaultReps: '15', defaultRest: 45 },
+  { name: 'Rosca direta', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Rosca direta') },
+  { name: 'Rosca alternada', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Rosca alternada') },
+  { name: 'Rosca martelo no cross corda', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Rosca martelo no cross corda') },
+  { name: 'Rosca direta pulley', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Rosca direta pulley') },
+  { name: 'Rosca direta barra w', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Rosca direta barra w') },
+  { name: 'Rosca direta pegada aberta', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Rosca direta pegada aberta') },
+  { name: 'Rosca direta pegada fechada', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Rosca direta pegada fechada') },
+  { name: 'Biceps concentrado', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Biceps concentrado') },
+  { name: 'Biceps polia alta', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Biceps polia alta') },
+  { name: 'Rosca concentrada', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Rosca concentrada') },
+  { name: 'Rosca martelo', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Rosca martelo') },
+  { name: 'Rosca no Cabo Deitado', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Rosca no Cabo Deitado') },
+  { name: 'Rosca Scott', muscleGroup: 'Bíceps', defaultSets: 3, defaultReps: '10-12', defaultRest: 60, image: getExerciseGifUrl('Rosca Scott') },
 
   // TRÍCEPS
-  { name: 'Tríceps Pulley Barra Reta', muscleGroup: 'Tríceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Tríceps Pulley Corda', muscleGroup: 'Tríceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Tríceps Testa Barra W', muscleGroup: 'Tríceps', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
-  { name: 'Tríceps Francês Halter', muscleGroup: 'Tríceps', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
-  { name: 'Tríceps Coice Polia', muscleGroup: 'Tríceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 45 },
-  { name: 'Supino Fechado', muscleGroup: 'Tríceps/Peito', defaultSets: 3, defaultReps: '8-10', defaultRest: 90 },
-  { name: 'Mergulho no Banco', muscleGroup: 'Tríceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
+  { name: 'Tríceps no cross', muscleGroup: 'Tríceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Tríceps no cross') },
+  { name: 'Tríceps corda', muscleGroup: 'Tríceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Tríceps corda') },
+  { name: 'Tríceps francês', muscleGroup: 'Tríceps', defaultSets: 3, defaultReps: '10-12', defaultRest: 60, image: getExerciseGifUrl('Tríceps francês') },
+  { name: 'Tríceps testa', muscleGroup: 'Tríceps', defaultSets: 3, defaultReps: '10-12', defaultRest: 60, image: getExerciseGifUrl('Tríceps testa') },
 
-  // PERNAS (QUADRÍCEPS)
-  { name: 'Agachamento Livre', muscleGroup: 'Quadríceps', defaultSets: 3, defaultReps: '8-12', defaultRest: 120 },
-  { name: 'Leg Press 45º', muscleGroup: 'Quadríceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 90 },
-  { name: 'Cadeira Extensora', muscleGroup: 'Quadríceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Agachamento Hack', muscleGroup: 'Quadríceps', defaultSets: 3, defaultReps: '10-12', defaultRest: 90 },
-  { name: 'Afundo com Halteres', muscleGroup: 'Pernas', defaultSets: 3, defaultReps: '10-12', defaultRest: 60 },
-  { name: 'Agachamento Sumô', muscleGroup: 'Pernas/Glúteo', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
+  // PERNAS
+  { name: 'Leg press', muscleGroup: 'Quadríceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 90, image: getExerciseGifUrl('Leg press') },
+  { name: 'Agachamento livre', muscleGroup: 'Quadríceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 90, image: getExerciseGifUrl('Agachamento livre') },
+  { name: 'Agachamento Livre Banco', muscleGroup: 'Quadríceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Agachamento Livre Banco') },
+  { name: 'Cadeira extensora', muscleGroup: 'Quadríceps', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Cadeira extensora') },
+  { name: 'Cadeira flexora', muscleGroup: 'Posterior', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Cadeira flexora') },
+  { name: 'Cadeira Adutora', muscleGroup: 'Adutores', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Cadeira Adutora') },
+  { name: 'Afundo', muscleGroup: 'Pernas', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Afundo') },
+  { name: 'Panturrilha em pe', muscleGroup: 'Panturrilha', defaultSets: 3, defaultReps: '15', defaultRest: 45, image: getExerciseGifUrl('Panturrilha em pe') },
+  { name: 'Panturrilha em pé inclinado', muscleGroup: 'Panturrilha', defaultSets: 3, defaultReps: '15', defaultRest: 45, image: getExerciseGifUrl('Panturrilha em pé inclinado') },
 
-  // PERNAS (POSTERIOR E GLÚTEO)
-  { name: 'Stiff Barra', muscleGroup: 'Posterior', defaultSets: 3, defaultReps: '10-12', defaultRest: 90 },
-  { name: 'Mesa Flexora', muscleGroup: 'Posterior', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Cadeira Flexora', muscleGroup: 'Posterior', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  { name: 'Elevação Pélvica Barra', muscleGroup: 'Glúteo', defaultSets: 3, defaultReps: '10-12', defaultRest: 90 },
-  { name: 'Glúteo Quatro Apoios Polia', muscleGroup: 'Glúteo', defaultSets: 3, defaultReps: '12-15', defaultRest: 45 },
-  { name: 'Cadeira Abdutora', muscleGroup: 'Glúteo', defaultSets: 3, defaultReps: '15-20', defaultRest: 45 },
-  { name: 'Cadeira Adutora', muscleGroup: 'Adutores', defaultSets: 3, defaultReps: '15-20', defaultRest: 45 },
-
-  // PANTURRILHA
-  { name: 'Panturrilha em Pé Máquina', muscleGroup: 'Panturrilha', defaultSets: 4, defaultReps: '15-20', defaultRest: 45 },
-  { name: 'Panturrilha Sentado (Gêmeos)', muscleGroup: 'Panturrilha', defaultSets: 4, defaultReps: '15-20', defaultRest: 45 },
-  { name: 'Panturrilha no Leg Press', muscleGroup: 'Panturrilha', defaultSets: 4, defaultReps: '15-20', defaultRest: 45 },
-
-  // ABDÔMEN
-  { name: 'Abdominal Supra Solo', muscleGroup: 'Abdômen', defaultSets: 3, defaultReps: '20-30', defaultRest: 45 },
-  { name: 'Abdominal Infra Solo', muscleGroup: 'Abdômen', defaultSets: 3, defaultReps: '15-20', defaultRest: 45 },
-  { name: 'Abdominal Remador', muscleGroup: 'Abdômen', defaultSets: 3, defaultReps: '20', defaultRest: 45 },
-  { name: 'Prancha Isométrica', muscleGroup: 'CORE', defaultSets: 3, defaultReps: '45-60s', defaultRest: 45 },
-  { name: 'Abdominal na Polia (Crunch)', muscleGroup: 'Abdômen', defaultSets: 3, defaultReps: '15-20', defaultRest: 60 },
-  { name: 'Elevação de Pernas na Barra', muscleGroup: 'Abdômen', defaultSets: 3, defaultReps: '12-15', defaultRest: 60 },
-  
-  // CARDIO
-  { name: 'Esteira (Caminhada)', muscleGroup: 'Cardio', defaultSets: 1, defaultReps: '20-30 min', defaultRest: 0 },
-  { name: 'Esteira (Corrida)', muscleGroup: 'Cardio', defaultSets: 1, defaultReps: '15-20 min', defaultRest: 0 },
-  { name: 'Bicicleta Ergométrica', muscleGroup: 'Cardio', defaultSets: 1, defaultReps: '20-30 min', defaultRest: 0 },
-  { name: 'Elíptico', muscleGroup: 'Cardio', defaultSets: 1, defaultReps: '20-30 min', defaultRest: 0 },
-  { name: 'Escada (Stairmaster)', muscleGroup: 'Cardio', defaultSets: 1, defaultReps: '10-15 min', defaultRest: 0 },
-  { name: 'Pular Corda', muscleGroup: 'Cardio', defaultSets: 3, defaultReps: '2-3 min', defaultRest: 60 },
-  { name: 'Burpees', muscleGroup: 'Cardio/CORE', defaultSets: 3, defaultReps: '10-15', defaultRest: 60 },
-
-  // MOBILIDADE / ALONGAMENTO
-  { name: 'Alongamento de Isquiotibiais', muscleGroup: 'Mobilidade', defaultSets: 2, defaultReps: '30s cada lado', defaultRest: 0 },
-  { name: 'Alongamento de Quadríceps', muscleGroup: 'Mobilidade', defaultSets: 2, defaultReps: '30s cada lado', defaultRest: 0 },
-  { name: 'Mobilidade de Quadril (90/90)', muscleGroup: 'Mobilidade', defaultSets: 2, defaultReps: '10 reps cada lado', defaultRest: 0 },
-  { name: 'Mobilidade de Tornozelo', muscleGroup: 'Mobilidade', defaultSets: 2, defaultReps: '12 reps cada lado', defaultRest: 0 },
-  { name: 'Cat-Cow (Gato-Camelo)', muscleGroup: 'Mobilidade', defaultSets: 2, defaultReps: '15 reps', defaultRest: 0 },
-  { name: 'Alongamento de Peitoral na Parede', muscleGroup: 'Mobilidade', defaultSets: 2, defaultReps: '30s cada lado', defaultRest: 0 },
+  // ABDÔMEN / CORE
+  { name: 'Abdomen Reto', muscleGroup: 'Abdômen', defaultSets: 3, defaultReps: '15-20', defaultRest: 45, image: getExerciseGifUrl('Abdomen Reto') },
+  { name: 'Abdomen Infra (Pingus)', muscleGroup: 'Abdômen', defaultSets: 3, defaultReps: '15-20', defaultRest: 45, image: getExerciseGifUrl('Abdomen Infra (Pingus)') },
+  { name: 'Prancha', muscleGroup: 'CORE', defaultSets: 3, defaultReps: '60s', defaultRest: 45, image: getExerciseGifUrl('Prancha') },
 ];

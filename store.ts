@@ -19,12 +19,7 @@ interface AppState {
   chatMessages: { role: 'user' | 'model'; text: string }[];
   isChatLoading: boolean;
   selectedStudent: string | null;
-  allWorkouts: {
-    henrique: WorkoutRoutine[];
-    jessica: WorkoutRoutine[];
-    maria: WorkoutRoutine[];
-    flavia: WorkoutRoutine[];
-  };
+  allWorkouts: Record<string, WorkoutRoutine[]>;
 
   // Actions
   setUser: (user: User | null) => void;

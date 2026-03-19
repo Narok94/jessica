@@ -29,9 +29,26 @@ export const TeacherView: React.FC = () => {
   const [pickerSearch, setPickerSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isDatabaseView, setIsDatabaseView] = useState(false);
+  const [isNewStudentModalOpen, setIsNewStudentModalOpen] = useState(false);
+  const [newStudentName, setNewStudentName] = useState('');
 
   const students = Object.keys(allWorkouts);
   const categories = Array.from(new Set(exerciseDatabase.map(ex => ex.muscleGroup)));
+
+  const handleAddStudent = () => {
+    if (!newStudentName.trim()) return;
+    const studentKey = newStudentName.trim().toLowerCase();
+    if (allWorkouts[studentKey]) {
+      if (addToast) addToast('Aluno já existe!', 'error');
+      return;
+    }
+
+    const updatedAllWorkouts = { ...allWorkouts, [studentKey]: [] };
+    setAllWorkouts(updatedAllWorkouts);
+    setNewStudentName('');
+    setIsNewStudentModalOpen(false);
+    if (addToast) addToast(`Aluno ${newStudentName} adicionado!`, 'success');
+  };
 
   const handleSaveWorkout = () => {
     if (!selectedStudent || !editingWorkout) return;
@@ -72,7 +89,8 @@ export const TeacherView: React.FC = () => {
       muscleGroup: baseEx.muscleGroup,
       sets: baseEx.defaultSets,
       reps: baseEx.defaultReps,
-      rest: baseEx.defaultRest
+      rest: baseEx.defaultRest,
+      image: baseEx.image
     };
     setEditingWorkout({
       ...editingWorkout,
@@ -157,8 +175,17 @@ export const TeacherView: React.FC = () => {
                 className="glass-card p-6 rounded-3xl border border-white/5 flex items-center justify-between group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-zinc-900 flex items-center justify-center text-zinc-500 group-hover:bg-blue-600 group-hover:text-white transition-all">
-                    <Dumbbell size={24} />
+                  <div className="w-16 h-16 rounded-2xl bg-zinc-900 flex items-center justify-center overflow-hidden border border-white/5">
+                    {ex.image ? (
+                      <img 
+                        src={ex.image} 
+                        alt={ex.name} 
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <Dumbbell size={24} className="text-zinc-500 group-hover:text-blue-500 transition-all" />
+                    )}
                   </div>
                   <div>
                     <h4 className="font-black uppercase italic tracking-tight">{ex.name}</h4>
@@ -236,9 +263,21 @@ export const TeacherView: React.FC = () => {
                 className="glass-card p-4 rounded-2xl border border-white/5 space-y-4"
               >
                 <div className="flex items-center justify-between">
-                  <span className="w-6 h-6 rounded-full bg-blue-600/20 text-blue-500 flex items-center justify-center text-[10px] font-black">
-                    {idx + 1}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="w-6 h-6 rounded-full bg-blue-600/20 text-blue-500 flex items-center justify-center text-[10px] font-black">
+                      {idx + 1}
+                    </span>
+                    {ex.image && (
+                      <div className="w-10 h-10 rounded-lg overflow-hidden bg-zinc-900 border border-white/5">
+                        <img 
+                          src={ex.image} 
+                          alt={ex.name} 
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                    )}
+                  </div>
                   <button 
                     onClick={() => handleRemoveExercise(ex.id)}
                     className="text-red-500/50 hover:text-red-500 transition-colors"
@@ -383,9 +422,21 @@ export const TeacherView: React.FC = () => {
                         onClick={() => handleAddExercise(ex)}
                         className="w-full p-4 rounded-2xl bg-white/5 hover:bg-blue-600/10 border border-white/5 hover:border-blue-500/30 flex items-center justify-between group transition-all"
                       >
-                        <div className="text-left">
-                          <h4 className="font-black uppercase italic tracking-tight group-hover:text-blue-500 transition-colors">{ex.name}</h4>
-                          <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{ex.muscleGroup}</span>
+                        <div className="flex items-center gap-4">
+                          {ex.image && (
+                            <div className="w-12 h-12 rounded-lg overflow-hidden bg-zinc-900 border border-white/5">
+                              <img 
+                                src={ex.image} 
+                                alt={ex.name} 
+                                className="w-full h-full object-cover"
+                                referrerPolicy="no-referrer"
+                              />
+                            </div>
+                          )}
+                          <div className="text-left">
+                            <h4 className="font-black uppercase italic tracking-tight group-hover:text-blue-500 transition-colors">{ex.name}</h4>
+                            <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{ex.muscleGroup}</span>
+                          </div>
                         </div>
                         <Plus size={18} className="text-zinc-600 group-hover:text-blue-500 transition-colors" />
                       </button>
@@ -498,9 +549,18 @@ export const TeacherView: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        <div className="flex items-center gap-2 mb-2">
-          <Users size={18} className="text-blue-500" />
-          <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400">Seus Alunos</h3>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <Users size={18} className="text-blue-500" />
+            <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400">Seus Alunos</h3>
+          </div>
+          <button 
+            onClick={() => setIsNewStudentModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600/10 text-blue-500 rounded-xl hover:bg-blue-600/20 transition-all text-[10px] font-black uppercase tracking-widest"
+          >
+            <Plus size={14} />
+            Novo Aluno
+          </button>
         </div>
 
         {students
@@ -530,6 +590,59 @@ export const TeacherView: React.FC = () => {
           </motion.button>
         ))}
       </div>
+
+      <AnimatePresence>
+        {isNewStudentModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsNewStudentModalOpen(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative w-full max-w-md glass-card p-8 rounded-[2.5rem] border border-white/10 shadow-2xl"
+            >
+              <h3 className="text-2xl font-black uppercase italic tracking-tighter mb-6">
+                Novo <span className="text-blue-500">Aluno</span>
+              </h3>
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Nome Completo</label>
+                  <input 
+                    type="text"
+                    value={newStudentName}
+                    onChange={(e) => setNewStudentName(e.target.value)}
+                    placeholder="Ex: João Silva"
+                    className="w-full bg-zinc-950/40 border border-white/5 rounded-2xl p-5 text-white font-bold outline-none focus:border-blue-500/50 transition-all"
+                    autoFocus
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button 
+                    onClick={() => setIsNewStudentModalOpen(false)}
+                    className="flex-1 py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    onClick={handleAddStudent}
+                    className="flex-1 py-4 bg-blue-600 hover:bg-blue-700 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20"
+                  >
+                    Criar Aluno
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <div className="glass-card p-8 rounded-[2.5rem] border border-white/5 bg-gradient-to-br from-blue-600/10 to-transparent">
         <div className="flex items-center gap-4 mb-4">
