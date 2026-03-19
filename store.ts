@@ -18,6 +18,7 @@ interface AppState {
   workoutDuration: number | null;
   chatMessages: { role: 'user' | 'model'; text: string }[];
   isChatLoading: boolean;
+  selectedStudent: string | null;
   allWorkouts: {
     henrique: WorkoutRoutine[];
     jessica: WorkoutRoutine[];
@@ -30,6 +31,8 @@ interface AppState {
   setIsLoggedIn: (isLoggedIn: boolean) => void;
   setActiveTab: (tab: AppTab) => void;
   setSelectedWorkout: (workout: WorkoutRoutine | null) => void;
+  setSelectedStudent: (student: string | null) => void;
+  setAllWorkouts: (workouts: AppState['allWorkouts']) => void;
   setCurrentSessionProgress: (progress: Record<string, SetPerformance[]>) => void;
   setIsWorkoutActive: (isActive: boolean) => void;
   setWorkoutStartTime: (time: number | null) => void;
@@ -62,18 +65,34 @@ export const useStore = create<AppState>((set, get) => ({
   workoutDuration: null,
   chatMessages: [],
   isChatLoading: false,
-  allWorkouts: {
-    henrique: henriqueWorkouts,
-    jessica: jessicaWorkouts,
-    maria: mariaWorkouts,
-    flavia: flaviaWorkouts
-  },
+  selectedStudent: null,
+  allWorkouts: (() => {
+    const saved = localStorage.getItem('tatugym_all_workouts');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Error loading workouts:', e);
+      }
+    }
+    return {
+      henrique: henriqueWorkouts,
+      jessica: jessicaWorkouts,
+      maria: mariaWorkouts,
+      flavia: flaviaWorkouts
+    };
+  })(),
   addToast: undefined,
 
   setUser: (user) => set({ user }),
   setIsLoggedIn: (isLoggedIn) => set({ isLoggedIn }),
   setActiveTab: (activeTab) => set({ activeTab }),
   setSelectedWorkout: (selectedWorkout) => set({ selectedWorkout }),
+  setSelectedStudent: (selectedStudent) => set({ selectedStudent }),
+  setAllWorkouts: (allWorkouts) => {
+    set({ allWorkouts });
+    localStorage.setItem('tatugym_all_workouts', JSON.stringify(allWorkouts));
+  },
   setCurrentSessionProgress: (currentSessionProgress) => set({ currentSessionProgress }),
   setIsWorkoutActive: (isWorkoutActive) => set({ isWorkoutActive }),
   setWorkoutStartTime: (workoutStartTime) => set({ workoutStartTime }),

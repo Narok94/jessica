@@ -55,6 +55,7 @@ export interface User {
   checkIns: string[];
   avatar?: string;
   isProfileComplete: boolean;
+  role: 'student' | 'teacher';
   weights?: Record<string, number>; 
   history: WorkoutHistoryEntry[];
   badges?: Badge[];
@@ -82,5 +83,6 @@ export enum AppTab {
   HISTORY = 'history',
   AI_ASSISTANT = 'ai',
   PROFILE = 'profile',
-  ADMIN = 'admin'
+  ADMIN = 'admin',
+  TEACHER = 'teacher'
 }

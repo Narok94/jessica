@@ -8,7 +8,8 @@ import {
   User as UserIcon,
   Lock,
   Check,
-  ArrowRight
+  ArrowRight,
+  Users
 } from 'lucide-react';
 import { useStore } from './store';
 import { AppTab, User } from './types';
@@ -21,6 +22,7 @@ import { WorkoutView } from './components/views/WorkoutView';
 import { HistoryView } from './components/views/HistoryView';
 import { AIAssistantView } from './components/views/AIAssistantView';
 import { ProfileView } from './components/views/ProfileView';
+import { TeacherView } from './components/views/TeacherView';
 
 const AppContent: React.FC = () => {
   const { 
@@ -111,10 +113,16 @@ const AppContent: React.FC = () => {
     e.preventDefault();
     const lowerUser = username.toLowerCase();
     
-    if (allWorkouts[lowerUser as keyof typeof allWorkouts]) {
+    if (allWorkouts[lowerUser as keyof typeof allWorkouts] || lowerUser === 'professor') {
       // Password check for Flavia
       if (lowerUser === 'flavia' && password !== '6087') {
         if (addToast) addToast('Senha incorreta para Flavia.', 'error');
+        return;
+      }
+
+      // Password check for Professor
+      if (lowerUser === 'professor' && password !== 'admin') {
+        if (addToast) addToast('Senha incorreta para Professor.', 'error');
         return;
       }
 
@@ -126,7 +134,7 @@ const AppContent: React.FC = () => {
         } else {
           userData = {
             username: lowerUser,
-            name: lowerUser === 'flavia' ? 'Flávia Reis' : username.charAt(0).toUpperCase() + username.slice(1),
+            name: lowerUser === 'flavia' ? 'Flávia Reis' : lowerUser === 'professor' ? 'Professor Tatu' : username.charAt(0).toUpperCase() + username.slice(1),
             age: lowerUser === 'flavia' ? 41 : undefined,
             goal: lowerUser === 'flavia' ? 'Saúde/ Tônus muscular' : undefined,
             totalWorkouts: 0,
@@ -135,14 +143,15 @@ const AppContent: React.FC = () => {
             checkIns: [],
             streak: 0,
             badges: [],
-            isProfileComplete: true
+            isProfileComplete: true,
+            role: lowerUser === 'professor' ? 'teacher' : 'student'
           };
         }
       } catch (error) {
         console.error('Error parsing profile:', error);
         userData = {
           username: lowerUser,
-          name: lowerUser === 'flavia' ? 'Flávia Reis' : username.charAt(0).toUpperCase() + username.slice(1),
+          name: lowerUser === 'flavia' ? 'Flávia Reis' : lowerUser === 'professor' ? 'Professor Tatu' : username.charAt(0).toUpperCase() + username.slice(1),
           age: lowerUser === 'flavia' ? 41 : undefined,
           goal: lowerUser === 'flavia' ? 'Saúde/ Tônus muscular' : undefined,
           totalWorkouts: 0,
@@ -151,12 +160,16 @@ const AppContent: React.FC = () => {
           checkIns: [],
           streak: 0,
           badges: [],
-          isProfileComplete: true
+          isProfileComplete: true,
+          role: lowerUser === 'professor' ? 'teacher' : 'student'
         };
       }
       
       setUser(userData);
       setIsLoggedIn(true);
+      if (userData.role === 'teacher') {
+        setActiveTab(AppTab.TEACHER);
+      }
       if (rememberMe) {
         localStorage.setItem('tatugym_remembered', JSON.stringify(userData));
       } else {
@@ -357,7 +370,8 @@ const AppContent: React.FC = () => {
             >
                <p className="text-zinc-600 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] leading-relaxed">
                  Acesso restrito a membros autorizados.<br />
-                 <span className="text-zinc-700">© 2025 Tatu Gym Pro. Todos os direitos reservados.</span>
+                 <span className="text-zinc-700">© 2025 Tatu Gym Pro. Todos os direitos reservados.</span><br />
+                 <span className="text-blue-500/50 mt-2 block">Professor: professor / admin</span>
                </p>
             </motion.div>
           </motion.div>
@@ -374,6 +388,7 @@ const AppContent: React.FC = () => {
       case AppTab.HISTORY: return <HistoryView />;
       case AppTab.AI_ASSISTANT: return <AIAssistantView />;
       case AppTab.PROFILE: return <ProfileView />;
+      case AppTab.TEACHER: return <TeacherView />;
       default: return <DashboardView />;
     }
   };
@@ -389,6 +404,7 @@ const AppContent: React.FC = () => {
         <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50">
           <div className="glass-card rounded-[2.5rem] p-2 flex items-center justify-between border border-white/10 shadow-2xl shadow-black/50">
             {[
+              ...(user?.role === 'teacher' ? [{ id: AppTab.TEACHER, icon: Users, label: 'Alunos' }] : []),
               { id: AppTab.DASHBOARD, icon: LayoutDashboard, label: 'Home' },
               { id: AppTab.HISTORY, icon: HistoryIcon, label: 'Histórico' },
               { id: AppTab.AI_ASSISTANT, icon: Bot, label: 'AI' },
