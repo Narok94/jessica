@@ -634,8 +634,11 @@ export const TeacherView: React.FC = () => {
 
             <form onSubmit={handleAddStudent} className="space-y-5">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Nome Completo</label>
+                <label htmlFor="student-name" className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Nome Completo</label>
                 <input 
+                  id="student-name"
+                  name="name"
+                  autoComplete="name"
                   type="text"
                   required
                   value={newStudentData.name}
@@ -645,8 +648,11 @@ export const TeacherView: React.FC = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Usuário (Login)</label>
+                <label htmlFor="student-username" className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Usuário (Login)</label>
                 <input 
+                  id="student-username"
+                  name="username"
+                  autoComplete="username"
                   type="text"
                   required
                   value={newStudentData.username}
@@ -656,8 +662,11 @@ export const TeacherView: React.FC = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Senha</label>
+                <label htmlFor="student-password" className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Senha</label>
                 <input 
+                  id="student-password"
+                  name="password"
+                  autoComplete="new-password"
                   type="password"
                   required
                   value={newStudentData.password}

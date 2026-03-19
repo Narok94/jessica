@@ -304,6 +304,9 @@ const AppContent: React.FC = () => {
                   <div className="relative group">
                     <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-blue-500 transition-all" size={20} />
                     <input 
+                      id="login-username"
+                      name="username"
+                      autoComplete="username"
                       type="text" 
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
@@ -315,10 +318,13 @@ const AppContent: React.FC = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Senha</label>
+                  <label htmlFor="login-password" title="Senha" className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Senha</label>
                   <div className="relative group">
                     <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-blue-500 transition-all" size={20} />
                     <input 
+                      id="login-password"
+                      name="password"
+                      autoComplete="current-password"
                       type="password" 
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}

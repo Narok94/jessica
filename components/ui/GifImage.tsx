@@ -20,12 +20,15 @@ export const GifImage: React.FC<GifImageProps> = ({ exerciseName, originalUrl, c
     setUrls(potentialUrls);
     setCurrentUrlIndex(0);
     setHasError(false);
+    console.log(`[GifImage] Iniciando carregamento para: ${exerciseName}`, potentialUrls);
   }, [exerciseName, originalUrl]);
 
   const handleError = () => {
+    console.warn(`[GifImage] Falha ao carregar: ${urls[currentUrlIndex]}`);
     if (currentUrlIndex < urls.length - 1) {
       setCurrentUrlIndex(prev => prev + 1);
     } else {
+      console.error(`[GifImage] Todas as variações falharam para: ${exerciseName}`);
       setHasError(true);
     }
   };
