@@ -70,6 +70,18 @@ const AppContent: React.FC = () => {
     return () => unsubscribe();
   }, [setCustomGifs]);
 
+  // Safety sync for already logged-in users to ensure security rules work
+  useEffect(() => {
+    if (isLoggedIn && user && auth.currentUser) {
+      const uid = auth.currentUser.uid;
+      setDoc(doc(db, 'uids', uid), { 
+        role: user.role,
+        username: user.username,
+        updatedAt: new Date().toISOString()
+      }).catch(err => console.error('Error in safety UID sync:', err));
+    }
+  }, [isLoggedIn, user]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -99,6 +111,18 @@ const AppContent: React.FC = () => {
           const userData = JSON.parse(remembered);
           const profile = localStorage.getItem(`tatugym_user_profile_${userData.username.toLowerCase()}`);
           const finalUser = profile ? JSON.parse(profile) : userData;
+          
+          // Ensure Firebase Auth session for security rules
+          signInAnonymously(auth).then(async (userCredential) => {
+            const uid = userCredential.user.uid;
+            // Sync role to uids collection for security rules
+            await setDoc(doc(db, 'uids', uid), { 
+              role: finalUser.role,
+              username: finalUser.username,
+              updatedAt: new Date().toISOString()
+            });
+          }).catch(err => console.error('Error in auto-login Firebase sync:', err));
+
           setUser(finalUser);
           setIsLoggedIn(true);
           
@@ -192,10 +216,18 @@ const AppContent: React.FC = () => {
       
       try {
         // Sign in anonymously to get a UID for Firestore rules
-        await signInAnonymously(auth);
+        const userCredential = await signInAnonymously(auth);
+        const uid = userCredential.user.uid;
         
         // Save to Firestore
         await setDoc(doc(db, 'users', lowerUser), userData);
+        
+        // Save UID mapping for security rules
+        await setDoc(doc(db, 'uids', uid), { 
+          role: userData.role,
+          username: lowerUser,
+          updatedAt: new Date().toISOString()
+        });
       } catch (error) {
         console.error('Error syncing with Firebase:', error);
       }
