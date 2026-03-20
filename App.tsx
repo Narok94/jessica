@@ -16,7 +16,7 @@ import { AppTab, User } from './types';
 import { ToastProvider, useToast } from './components/ui/Toast';
 import { DashboardSkeleton } from './components/ui/Skeleton';
 import { db, auth } from './firebase';
-import { collection, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
 import { signInAnonymously } from 'firebase/auth';
 
 // Views
@@ -55,21 +55,19 @@ const AppContent: React.FC = () => {
     setAddToast(toastFn);
   }, [toastFn, setAddToast]);
 
-  // Load custom gifs from Firestore on startup
+  // Load custom gifs from Firestore with real-time updates
   useEffect(() => {
-    const loadCustomGifs = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'exercise_gifs'));
-        const gifs: Record<string, string> = {};
-        querySnapshot.forEach((doc) => {
-          gifs[doc.id] = doc.data().url;
-        });
-        setCustomGifs(gifs);
-      } catch (error) {
-        console.error('Error loading custom gifs:', error);
-      }
-    };
-    loadCustomGifs();
+    const unsubscribe = onSnapshot(collection(db, 'exercise_gifs'), (querySnapshot) => {
+      const gifs: Record<string, string> = {};
+      querySnapshot.forEach((doc) => {
+        gifs[doc.id] = doc.data().url;
+      });
+      setCustomGifs(gifs);
+    }, (error) => {
+      console.error('Error loading custom gifs:', error);
+    });
+    
+    return () => unsubscribe();
   }, [setCustomGifs]);
 
   const [isLoading, setIsLoading] = useState(true);

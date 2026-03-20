@@ -30,7 +30,7 @@ import { exerciseDatabase, BaseExercise } from '../../data/exerciseDatabase';
 import { GifImage } from '../ui/GifImage';
 import { storage, db } from '../../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, getDocs, onSnapshot } from 'firebase/firestore';
 import { normalizeExerciseName } from '../../src/utils/exerciseUtils';
 
 export const TeacherView: React.FC = () => {
@@ -60,21 +60,19 @@ export const TeacherView: React.FC = () => {
   const [uploadingExercise, setUploadingExercise] = useState<string | null>(null);
   const [customGifs, setCustomGifs] = useState<Record<string, string>>({});
 
-  // Load custom gifs from Firestore
+  // Load custom gifs from Firestore with real-time updates
   useEffect(() => {
-    const loadCustomGifs = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'exercise_gifs'));
-        const gifs: Record<string, string> = {};
-        querySnapshot.forEach((doc) => {
-          gifs[doc.id] = doc.data().url;
-        });
-        setCustomGifs(gifs);
-      } catch (error) {
-        console.error('Error loading custom gifs:', error);
-      }
-    };
-    loadCustomGifs();
+    const unsubscribe = onSnapshot(collection(db, 'exercise_gifs'), (querySnapshot) => {
+      const gifs: Record<string, string> = {};
+      querySnapshot.forEach((doc) => {
+        gifs[doc.id] = doc.data().url;
+      });
+      setCustomGifs(gifs);
+    }, (error) => {
+      console.error('Error loading custom gifs:', error);
+    });
+    
+    return () => unsubscribe();
   }, []);
 
   const handleGifUpload = async (exerciseName: string, file: File) => {

@@ -17,6 +17,8 @@ export const GifImage: React.FC<GifImageProps> = ({ exerciseName, originalUrl, c
   const [hasError, setHasError] = useState(false);
   const [urls, setUrls] = useState<string[]>([]);
 
+  const [retryCount, setRetryCount] = useState(0);
+
   useEffect(() => {
     const normalizedName = normalizeExerciseName(exerciseName);
     const customGif = customGifs[normalizedName];
@@ -28,15 +30,32 @@ export const GifImage: React.FC<GifImageProps> = ({ exerciseName, originalUrl, c
       potentialUrls = [customGif, ...potentialUrls.filter(u => u !== customGif)];
     }
     
-    setUrls(potentialUrls);
-    setCurrentUrlIndex(0);
-    setHasError(false);
+    // Only update if the URLs have actually changed for this exercise
+    setUrls(prevUrls => {
+      if (JSON.stringify(prevUrls) === JSON.stringify(potentialUrls)) {
+        return prevUrls;
+      }
+      setCurrentUrlIndex(0);
+      setRetryCount(0);
+      setHasError(false);
+      return potentialUrls;
+    });
   }, [exerciseName, originalUrl, customGifs]);
 
   const handleError = () => {
+    // Se for a primeira URL (provavelmente a customizada), tenta de novo 2 vezes com delay
+    // Isso evita o "piscado" e dá tempo do Firebase Storage propagar o arquivo
+    if (currentUrlIndex === 0 && retryCount < 2) {
+      setTimeout(() => {
+        setRetryCount(prev => prev + 1);
+      }, 1500);
+      return;
+    }
+
     console.warn(`[GifImage] Falha ao carregar: ${urls[currentUrlIndex]}`);
     if (currentUrlIndex < urls.length - 1) {
       setCurrentUrlIndex(prev => prev + 1);
+      setRetryCount(0);
     } else {
       console.error(`[GifImage] Todas as variações falharam para: ${exerciseName}`);
       setHasError(true);
@@ -60,6 +79,7 @@ export const GifImage: React.FC<GifImageProps> = ({ exerciseName, originalUrl, c
   if (isVideo(currentUrl)) {
     return (
       <video
+        key={`${currentUrl}-${retryCount}`}
         src={currentUrl}
         className={className}
         autoPlay
@@ -73,6 +93,7 @@ export const GifImage: React.FC<GifImageProps> = ({ exerciseName, originalUrl, c
 
   return (
     <img
+      key={`${currentUrl}-${retryCount}`}
       src={currentUrl}
       alt={exerciseName}
       className={className}
