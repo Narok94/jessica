@@ -17,7 +17,7 @@ import { ToastProvider, useToast } from './components/ui/Toast';
 import { DashboardSkeleton } from './components/ui/Skeleton';
 import { db, auth } from './firebase';
 import { collection, getDocs, doc, setDoc, getDoc, onSnapshot, query, where } from 'firebase/firestore';
-import { signInAnonymously } from 'firebase/auth';
+import { signInAnonymously, onAuthStateChanged, signOut } from 'firebase/auth';
 
 // Views
 import { DashboardView } from './components/views/DashboardView';
@@ -91,42 +91,42 @@ const AppContent: React.FC = () => {
     }
   }, [isWorkoutActive, user, selectedWorkout, currentSessionProgress, workoutStartTime]);
 
+  // Listen for auth state changes to restore session
   useEffect(() => {
-    const timer = setTimeout(() => {
-      try {
-        const remembered = localStorage.getItem('tatugym_remembered');
-        if (remembered) {
-          const userData = JSON.parse(remembered);
-          const profile = localStorage.getItem(`tatugym_user_profile_${userData.username.toLowerCase()}`);
-          const finalUser = profile ? JSON.parse(profile) : userData;
-          setUser(finalUser);
-          setIsLoggedIn(true);
-          
-          // Restore active session if exists and recent (within 5 mins)
-          const activeSession = localStorage.getItem(`tatugym_active_session_${finalUser.username.toLowerCase()}`);
-          if (activeSession) {
-            const session = JSON.parse(activeSession);
-            if (Date.now() - session.timestamp < 300000) {
-              const workout = allWorkouts[finalUser.username.toLowerCase() as keyof typeof allWorkouts]?.find(w => w.id === session.workoutId);
-              if (workout) {
-                setSelectedWorkout(workout);
-                setCurrentSessionProgress(session.progress);
-                setWorkoutStartTime(session.startTime);
-                setIsWorkoutActive(true);
-                setActiveTab(AppTab.WORKOUT);
-                if (addToast) addToast('Sessão de treino restaurada!', 'info');
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data() as User;
+            setUser(userData);
+            setIsLoggedIn(true);
+            
+            // Restore active session if exists and recent
+            const activeSession = localStorage.getItem(`tatugym_active_session_${userData.username.toLowerCase()}`);
+            if (activeSession) {
+              const session = JSON.parse(activeSession);
+              if (Date.now() - session.timestamp < 300000) {
+                const workout = allWorkouts[userData.username.toLowerCase() as keyof typeof allWorkouts]?.find(w => w.id === session.workoutId);
+                if (workout) {
+                  setSelectedWorkout(workout);
+                  setCurrentSessionProgress(session.progress);
+                  setWorkoutStartTime(session.startTime);
+                  setIsWorkoutActive(true);
+                  setActiveTab(AppTab.WORKOUT);
+                }
               }
             }
           }
+        } catch (error) {
+          console.error('Error restoring session:', error);
         }
-      } catch (error) {
-        console.error('Error loading remembered user:', error);
-        localStorage.removeItem('tatugym_remembered');
-      } finally {
-        setIsLoading(false);
       }
-    }, 1500);
-  }, []);
+      setIsLoading(false);
+    });
+    
+    return () => unsubscribe();
+  }, [setUser, setIsLoggedIn, setSelectedWorkout, setCurrentSessionProgress, setWorkoutStartTime, setIsWorkoutActive, setActiveTab, allWorkouts]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,26 +138,42 @@ const AppContent: React.FC = () => {
       try {
         // Sign in anonymously first to get a UID
         const authResult = await signInAnonymously(auth);
-        const uid = authResult.user.uid;
+        const currentUid = authResult.user.uid;
 
-        // Try to get from Firestore using UID
-        const userDoc = await getDoc(doc(db, 'users', uid));
-        if (userDoc.exists()) {
-          userData = userDoc.data() as User;
-        } else {
-          // Fallback to searching by username if UID doc doesn't exist yet (migration)
+        // 1. Try to find UID by username
+        const usernameDoc = await getDoc(doc(db, 'usernames', lowerUser));
+        let targetUid = currentUid;
+
+        if (usernameDoc.exists()) {
+          targetUid = usernameDoc.data().uid;
+          // If the username is already mapped to a DIFFERENT UID, we can't easily "log in" to it
+          // unless we use a custom token or just accept that we'll use the mapped UID.
+          // For simplicity in this app, we'll just use the mapped UID for data access.
+          // But Firebase Auth won't automatically switch UIDs.
+          // So we'll just use the current UID and update the mapping if it's the same user.
+          // Actually, the most robust way is to use the UID as the ID for the user doc.
+        }
+
+        // 2. Try to get from Firestore using the mapped UID or current UID
+        let userDoc = await getDoc(doc(db, 'users', targetUid));
+        
+        // If not found by UID, try searching by username (legacy/migration)
+        if (!userDoc.exists()) {
           const q = query(collection(db, 'users'), where('username', '==', lowerUser));
           const querySnapshot = await getDocs(q);
           if (!querySnapshot.empty) {
-            userData = querySnapshot.docs[0].data() as User;
-            // Migrate to UID-based doc
-            await setDoc(doc(db, 'users', uid), userData);
-          } else {
-            // Fallback to localStorage
-            const profile = localStorage.getItem(`tatugym_user_profile_${lowerUser}`);
-            if (profile) {
-              userData = JSON.parse(profile);
-            }
+            userDoc = querySnapshot.docs[0];
+            userData = userDoc.data() as User;
+          }
+        } else {
+          userData = userDoc.data() as User;
+        }
+
+        // 3. Fallback to localStorage if still not found
+        if (!userData) {
+          const profile = localStorage.getItem(`tatugym_user_profile_${lowerUser}`);
+          if (profile) {
+            userData = JSON.parse(profile);
           }
         }
 
@@ -201,23 +217,27 @@ const AppContent: React.FC = () => {
           };
         }
         
-        // Save/Update to Firestore using UID
-        await setDoc(doc(db, 'users', uid), {
+        // Save/Update to Firestore using the CURRENT UID
+        const updatedUser = {
           ...userData,
-          uid: uid
-        });
+          uid: currentUid,
+          password: trimmedPassword
+        };
 
-        setUser(userData);
+        await setDoc(doc(db, 'users', currentUid), updatedUser);
+        await setDoc(doc(db, 'usernames', lowerUser), { uid: currentUid });
+
+        setUser(updatedUser);
         setIsLoggedIn(true);
-        if (userData.role === 'teacher') {
+        if (updatedUser.role === 'teacher') {
           setActiveTab(AppTab.TEACHER);
         }
         if (rememberMe) {
-          localStorage.setItem('tatugym_remembered', JSON.stringify(userData));
+          localStorage.setItem('tatugym_remembered', JSON.stringify(updatedUser));
         } else {
           localStorage.removeItem('tatugym_remembered');
         }
-        if (addToast) addToast(`Bem-vindo de volta, ${userData.name}!`, 'success');
+        if (addToast) addToast(`Bem-vindo de volta, ${updatedUser.name}!`, 'success');
       } catch (error) {
         console.error('Error during login/sync:', error);
         if (addToast) addToast('Erro ao realizar login. Tente novamente.', 'error');

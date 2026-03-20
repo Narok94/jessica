@@ -652,12 +652,12 @@ export const TeacherView: React.FC = () => {
                       originalUrl={hasCustomGif ? customGifs[normalizedName] : ex.image} 
                       className="w-20 h-20 rounded-2xl object-cover bg-zinc-950 border border-white/5" 
                     />
-                    <label className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover/gif:opacity-100 transition-opacity rounded-2xl cursor-pointer">
+                    <label className="absolute bottom-1 right-1 p-1.5 bg-blue-600 text-white rounded-lg shadow-lg cursor-pointer active:scale-95 transition-transform">
                       {uploadingExercise === ex.name ? (
-                        <Loader2 size={24} className="text-white animate-spin" />
+                        <Loader2 size={14} className="animate-spin" />
                       ) : (
                         <>
-                          <Upload size={24} className="text-white" />
+                          <Upload size={14} />
                           <input 
                             type="file" 
                             accept="image/gif" 
