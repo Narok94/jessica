@@ -34,7 +34,7 @@ import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { normalizeExerciseName } from '../../src/utils/exerciseUtils';
 
 export const TeacherView: React.FC = () => {
-  const { allWorkouts, setAllWorkouts, user: currentUser, addToast } = useStore();
+  const { allWorkouts, setAllWorkouts, user: currentUser, addToast, customGifs, setCustomGifs } = useStore();
   const [activeSubTab, setActiveSubTab] = useState<'students' | 'database'>('students');
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,24 +58,6 @@ export const TeacherView: React.FC = () => {
   const [isExercisePickerOpen, setIsExercisePickerOpen] = useState(false);
   const [exerciseSearch, setExerciseSearch] = useState('');
   const [uploadingExercise, setUploadingExercise] = useState<string | null>(null);
-  const [customGifs, setCustomGifs] = useState<Record<string, string>>({});
-
-  // Load custom gifs from Firestore
-  useEffect(() => {
-    const loadCustomGifs = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'exercise_gifs'));
-        const gifs: Record<string, string> = {};
-        querySnapshot.forEach((doc) => {
-          gifs[doc.id] = doc.data().url;
-        });
-        setCustomGifs(gifs);
-      } catch (error) {
-        console.error('Error loading custom gifs:', error);
-      }
-    };
-    loadCustomGifs();
-  }, []);
 
   const handleGifUpload = async (exerciseName: string, file: File) => {
     setUploadingExercise(exerciseName);
@@ -92,7 +74,8 @@ export const TeacherView: React.FC = () => {
         updatedAt: new Date().toISOString()
       });
 
-      setCustomGifs(prev => ({ ...prev, [normalizedName]: downloadURL }));
+      // Update global store
+      setCustomGifs({ ...customGifs, [normalizedName]: downloadURL });
       if (addToast) addToast('GIF enviado com sucesso!', 'success');
     } catch (error) {
       console.error('Error uploading GIF:', error);

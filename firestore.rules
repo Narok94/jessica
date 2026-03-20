@@ -32,8 +32,7 @@ service cloud.firestore {
     
     function isAdmin() {
       return isAuthenticated() && 
-        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher' ||
-         request.auth.token.email == "hollyood.caribe@gmail.com");
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher');
     }
     
     function isOwner(userId) {

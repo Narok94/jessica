@@ -16,7 +16,7 @@ import { AppTab, User } from './types';
 import { ToastProvider, useToast } from './components/ui/Toast';
 import { DashboardSkeleton } from './components/ui/Skeleton';
 import { db, auth } from './firebase';
-import { collection, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, getDoc, onSnapshot, query, where } from 'firebase/firestore';
 import { signInAnonymously } from 'firebase/auth';
 
 // Views
@@ -55,21 +55,19 @@ const AppContent: React.FC = () => {
     setAddToast(toastFn);
   }, [toastFn, setAddToast]);
 
-  // Load custom gifs from Firestore on startup
+  // Load custom gifs from Firestore on startup and listen for updates
   useEffect(() => {
-    const loadCustomGifs = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'exercise_gifs'));
-        const gifs: Record<string, string> = {};
-        querySnapshot.forEach((doc) => {
-          gifs[doc.id] = doc.data().url;
-        });
-        setCustomGifs(gifs);
-      } catch (error) {
-        console.error('Error loading custom gifs:', error);
-      }
-    };
-    loadCustomGifs();
+    const unsubscribe = onSnapshot(collection(db, 'exercise_gifs'), (querySnapshot) => {
+      const gifs: Record<string, string> = {};
+      querySnapshot.forEach((doc) => {
+        gifs[doc.id] = doc.data().url;
+      });
+      setCustomGifs(gifs);
+    }, (error) => {
+      console.error('Error loading custom gifs:', error);
+    });
+    
+    return () => unsubscribe();
   }, [setCustomGifs]);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -138,82 +136,92 @@ const AppContent: React.FC = () => {
     if (allWorkouts[lowerUser] !== undefined || lowerUser === 'professor' || lowerUser === 'admin') {
       let userData: User | null = null;
       try {
-        // Try to get from Firestore first
-        const userDoc = await getDoc(doc(db, 'users', lowerUser));
+        // Sign in anonymously first to get a UID
+        const authResult = await signInAnonymously(auth);
+        const uid = authResult.user.uid;
+
+        // Try to get from Firestore using UID
+        const userDoc = await getDoc(doc(db, 'users', uid));
         if (userDoc.exists()) {
           userData = userDoc.data() as User;
         } else {
-          // Fallback to localStorage
-          const profile = localStorage.getItem(`tatugym_user_profile_${lowerUser}`);
-          if (profile) {
-            userData = JSON.parse(profile);
+          // Fallback to searching by username if UID doc doesn't exist yet (migration)
+          const q = query(collection(db, 'users'), where('username', '==', lowerUser));
+          const querySnapshot = await getDocs(q);
+          if (!querySnapshot.empty) {
+            userData = querySnapshot.docs[0].data() as User;
+            // Migrate to UID-based doc
+            await setDoc(doc(db, 'users', uid), userData);
+          } else {
+            // Fallback to localStorage
+            const profile = localStorage.getItem(`tatugym_user_profile_${lowerUser}`);
+            if (profile) {
+              userData = JSON.parse(profile);
+            }
           }
         }
-      } catch (error) {
-        console.error('Error parsing profile:', error);
-      }
 
-      // Password check logic
-      if (userData?.password) {
-        if (trimmedPassword !== userData.password) {
-          if (addToast) addToast('Senha incorreta.', 'error');
-          return;
+        // Password check logic
+        if (userData?.password) {
+          if (trimmedPassword !== userData.password) {
+            if (addToast) addToast('Senha incorreta.', 'error');
+            return;
+          }
+        } else {
+          // Fallback for hardcoded users if no profile exists yet
+          if (lowerUser === 'flavia' && trimmedPassword !== '6087') {
+            if (addToast) addToast('Senha incorreta para Flavia.', 'error');
+            return;
+          }
+          if (lowerUser === 'professor' && trimmedPassword !== 'admin') {
+            if (addToast) addToast('Senha incorreta para Professor.', 'error');
+            return;
+          }
+          if (lowerUser === 'admin' && trimmedPassword !== '9860') {
+            if (addToast) addToast('Senha incorreta para Admin.', 'error');
+            return;
+          }
         }
-      } else {
-        // Fallback for hardcoded users if no profile exists yet
-        if (lowerUser === 'flavia' && trimmedPassword !== '6087') {
-          if (addToast) addToast('Senha incorreta para Flavia.', 'error');
-          return;
-        }
-        if (lowerUser === 'professor' && trimmedPassword !== 'admin') {
-          if (addToast) addToast('Senha incorreta para Professor.', 'error');
-          return;
-        }
-        if (lowerUser === 'admin' && trimmedPassword !== '9860') {
-          if (addToast) addToast('Senha incorreta para Admin.', 'error');
-          return;
-        }
-      }
 
-      // If no profile exists, create default one
-      if (!userData) {
-        userData = {
-          username: lowerUser,
-          name: lowerUser === 'flavia' ? 'Flávia Reis' : lowerUser === 'professor' ? 'Professor Tatu' : lowerUser === 'admin' ? 'Administrador' : username.charAt(0).toUpperCase() + username.slice(1),
-          age: lowerUser === 'flavia' ? 41 : undefined,
-          goal: lowerUser === 'flavia' ? 'Saúde/ Tônus muscular' : undefined,
-          totalWorkouts: 0,
-          history: [],
-          weights: {},
-          checkIns: [],
-          streak: 0,
-          badges: [],
-          isProfileComplete: true,
-          role: (lowerUser === 'professor' || lowerUser === 'admin') ? 'teacher' : 'student'
-        };
-      }
-      
-      try {
-        // Sign in anonymously to get a UID for Firestore rules
-        await signInAnonymously(auth);
+        // If no profile exists, create default one
+        if (!userData) {
+          userData = {
+            username: lowerUser,
+            name: lowerUser === 'flavia' ? 'Flávia Reis' : lowerUser === 'professor' ? 'Professor Tatu' : lowerUser === 'admin' ? 'Administrador' : username.charAt(0).toUpperCase() + username.slice(1),
+            age: lowerUser === 'flavia' ? 41 : undefined,
+            goal: lowerUser === 'flavia' ? 'Saúde/ Tônus muscular' : undefined,
+            totalWorkouts: 0,
+            history: [],
+            weights: {},
+            checkIns: [],
+            streak: 0,
+            badges: [],
+            isProfileComplete: true,
+            role: (lowerUser === 'professor' || lowerUser === 'admin') ? 'teacher' : 'student'
+          };
+        }
         
-        // Save to Firestore
-        await setDoc(doc(db, 'users', lowerUser), userData);
-      } catch (error) {
-        console.error('Error syncing with Firebase:', error);
-      }
+        // Save/Update to Firestore using UID
+        await setDoc(doc(db, 'users', uid), {
+          ...userData,
+          uid: uid
+        });
 
-      setUser(userData);
-      setIsLoggedIn(true);
-      if (userData.role === 'teacher') {
-        setActiveTab(AppTab.TEACHER);
+        setUser(userData);
+        setIsLoggedIn(true);
+        if (userData.role === 'teacher') {
+          setActiveTab(AppTab.TEACHER);
+        }
+        if (rememberMe) {
+          localStorage.setItem('tatugym_remembered', JSON.stringify(userData));
+        } else {
+          localStorage.removeItem('tatugym_remembered');
+        }
+        if (addToast) addToast(`Bem-vindo de volta, ${userData.name}!`, 'success');
+      } catch (error) {
+        console.error('Error during login/sync:', error);
+        if (addToast) addToast('Erro ao realizar login. Tente novamente.', 'error');
       }
-      if (rememberMe) {
-        localStorage.setItem('tatugym_remembered', JSON.stringify(userData));
-      } else {
-        localStorage.removeItem('tatugym_remembered');
-      }
-      if (addToast) addToast(`Bem-vindo de volta, ${userData.name}!`, 'success');
     } else {
       if (addToast) addToast('Usuário não encontrado.', 'error');
     }
