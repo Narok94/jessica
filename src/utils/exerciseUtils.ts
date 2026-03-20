@@ -19,16 +19,35 @@ export const normalizeExerciseName = (name: string): string => {
     'Supino Reto': 'supino-reto',
     'Supino Inclinado': 'supino-inclinado',
     'Puxada Aberta': 'puxada-frente',
+    'Puxada Frente Aberta': 'puxada-frente',
     'Remada Curvada': 'remada-curvada',
     'Desenvolvimento': 'desenvolvimento-ombros',
     'Elevação Lateral': 'elevacao-lateral',
     'Rosca Direta': 'rosca-direta',
     'Tríceps Corda': 'triceps-corda',
+    'Tríceps Pulley (Corda)': 'triceps-corda',
+    'Tríceps Pulley (Barra)': 'triceps-barra',
     'Tríceps Testa': 'triceps-testa',
     'Panturrilha em Pé': 'panturrilha-pe',
     'Panturrilha Sentado': 'panturrilha-sentado',
     'Abdominal Supra': 'abdominal-supra',
-    'Prancha': 'prancha-abdominal'
+    'Prancha': 'prancha-abdominal',
+    'Remada Unilateral (Serrote)': 'remada-unilateral',
+    'Remada Unilateral': 'remada-unilateral',
+    'Crossover Polia Alta': 'crossover-polia-alta',
+    'Dips (Paralelas)': 'dips',
+    'Peck Deck (Voador)': 'peck-deck',
+    'Peck Deck': 'peck-deck',
+    'Agachamento Sumô': 'agachamento-sumo-com-halteres',
+    'Agachamento Hack': 'agachamento-hack-machine',
+    'Hack Machine': 'agachamento-hack-machine',
+    'Sissy Squat': 'agachamento-sissy',
+    'Afundo com Halteres': 'afundo-com-halteres',
+    'Agachamento Búlgaro': 'agachamento-bulgaro',
+    'Elevação Pélvica': 'elevacao-pelvica-com-barra',
+    'Cadeira Abdutora': 'abduçao-de-quadril-em-pé', // Fallback or specific
+    'Cadeira Adutora': 'adução-na-polia', // Fallback or specific
+    'Glúteo Cabo': 'gluteo-no-cabo',
   };
 
   if (manualMap[name]) return manualMap[name];
