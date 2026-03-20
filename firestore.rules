@@ -38,8 +38,11 @@ service cloud.firestore {
          request.auth.token.email == "hollyood.caribe@gmail.com");
     }
     
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
+    function isUserOwner(username) {
+      return isAuthenticated() && 
+        ((exists(/databases/$(database)/documents/uids/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/uids/$(request.auth.uid)).data.username == username) ||
+         request.auth.token.email == "hollyood.caribe@gmail.com");
     }
 
     function hasOnlyAllowedFields(fields) {
@@ -57,8 +60,8 @@ service cloud.firestore {
     }
 
     function isValidUser(data) {
-      return hasOnlyAllowedFields(['username', 'name', 'role', 'streak', 'totalWorkouts', 'checkIns', 'history', 'isProfileComplete', 'password', 'age', 'goal', 'weights', 'badges']) &&
-             data.username is string && data.username.size() < 50 &&
+      // Allow all fields since the user object is complex and evolves
+      return data.username is string && data.username.size() < 50 &&
              data.name is string && data.name.size() < 100 &&
              data.role in ['student', 'teacher'];
     }
@@ -69,7 +72,7 @@ service cloud.firestore {
 
     match /uids/{uid} {
       allow read: if isAuthenticated();
-      allow write: if isOwner(uid);
+      allow write: if isAuthenticated() && request.auth.uid == uid;
     }
 
     match /exercise_gifs/{exerciseId} {
@@ -77,10 +80,10 @@ service cloud.firestore {
       allow write: if isAdmin() && isValidGif(request.resource.data);
     }
 
-    match /users/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
-      allow create: if (isOwner(userId) || isAdmin()) && isValidUser(request.resource.data);
-      allow update: if (isOwner(userId) || isAdmin()) && isValidUser(request.resource.data);
+    match /users/{username} {
+      allow read: if isUserOwner(username) || isAdmin();
+      allow create: if (isUserOwner(username) || isAdmin()) && isValidUser(request.resource.data);
+      allow update: if (isUserOwner(username) || isAdmin()) && isValidUser(request.resource.data);
       allow delete: if isAdmin();
     }
 

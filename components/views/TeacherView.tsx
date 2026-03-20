@@ -28,7 +28,7 @@ import { useStore } from '../../store';
 import { User, WorkoutRoutine, Exercise, AppTab } from '../../types';
 import { exerciseDatabase, BaseExercise } from '../../data/exerciseDatabase';
 import { GifImage } from '../ui/GifImage';
-import { storage, db } from '../../firebase';
+import { storage, db, auth } from '../../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, setDoc, getDoc, collection, getDocs, onSnapshot } from 'firebase/firestore';
 import { normalizeExerciseName } from '../../src/utils/exerciseUtils';
@@ -73,16 +73,28 @@ export const TeacherView: React.FC = () => {
       
       // Save to Firestore so all users get it
       console.log(`[TeacherView] Salvando no Firestore: exercise_gifs/${normalizedName}`);
-      await setDoc(doc(db, 'exercise_gifs', normalizedName), {
-        url: downloadURL,
-        updatedAt: new Date().toISOString()
-      });
+      try {
+        await setDoc(doc(db, 'exercise_gifs', normalizedName), {
+          url: downloadURL,
+          updatedAt: new Date().toISOString()
+        });
+        console.log(`[TeacherView] Firestore atualizado com sucesso.`);
+      } catch (fsError: any) {
+        console.error('[TeacherView] Erro ao salvar no Firestore:', fsError);
+        if (fsError.message?.includes('permission-denied')) {
+          console.error('[TeacherView] Erro de permissão. Verifique se o usuário tem papel de "teacher" ou "admin" no Firestore.');
+          // Tenta logar o UID atual para depuração
+          const currentUid = auth.currentUser?.uid;
+          console.log(`[TeacherView] UID atual: ${currentUid}`);
+        }
+        throw fsError;
+      }
 
       if (addToast) addToast('GIF enviado com sucesso!', 'success');
       console.log(`[TeacherView] Processo completo para: ${exerciseName}`);
     } catch (error) {
       console.error('[TeacherView] Erro no upload do GIF:', error);
-      if (addToast) addToast('Erro ao enviar GIF.', 'error');
+      if (addToast) addToast('Erro ao enviar GIF. Verifique o console para detalhes.', 'error');
     } finally {
       setUploadingExercise(null);
     }

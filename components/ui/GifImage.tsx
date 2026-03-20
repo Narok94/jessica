@@ -21,132 +21,100 @@ export const GifImage: React.FC<GifImageProps> = ({
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [urls, setUrls] = useState<string[]>([]);
   const [retryCount, setRetryCount] = useState(0);
   const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    const firestoreId = normalizeExerciseName(exerciseName);
-    const customGif = customGifs[firestoreId];
-    
-    // Lista simplificada de URLs para evitar spam e lentidão
-    let potentialUrls: string[] = [];
-    
-    if (customGif) {
-      // Se tem GIF customizado, ele é a única prioridade inicial
-      potentialUrls = [customGif];
-    } else {
-      // Se não tem, tenta as 3 variações mais prováveis do GitHub
-      const normalized = normalizeExerciseName(exerciseName);
-      potentialUrls = [
-        `https://raw.githubusercontent.com/Narok94/tatu-gym-assets/main/${encodeURIComponent(normalized)}.gif`,
-        `https://raw.githubusercontent.com/Narok94/tatu-gym-assets/main/assets/${encodeURIComponent(normalized)}.gif`,
-        `https://cdn.jsdelivr.net/gh/Narok94/tatu-gym-assets@main/${encodeURIComponent(normalized)}.gif`
-      ];
-      
-      if (originalUrl && !potentialUrls.includes(originalUrl)) {
-        potentialUrls.push(originalUrl);
-      }
-    }
-    
-    setUrls(prevUrls => {
-      if (JSON.stringify(prevUrls) === JSON.stringify(potentialUrls)) {
-        return prevUrls;
-      }
-      setCurrentUrlIndex(0);
-      setRetryCount(0);
-      setHasError(false);
-      setIsLoading(true);
-      return potentialUrls;
-    });
-  }, [exerciseName, originalUrl, customGifs]);
+  // Derivamos as URLs diretamente das props/store para evitar loops de estado
+  const normalized = normalizeExerciseName(exerciseName);
+  const customGif = customGifs[normalized];
+  
+  // Usamos a função robusta de variações para garantir o carregamento
+  const variations = getExerciseGifUrlVariations(exerciseName, originalUrl);
+  
+  const urls = customGif ? [customGif, ...variations] : variations;
+  const currentUrl = urls[currentUrlIndex] || urls[0];
 
-  // Timeout para evitar ficar preso em uma URL que não carrega
+  // Resetar estado quando o exercício muda ou um novo GIF customizado aparece
   useEffect(() => {
-    if (isLoading && !hasError && urls.length > 0) {
+    setCurrentUrlIndex(0);
+    setRetryCount(0);
+    setHasError(false);
+    setIsLoading(true);
+  }, [exerciseName, customGif]);
+
+  // Timeout de segurança para cada tentativa de URL
+  useEffect(() => {
+    if (isLoading && !hasError && currentUrl) {
       if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
       
       loadTimeoutRef.current = setTimeout(() => {
         if (isLoading) {
-          console.warn(`[GifImage] Timeout (${urls[currentUrlIndex]})`);
+          console.warn(`[GifImage] Timeout no carregamento de: ${currentUrl}`);
           handleError();
         }
-      }, 4000); 
+      }, 3000); 
     }
     
     return () => {
       if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
     };
-  }, [currentUrlIndex, urls, isLoading]);
+  }, [currentUrl, isLoading, hasError]);
 
   const handleLoad = () => {
-    console.log(`[GifImage] Carregado com sucesso: ${urls[currentUrlIndex]}`);
+    console.log(`[GifImage] Sucesso (${exerciseName}): ${currentUrl}`);
     setIsLoading(false);
     if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
   };
 
   const handleError = () => {
-    const firestoreId = normalizeExerciseName(exerciseName);
-    const isCustom = customGifs[firestoreId] === urls[currentUrlIndex];
-    
-    console.warn(`[GifImage] Erro ao carregar: ${urls[currentUrlIndex]}`);
-
-    // Se o GIF do Firebase falhar, tentamos 3 vezes antes de desistir e ir para o fallback
-    if (isCustom && retryCount < 3) {
-      console.log(`[GifImage] Retentativa ${retryCount + 1} para GIF customizado...`);
-      setTimeout(() => {
-        setRetryCount(prev => prev + 1);
-        setIsLoading(true);
-      }, 2000);
-      return;
-    }
-
-    // Se falhou o customizado após retentativas, adiciona os fallbacks do GitHub na lista
-    if (isCustom && urls.length === 1) {
-      console.warn(`[GifImage] GIF customizado falhou definitivamente. Tentando fallbacks do GitHub...`);
-      const normalized = normalizeExerciseName(exerciseName);
-      const fallbacks = [
-        `https://raw.githubusercontent.com/Narok94/tatu-gym-assets/main/${encodeURIComponent(normalized)}.gif`,
-        `https://cdn.jsdelivr.net/gh/Narok94/tatu-gym-assets@main/${encodeURIComponent(normalized)}.gif`
-      ];
-      setUrls(prev => [...prev, ...fallbacks]);
-      setCurrentUrlIndex(1);
-      setRetryCount(0);
-      setIsLoading(true);
-      return;
-    }
+    console.warn(`[GifImage] Falha (${exerciseName}): ${currentUrl}`);
 
     if (currentUrlIndex < urls.length - 1) {
-      console.log(`[GifImage] Tentando próxima URL: ${urls[currentUrlIndex + 1]}`);
+      console.log(`[GifImage] Tentando próxima URL...`);
       setCurrentUrlIndex(prev => prev + 1);
       setRetryCount(0);
       setIsLoading(true);
+    } else if (retryCount < 1) {
+      console.log(`[GifImage] Retentando última URL uma vez...`);
+      setRetryCount(prev => prev + 1);
+      setIsLoading(true);
     } else {
-      console.error(`[GifImage] Todas as URLs falharam para: ${exerciseName}`);
+      console.error(`[GifImage] Todas as opções falharam para: ${exerciseName}`);
       setHasError(true);
       setIsLoading(false);
     }
   };
 
   const isVideo = (url: string) => {
+    if (!url) return false;
     const lowerUrl = url.toLowerCase();
     return lowerUrl.endsWith('.mp4') || lowerUrl.includes('.mp4?') || lowerUrl.includes('video%2fmp4');
   };
 
-  if (hasError || urls.length === 0) {
+  if (hasError) {
     return (
-      <div className={`flex items-center justify-center bg-zinc-900/50 rounded-lg ${className}`}>
+      <div className={`flex flex-col items-center justify-center bg-zinc-900 rounded-2xl gap-2 ${className}`}>
         <Dumbbell size={fallbackSize} className="text-zinc-700" />
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            setHasError(false);
+            setIsLoading(true);
+            setCurrentUrlIndex(0);
+            setRetryCount(0);
+          }}
+          className="text-[8px] font-black text-blue-500 uppercase tracking-widest hover:text-blue-400 transition-colors"
+        >
+          Tentar Novamente
+        </button>
       </div>
     );
   }
 
-  const currentUrl = urls[currentUrlIndex];
-
   return (
-    <div className="relative w-full h-full overflow-hidden rounded-2xl">
+    <div className="relative w-full h-full overflow-hidden rounded-2xl bg-zinc-900">
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-zinc-900 z-10">
+        <div className="absolute inset-0 flex items-center justify-center z-10 bg-zinc-900">
           <Loader2 className="text-emerald-500 animate-spin" size={24} />
         </div>
       )}

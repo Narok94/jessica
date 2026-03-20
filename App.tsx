@@ -57,6 +57,7 @@ const AppContent: React.FC = () => {
 
   // Load custom gifs from Firestore with real-time updates (v2.2.1)
   useEffect(() => {
+    console.log('[App] Iniciando listener de GIFs customizados...');
     const unsubscribe = onSnapshot(collection(db, 'exercise_gifs'), (querySnapshot) => {
       const gifs: Record<string, string> = {};
       querySnapshot.forEach((doc) => {
@@ -65,7 +66,10 @@ const AppContent: React.FC = () => {
       console.log(`[App] Recebidos ${querySnapshot.size} GIFs customizados do Firestore.`);
       setCustomGifs(gifs);
     }, (error) => {
-      console.error('Error loading custom gifs:', error);
+      console.error('[App] Erro ao carregar GIFs customizados:', error);
+      if (error.message.includes('permission-denied')) {
+        console.error('[App] Erro de permissão no Firestore. Verifique as Security Rules.');
+      }
     });
     
     return () => unsubscribe();
@@ -91,7 +95,19 @@ const AppContent: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(localStorage.getItem('tatugym_remembered') ? true : false);
+  const [rememberMe, setRememberMe] = useState(() => {
+    const saved = localStorage.getItem('tatugym_remember_me_checked');
+    if (saved !== null) return saved === 'true';
+    return localStorage.getItem('tatugym_remembered') !== null;
+  });
+
+  // Sync rememberMe state with localStorage on change
+  useEffect(() => {
+    if (!rememberMe) {
+      // We don't remove 'tatugym_remembered' here because it might be needed for auto-login
+      // but we update the preference for NEXT login
+    }
+  }, [rememberMe]);
 
   // Auto-save logic
   useEffect(() => {
@@ -110,28 +126,35 @@ const AppContent: React.FC = () => {
   }, [isWorkoutActive, user, selectedWorkout, currentSessionProgress, workoutStartTime]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const checkAutoLogin = async () => {
       try {
+        console.log('[App] Verificando auto-login...');
         const remembered = localStorage.getItem('tatugym_remembered');
         if (remembered) {
           const userData = JSON.parse(remembered);
+          console.log(`[App] Usuário lembrado encontrado: ${userData.username}`);
+          
           const profile = localStorage.getItem(`tatugym_user_profile_${userData.username.toLowerCase()}`);
           const finalUser = profile ? JSON.parse(profile) : userData;
           
           // Ensure Firebase Auth session for security rules
-          signInAnonymously(auth).then(async (userCredential) => {
+          try {
+            const userCredential = await signInAnonymously(auth);
             const uid = userCredential.user.uid;
+            console.log(`[App] Auto-login Firebase sync UID: ${uid}`);
+            
             // Sync role to uids collection for security rules
             await setDoc(doc(db, 'uids', uid), { 
               role: finalUser.role,
               username: finalUser.username,
               updatedAt: new Date().toISOString()
             });
-          }).catch(err => console.error('Error in auto-login Firebase sync:', err));
+          } catch (err) {
+            console.error('[App] Erro na sincronização Firebase durante auto-login:', err);
+          }
 
           setUser(finalUser);
           setIsLoggedIn(true);
-          setRememberMe(true);
           
           // Restore active session if exists and recent (within 5 mins)
           const activeSession = localStorage.getItem(`tatugym_active_session_${finalUser.username.toLowerCase()}`);
@@ -149,15 +172,18 @@ const AppContent: React.FC = () => {
               }
             }
           }
+        } else {
+          console.log('[App] Nenhum usuário lembrado encontrado.');
         }
       } catch (error) {
-        console.error('Error loading remembered user:', error);
+        console.error('[App] Erro ao carregar usuário lembrado:', error);
         localStorage.removeItem('tatugym_remembered');
       } finally {
         setIsLoading(false);
       }
-    }, 500);
-    return () => clearTimeout(timer);
+    };
+
+    checkAutoLogin();
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -245,11 +271,19 @@ const AppContent: React.FC = () => {
       if (userData.role === 'teacher') {
         setActiveTab(AppTab.TEACHER);
       }
+      
+      // Persistência de login
+      console.log(`[App] Login bem-sucedido. Lembrar-me: ${rememberMe}`);
+      localStorage.setItem('tatugym_remember_me_checked', rememberMe.toString());
+      
       if (rememberMe) {
+        console.log('[App] Salvando credenciais para "Lembrar-me" no localStorage');
         localStorage.setItem('tatugym_remembered', JSON.stringify(userData));
       } else {
+        console.log('[App] Removendo credenciais de "Lembrar-me" do localStorage');
         localStorage.removeItem('tatugym_remembered');
       }
+      
       if (addToast) addToast(`Bem-vindo de volta, ${userData.name}!`, 'success');
     } else {
       if (addToast) addToast('Usuário não encontrado.', 'error');
@@ -423,9 +457,12 @@ const AppContent: React.FC = () => {
                   </div>
                   <input 
                     type="checkbox" 
-                    className="hidden" 
+                    className="opacity-0 absolute" 
                     checked={rememberMe}
-                    onChange={() => setRememberMe(!rememberMe)}
+                    onChange={() => {
+                      console.log(`[App] Toggling rememberMe from ${rememberMe} to ${!rememberMe}`);
+                      setRememberMe(!rememberMe);
+                    }}
                   />
                   <span className="text-[10px] md:text-[11px] font-black text-zinc-500 uppercase tracking-widest group-hover:text-zinc-300 transition-colors">Lembrar</span>
                 </label>
