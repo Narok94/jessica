@@ -132,9 +132,10 @@ const AppContent: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const lowerUser = username.toLowerCase();
+    const lowerUser = username.trim().toLowerCase();
+    const trimmedPassword = password.trim();
     
-    if (allWorkouts[lowerUser as keyof typeof allWorkouts] || lowerUser === 'professor' || lowerUser === 'admin') {
+    if (allWorkouts[lowerUser] !== undefined || lowerUser === 'professor' || lowerUser === 'admin') {
       let userData: User | null = null;
       try {
         // Try to get from Firestore first
@@ -154,21 +155,21 @@ const AppContent: React.FC = () => {
 
       // Password check logic
       if (userData?.password) {
-        if (password !== userData.password) {
+        if (trimmedPassword !== userData.password) {
           if (addToast) addToast('Senha incorreta.', 'error');
           return;
         }
       } else {
         // Fallback for hardcoded users if no profile exists yet
-        if (lowerUser === 'flavia' && password !== '6087') {
+        if (lowerUser === 'flavia' && trimmedPassword !== '6087') {
           if (addToast) addToast('Senha incorreta para Flavia.', 'error');
           return;
         }
-        if (lowerUser === 'professor' && password !== 'admin') {
+        if (lowerUser === 'professor' && trimmedPassword !== 'admin') {
           if (addToast) addToast('Senha incorreta para Professor.', 'error');
           return;
         }
-        if (lowerUser === 'admin' && password !== '9860') {
+        if (lowerUser === 'admin' && trimmedPassword !== '9860') {
           if (addToast) addToast('Senha incorreta para Admin.', 'error');
           return;
         }
