@@ -26,44 +26,52 @@ export const GifImage: React.FC<GifImageProps> = ({
   const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    // Usar a mesma normalização do resto do app para bater com o ID do Firestore
     const firestoreId = normalizeExerciseName(exerciseName);
     const customGif = customGifs[firestoreId];
     
-    let potentialUrls = getExerciseGifUrlVariations(exerciseName, originalUrl);
+    // Lista simplificada de URLs para evitar spam e lentidão
+    let potentialUrls: string[] = [];
     
     if (customGif) {
-      // Coloca o GIF customizado no topo da lista
-      potentialUrls = [customGif, ...potentialUrls.filter(u => u !== customGif)];
+      // Se tem GIF customizado, ele é a única prioridade inicial
+      potentialUrls = [customGif];
+    } else {
+      // Se não tem, tenta as 3 variações mais prováveis do GitHub
+      const normalized = normalizeExerciseName(exerciseName);
+      potentialUrls = [
+        `https://raw.githubusercontent.com/Narok94/tatu-gym-assets/main/${encodeURIComponent(normalized)}.gif`,
+        `https://raw.githubusercontent.com/Narok94/tatu-gym-assets/main/assets/${encodeURIComponent(normalized)}.gif`,
+        `https://cdn.jsdelivr.net/gh/Narok94/tatu-gym-assets@main/${encodeURIComponent(normalized)}.gif`
+      ];
+      
+      if (originalUrl && !potentialUrls.includes(originalUrl)) {
+        potentialUrls.push(originalUrl);
+      }
     }
     
-    // Limita a quantidade de variações para evitar loops infinitos e lentidão
-    // Tenta as primeiras 15 variações (que cobrem as principais fontes)
-    const limitedUrls = potentialUrls.slice(0, 15);
-    
     setUrls(prevUrls => {
-      if (JSON.stringify(prevUrls) === JSON.stringify(limitedUrls)) {
+      if (JSON.stringify(prevUrls) === JSON.stringify(potentialUrls)) {
         return prevUrls;
       }
       setCurrentUrlIndex(0);
       setRetryCount(0);
       setHasError(false);
       setIsLoading(true);
-      return limitedUrls;
+      return potentialUrls;
     });
   }, [exerciseName, originalUrl, customGifs]);
 
-  // Timeout para evitar ficar preso em uma URL que não carrega (ex: tela preta)
+  // Timeout para evitar ficar preso em uma URL que não carrega
   useEffect(() => {
     if (isLoading && !hasError && urls.length > 0) {
       if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
       
       loadTimeoutRef.current = setTimeout(() => {
         if (isLoading) {
-          console.warn(`[GifImage] Timeout carregando: ${urls[currentUrlIndex]}`);
+          console.warn(`[GifImage] Timeout (${urls[currentUrlIndex]})`);
           handleError();
         }
-      }, 3500); // Reduzido para 3.5s para evitar espera excessiva
+      }, 4000); 
     }
     
     return () => {
@@ -72,23 +80,39 @@ export const GifImage: React.FC<GifImageProps> = ({
   }, [currentUrlIndex, urls, isLoading]);
 
   const handleError = () => {
-    // Se for a primeira URL (provavelmente a customizada), tenta de novo 2 vezes com delay
-    // Isso evita o "piscado" e dá tempo do Firebase Storage propagar o arquivo
-    if (currentUrlIndex === 0 && retryCount < 2) {
-      setIsLoading(true);
+    const firestoreId = normalizeExerciseName(exerciseName);
+    const isCustom = customGifs[firestoreId] === urls[currentUrlIndex];
+
+    // Se o GIF do Firebase falhar, tentamos 3 vezes antes de desistir e ir para o fallback
+    if (isCustom && retryCount < 3) {
+      console.log(`[GifImage] Retentativa ${retryCount + 1} para GIF customizado...`);
       setTimeout(() => {
         setRetryCount(prev => prev + 1);
-      }, 1500);
+        setIsLoading(true);
+      }, 2000);
       return;
     }
 
-    console.warn(`[GifImage] Falha ao carregar: ${urls[currentUrlIndex]}`);
+    // Se falhou o customizado após retentativas, adiciona os fallbacks do GitHub na lista
+    if (isCustom && urls.length === 1) {
+      console.warn(`[GifImage] GIF customizado falhou. Tentando fallbacks do GitHub...`);
+      const normalized = normalizeExerciseName(exerciseName);
+      const fallbacks = [
+        `https://raw.githubusercontent.com/Narok94/tatu-gym-assets/main/${encodeURIComponent(normalized)}.gif`,
+        `https://cdn.jsdelivr.net/gh/Narok94/tatu-gym-assets@main/${encodeURIComponent(normalized)}.gif`
+      ];
+      setUrls(prev => [...prev, ...fallbacks]);
+      setCurrentUrlIndex(1);
+      setRetryCount(0);
+      setIsLoading(true);
+      return;
+    }
+
     if (currentUrlIndex < urls.length - 1) {
       setCurrentUrlIndex(prev => prev + 1);
       setRetryCount(0);
       setIsLoading(true);
     } else {
-      console.error(`[GifImage] Todas as variações falharam para: ${exerciseName}`);
       setHasError(true);
       setIsLoading(false);
     }

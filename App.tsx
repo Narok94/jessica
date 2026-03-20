@@ -55,7 +55,7 @@ const AppContent: React.FC = () => {
     setAddToast(toastFn);
   }, [toastFn, setAddToast]);
 
-  // Load custom gifs from Firestore with real-time updates
+  // Load custom gifs from Firestore with real-time updates (v2.2.1)
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'exercise_gifs'), (querySnapshot) => {
       const gifs: Record<string, string> = {};
