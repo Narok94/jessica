@@ -60,23 +60,28 @@ export const TeacherView: React.FC = () => {
   const [uploadingExercise, setUploadingExercise] = useState<string | null>(null);
 
   const handleGifUpload = async (exerciseName: string, file: File) => {
+    console.log(`[TeacherView] Iniciando upload para: ${exerciseName}`, file.name);
     setUploadingExercise(exerciseName);
     try {
       const normalizedName = normalizeExerciseName(exerciseName);
       const storageRef = ref(storage, `exercise_gifs/${normalizedName}.gif`);
       
+      console.log(`[TeacherView] Enviando para Storage: exercise_gifs/${normalizedName}.gif`);
       await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(storageRef);
+      console.log(`[TeacherView] Upload concluído. URL: ${downloadURL}`);
       
       // Save to Firestore so all users get it
+      console.log(`[TeacherView] Salvando no Firestore: exercise_gifs/${normalizedName}`);
       await setDoc(doc(db, 'exercise_gifs', normalizedName), {
         url: downloadURL,
         updatedAt: new Date().toISOString()
       });
 
       if (addToast) addToast('GIF enviado com sucesso!', 'success');
+      console.log(`[TeacherView] Processo completo para: ${exerciseName}`);
     } catch (error) {
-      console.error('Error uploading GIF:', error);
+      console.error('[TeacherView] Erro no upload do GIF:', error);
       if (addToast) addToast('Erro ao enviar GIF.', 'error');
     } finally {
       setUploadingExercise(null);

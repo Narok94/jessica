@@ -32,7 +32,9 @@ service cloud.firestore {
     
     function isAdmin() {
       return isAuthenticated() && 
-        (exists(/databases/$(database)/documents/uids/$(request.auth.uid)) && get(/databases/$(database)/documents/uids/$(request.auth.uid)).data.role == 'teacher' ||
+        ((exists(/databases/$(database)/documents/uids/$(request.auth.uid)) && 
+          (get(/databases/$(database)/documents/uids/$(request.auth.uid)).data.role == 'teacher' || 
+           get(/databases/$(database)/documents/uids/$(request.auth.uid)).data.role == 'admin')) ||
          request.auth.token.email == "hollyood.caribe@gmail.com");
     }
     

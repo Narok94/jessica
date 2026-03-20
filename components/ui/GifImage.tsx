@@ -37,15 +37,19 @@ export const GifImage: React.FC<GifImageProps> = ({
       potentialUrls = [customGif, ...potentialUrls.filter(u => u !== customGif)];
     }
     
+    // Limita a quantidade de variações para evitar loops infinitos e lentidão
+    // Tenta as primeiras 15 variações (que cobrem as principais fontes)
+    const limitedUrls = potentialUrls.slice(0, 15);
+    
     setUrls(prevUrls => {
-      if (JSON.stringify(prevUrls) === JSON.stringify(potentialUrls)) {
+      if (JSON.stringify(prevUrls) === JSON.stringify(limitedUrls)) {
         return prevUrls;
       }
       setCurrentUrlIndex(0);
       setRetryCount(0);
       setHasError(false);
       setIsLoading(true);
-      return potentialUrls;
+      return limitedUrls;
     });
   }, [exerciseName, originalUrl, customGifs]);
 
@@ -59,7 +63,7 @@ export const GifImage: React.FC<GifImageProps> = ({
           console.warn(`[GifImage] Timeout carregando: ${urls[currentUrlIndex]}`);
           handleError();
         }
-      }, 6000); // 6 segundos de timeout
+      }, 3500); // Reduzido para 3.5s para evitar espera excessiva
     }
     
     return () => {

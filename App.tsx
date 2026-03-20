@@ -62,6 +62,7 @@ const AppContent: React.FC = () => {
       querySnapshot.forEach((doc) => {
         gifs[doc.id] = doc.data().url;
       });
+      console.log(`[App] Recebidos ${querySnapshot.size} GIFs customizados do Firestore.`);
       setCustomGifs(gifs);
     }, (error) => {
       console.error('Error loading custom gifs:', error);
@@ -74,11 +75,16 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     if (isLoggedIn && user && auth.currentUser) {
       const uid = auth.currentUser.uid;
+      console.log(`[App] Sincronizando UID: ${uid} com papel: ${user.role}`);
       setDoc(doc(db, 'uids', uid), { 
         role: user.role,
         username: user.username,
         updatedAt: new Date().toISOString()
-      }).catch(err => console.error('Error in safety UID sync:', err));
+      }).then(() => {
+        console.log(`[App] Sincronização de UID concluída com sucesso.`);
+      }).catch(err => {
+        console.error('[App] Erro na sincronização de UID:', err);
+      });
     }
   }, [isLoggedIn, user]);
 
