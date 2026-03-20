@@ -3,8 +3,6 @@ import { create } from 'zustand';
 import confetti from 'canvas-confetti';
 import { User, WorkoutRoutine, AppTab, SetPerformance, WorkoutHistoryEntry, Badge } from './types';
 import { jessicaWorkouts, henriqueWorkouts, mariaWorkouts, flaviaWorkouts } from './data/workoutData';
-import { auth } from './firebase';
-import { signOut } from 'firebase/auth';
 
 interface AppState {
   user: User | null;
@@ -105,12 +103,7 @@ export const useStore = create<AppState>((set, get) => ({
   setIsChatLoading: (isChatLoading) => set({ isChatLoading }),
   setAddToast: (fn) => set({ addToast: fn }),
 
-  logout: async () => {
-    try {
-      await signOut(auth);
-    } catch (e) {
-      console.error('Error signing out:', e);
-    }
+  logout: () => {
     set({ 
       user: null, 
       isLoggedIn: false, 

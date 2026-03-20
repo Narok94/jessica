@@ -34,7 +34,7 @@ import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { normalizeExerciseName } from '../../src/utils/exerciseUtils';
 
 export const TeacherView: React.FC = () => {
-  const { allWorkouts, setAllWorkouts, user: currentUser, addToast, customGifs, setCustomGifs } = useStore();
+  const { allWorkouts, setAllWorkouts, user: currentUser, addToast } = useStore();
   const [activeSubTab, setActiveSubTab] = useState<'students' | 'database'>('students');
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,6 +58,24 @@ export const TeacherView: React.FC = () => {
   const [isExercisePickerOpen, setIsExercisePickerOpen] = useState(false);
   const [exerciseSearch, setExerciseSearch] = useState('');
   const [uploadingExercise, setUploadingExercise] = useState<string | null>(null);
+  const [customGifs, setCustomGifs] = useState<Record<string, string>>({});
+
+  // Load custom gifs from Firestore
+  useEffect(() => {
+    const loadCustomGifs = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'exercise_gifs'));
+        const gifs: Record<string, string> = {};
+        querySnapshot.forEach((doc) => {
+          gifs[doc.id] = doc.data().url;
+        });
+        setCustomGifs(gifs);
+      } catch (error) {
+        console.error('Error loading custom gifs:', error);
+      }
+    };
+    loadCustomGifs();
+  }, []);
 
   const handleGifUpload = async (exerciseName: string, file: File) => {
     setUploadingExercise(exerciseName);
@@ -74,8 +92,7 @@ export const TeacherView: React.FC = () => {
         updatedAt: new Date().toISOString()
       });
 
-      // Update global store
-      setCustomGifs({ ...customGifs, [normalizedName]: downloadURL });
+      setCustomGifs(prev => ({ ...prev, [normalizedName]: downloadURL }));
       if (addToast) addToast('GIF enviado com sucesso!', 'success');
     } catch (error) {
       console.error('Error uploading GIF:', error);
@@ -652,12 +669,12 @@ export const TeacherView: React.FC = () => {
                       originalUrl={hasCustomGif ? customGifs[normalizedName] : ex.image} 
                       className="w-20 h-20 rounded-2xl object-cover bg-zinc-950 border border-white/5" 
                     />
-                    <label className="absolute bottom-1 right-1 p-1.5 bg-blue-600 text-white rounded-lg shadow-lg cursor-pointer active:scale-95 transition-transform">
+                    <label className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover/gif:opacity-100 transition-opacity rounded-2xl cursor-pointer">
                       {uploadingExercise === ex.name ? (
-                        <Loader2 size={14} className="animate-spin" />
+                        <Loader2 size={24} className="text-white animate-spin" />
                       ) : (
                         <>
-                          <Upload size={14} />
+                          <Upload size={24} className="text-white" />
                           <input 
                             type="file" 
                             accept="image/gif" 
