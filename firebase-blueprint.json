@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "exercise_gifs": {
+      "title": "Exercise Gifs",
+      "description": "Custom GIF URLs for exercises",
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "The download URL of the GIF"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the GIF was last updated"
+        }
+      },
+      "required": ["url", "updatedAt"]
+    },
+    "user_profiles": {
+      "title": "User Profile",
+      "description": "Extended user profile data",
+      "type": "object",
+      "properties": {
+        "username": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["student", "teacher"] },
+        "streak": { "type": "integer" },
+        "totalWorkouts": { "type": "integer" }
+      }
+    }
+  },
+  "firestore": {
+    "exercise_gifs/{exerciseId}": {
+      "schema": "exercise_gifs",
+      "description": "Custom GIF for a specific exercise"
+    },
+    "users/{userId}": {
+      "schema": "user_profiles",
+      "description": "User profile data"
+    }
+  }
+}

@@ -20,12 +20,18 @@ import {
   PlusCircle,
   MoreVertical,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Upload,
+  Loader2
 } from 'lucide-react';
 import { useStore } from '../../store';
 import { User, WorkoutRoutine, Exercise, AppTab } from '../../types';
 import { exerciseDatabase, BaseExercise } from '../../data/exerciseDatabase';
 import { GifImage } from '../ui/GifImage';
+import { storage, db } from '../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { normalizeExerciseName } from '../../src/utils/exerciseUtils';
 
 export const TeacherView: React.FC = () => {
   const { allWorkouts, setAllWorkouts, user: currentUser, addToast } = useStore();
@@ -51,6 +57,50 @@ export const TeacherView: React.FC = () => {
 
   const [isExercisePickerOpen, setIsExercisePickerOpen] = useState(false);
   const [exerciseSearch, setExerciseSearch] = useState('');
+  const [uploadingExercise, setUploadingExercise] = useState<string | null>(null);
+  const [customGifs, setCustomGifs] = useState<Record<string, string>>({});
+
+  // Load custom gifs from Firestore
+  useEffect(() => {
+    const loadCustomGifs = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'exercise_gifs'));
+        const gifs: Record<string, string> = {};
+        querySnapshot.forEach((doc) => {
+          gifs[doc.id] = doc.data().url;
+        });
+        setCustomGifs(gifs);
+      } catch (error) {
+        console.error('Error loading custom gifs:', error);
+      }
+    };
+    loadCustomGifs();
+  }, []);
+
+  const handleGifUpload = async (exerciseName: string, file: File) => {
+    setUploadingExercise(exerciseName);
+    try {
+      const normalizedName = normalizeExerciseName(exerciseName);
+      const storageRef = ref(storage, `exercise_gifs/${normalizedName}.gif`);
+      
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+      
+      // Save to Firestore so all users get it
+      await setDoc(doc(db, 'exercise_gifs', normalizedName), {
+        url: downloadURL,
+        updatedAt: new Date().toISOString()
+      });
+
+      setCustomGifs(prev => ({ ...prev, [normalizedName]: downloadURL }));
+      if (addToast) addToast('GIF enviado com sucesso!', 'success');
+    } catch (error) {
+      console.error('Error uploading GIF:', error);
+      if (addToast) addToast('Erro ao enviar GIF.', 'error');
+    } finally {
+      setUploadingExercise(null);
+    }
+  };
 
   // Get all students from localStorage profiles + allWorkouts keys
   const [students, setStudents] = useState<User[]>([]);
@@ -271,6 +321,21 @@ export const TeacherView: React.FC = () => {
             <p className="text-sm font-black text-white uppercase">
               {studentProfile?.checkIns?.length ? new Date(studentProfile.checkIns[studentProfile.checkIns.length - 1]).toLocaleDateString('pt-BR') : 'Nunca'}
             </p>
+          </div>
+        </div>
+
+        {/* Configured Exercises Summary */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-black text-white uppercase tracking-widest">Exercícios Configurados</h3>
+          <div className="flex flex-wrap gap-2">
+            {Array.from(new Set(studentWorkouts.flatMap(w => w.exercises.map(e => e.name)))).map(exName => (
+              <span key={exName} className="px-3 py-1.5 bg-zinc-900 border border-white/5 rounded-full text-[10px] font-bold text-zinc-400 uppercase tracking-tight">
+                {exName}
+              </span>
+            ))}
+            {studentWorkouts.length === 0 && (
+              <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest">Nenhum exercício configurado.</p>
+            )}
           </div>
         </div>
 
@@ -592,29 +657,58 @@ export const TeacherView: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filteredExercises.map((ex, i) => (
-              <div key={i} className="glass-card p-4 rounded-3xl border border-white/5 flex items-center gap-4 bg-zinc-900/20">
-                <GifImage exerciseName={ex.name} originalUrl={ex.image} className="w-20 h-20 rounded-2xl object-cover bg-zinc-950 border border-white/5" />
-                <div>
-                  <h4 className="font-black text-white uppercase tracking-tight italic">{ex.name}</h4>
-                  <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mt-1">{ex.muscleGroup}</p>
-                  <div className="flex gap-3 mt-2">
-                    <div className="flex flex-col">
-                      <span className="text-[7px] font-black text-zinc-600 uppercase">Séries</span>
-                      <span className="text-[10px] font-bold text-zinc-400">{ex.defaultSets}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[7px] font-black text-zinc-600 uppercase">Reps</span>
-                      <span className="text-[10px] font-bold text-zinc-400">{ex.defaultReps}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[7px] font-black text-zinc-600 uppercase">Descanso</span>
-                      <span className="text-[10px] font-bold text-zinc-400">{ex.defaultRest}s</span>
+            {filteredExercises.map((ex, i) => {
+              const normalizedName = normalizeExerciseName(ex.name);
+              const hasCustomGif = !!customGifs[normalizedName];
+              
+              return (
+                <div key={i} className="glass-card p-4 rounded-3xl border border-white/5 flex items-center gap-4 bg-zinc-900/20">
+                  <div className="relative group/gif">
+                    <GifImage 
+                      exerciseName={ex.name} 
+                      originalUrl={hasCustomGif ? customGifs[normalizedName] : ex.image} 
+                      className="w-20 h-20 rounded-2xl object-cover bg-zinc-950 border border-white/5" 
+                    />
+                    <label className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover/gif:opacity-100 transition-opacity rounded-2xl cursor-pointer">
+                      {uploadingExercise === ex.name ? (
+                        <Loader2 size={24} className="text-white animate-spin" />
+                      ) : (
+                        <>
+                          <Upload size={24} className="text-white" />
+                          <input 
+                            type="file" 
+                            accept="image/gif" 
+                            className="hidden" 
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleGifUpload(ex.name, file);
+                            }}
+                          />
+                        </>
+                      )}
+                    </label>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-black text-white uppercase tracking-tight italic">{ex.name}</h4>
+                    <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mt-1">{ex.muscleGroup}</p>
+                    <div className="flex gap-3 mt-2">
+                      <div className="flex flex-col">
+                        <span className="text-[7px] font-black text-zinc-600 uppercase">Séries</span>
+                        <span className="text-[10px] font-bold text-zinc-400">{ex.defaultSets}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[7px] font-black text-zinc-600 uppercase">Reps</span>
+                        <span className="text-[10px] font-bold text-zinc-400">{ex.defaultReps}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[7px] font-black text-zinc-600 uppercase">Descanso</span>
+                        <span className="text-[10px] font-bold text-zinc-400">{ex.defaultRest}s</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

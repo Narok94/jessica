@@ -15,6 +15,9 @@ import { useStore } from './store';
 import { AppTab, User } from './types';
 import { ToastProvider, useToast } from './components/ui/Toast';
 import { DashboardSkeleton } from './components/ui/Skeleton';
+import { db, auth } from './firebase';
+import { collection, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
+import { signInAnonymously } from 'firebase/auth';
 
 // Views
 import { DashboardView } from './components/views/DashboardView';
@@ -42,7 +45,8 @@ const AppContent: React.FC = () => {
     setIsWorkoutActive,
     setWorkoutStartTime,
     addToast,
-    setAddToast
+    setAddToast,
+    setCustomGifs
   } = useStore();
 
   const { addToast: toastFn } = useToast();
@@ -50,6 +54,23 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     setAddToast(toastFn);
   }, [toastFn, setAddToast]);
+
+  // Load custom gifs from Firestore on startup
+  useEffect(() => {
+    const loadCustomGifs = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'exercise_gifs'));
+        const gifs: Record<string, string> = {};
+        querySnapshot.forEach((doc) => {
+          gifs[doc.id] = doc.data().url;
+        });
+        setCustomGifs(gifs);
+      } catch (error) {
+        console.error('Error loading custom gifs:', error);
+      }
+    };
+    loadCustomGifs();
+  }, [setCustomGifs]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [username, setUsername] = useState('');
@@ -109,16 +130,23 @@ const AppContent: React.FC = () => {
     }, 1500);
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const lowerUser = username.toLowerCase();
     
-    if (allWorkouts[lowerUser as keyof typeof allWorkouts] || lowerUser === 'professor') {
+    if (allWorkouts[lowerUser as keyof typeof allWorkouts] || lowerUser === 'professor' || lowerUser === 'admin') {
       let userData: User | null = null;
       try {
-        const profile = localStorage.getItem(`tatugym_user_profile_${lowerUser}`);
-        if (profile) {
-          userData = JSON.parse(profile);
+        // Try to get from Firestore first
+        const userDoc = await getDoc(doc(db, 'users', lowerUser));
+        if (userDoc.exists()) {
+          userData = userDoc.data() as User;
+        } else {
+          // Fallback to localStorage
+          const profile = localStorage.getItem(`tatugym_user_profile_${lowerUser}`);
+          if (profile) {
+            userData = JSON.parse(profile);
+          }
         }
       } catch (error) {
         console.error('Error parsing profile:', error);
@@ -140,13 +168,17 @@ const AppContent: React.FC = () => {
           if (addToast) addToast('Senha incorreta para Professor.', 'error');
           return;
         }
+        if (lowerUser === 'admin' && password !== '9860') {
+          if (addToast) addToast('Senha incorreta para Admin.', 'error');
+          return;
+        }
       }
 
       // If no profile exists, create default one
       if (!userData) {
         userData = {
           username: lowerUser,
-          name: lowerUser === 'flavia' ? 'Flávia Reis' : lowerUser === 'professor' ? 'Professor Tatu' : username.charAt(0).toUpperCase() + username.slice(1),
+          name: lowerUser === 'flavia' ? 'Flávia Reis' : lowerUser === 'professor' ? 'Professor Tatu' : lowerUser === 'admin' ? 'Administrador' : username.charAt(0).toUpperCase() + username.slice(1),
           age: lowerUser === 'flavia' ? 41 : undefined,
           goal: lowerUser === 'flavia' ? 'Saúde/ Tônus muscular' : undefined,
           totalWorkouts: 0,
@@ -156,10 +188,20 @@ const AppContent: React.FC = () => {
           streak: 0,
           badges: [],
           isProfileComplete: true,
-          role: lowerUser === 'professor' ? 'teacher' : 'student'
+          role: (lowerUser === 'professor' || lowerUser === 'admin') ? 'teacher' : 'student'
         };
       }
       
+      try {
+        // Sign in anonymously to get a UID for Firestore rules
+        await signInAnonymously(auth);
+        
+        // Save to Firestore
+        await setDoc(doc(db, 'users', lowerUser), userData);
+      } catch (error) {
+        console.error('Error syncing with Firebase:', error);
+      }
+
       setUser(userData);
       setIsLoggedIn(true);
       if (userData.role === 'teacher') {
@@ -372,7 +414,7 @@ const AppContent: React.FC = () => {
                <p className="text-zinc-600 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] leading-relaxed">
                  Acesso restrito a membros autorizados.<br />
                  <span className="text-zinc-700">© 2025 Tatu Gym Pro. Todos os direitos reservados.</span><br />
-                 <span className="text-blue-500/50 mt-2 block">Professor: professor / admin</span>
+                 <span className="text-blue-500/50 mt-2 block">Professor: professor / admin | Admin: admin / 9860</span>
                </p>
             </motion.div>
           </motion.div>

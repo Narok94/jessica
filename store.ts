@@ -20,6 +20,7 @@ interface AppState {
   isChatLoading: boolean;
   selectedStudent: string | null;
   allWorkouts: Record<string, WorkoutRoutine[]>;
+  customGifs: Record<string, string>;
 
   // Actions
   setUser: (user: User | null) => void;
@@ -28,6 +29,7 @@ interface AppState {
   setSelectedWorkout: (workout: WorkoutRoutine | null) => void;
   setSelectedStudent: (student: string | null) => void;
   setAllWorkouts: (workouts: AppState['allWorkouts']) => void;
+  setCustomGifs: (gifs: Record<string, string>) => void;
   setCurrentSessionProgress: (progress: Record<string, SetPerformance[]>) => void;
   setIsWorkoutActive: (isActive: boolean) => void;
   setWorkoutStartTime: (time: number | null) => void;
@@ -77,6 +79,7 @@ export const useStore = create<AppState>((set, get) => ({
       flavia: flaviaWorkouts
     };
   })(),
+  customGifs: {},
   addToast: undefined,
 
   setUser: (user) => set({ user }),
@@ -88,6 +91,7 @@ export const useStore = create<AppState>((set, get) => ({
     set({ allWorkouts });
     localStorage.setItem('tatugym_all_workouts', JSON.stringify(allWorkouts));
   },
+  setCustomGifs: (customGifs) => set({ customGifs }),
   setCurrentSessionProgress: (currentSessionProgress) => set({ currentSessionProgress }),
   setIsWorkoutActive: (isWorkoutActive) => set({ isWorkoutActive }),
   setWorkoutStartTime: (workoutStartTime) => set({ workoutStartTime }),

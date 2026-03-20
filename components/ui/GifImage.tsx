@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Dumbbell } from 'lucide-react';
-import { getExerciseGifUrlVariations } from '../../src/utils/exerciseUtils';
+import { getExerciseGifUrlVariations, normalizeExerciseName } from '../../src/utils/exerciseUtils';
+import { useStore } from '../../store';
 
 interface GifImageProps {
   exerciseName: string;
@@ -11,17 +12,26 @@ interface GifImageProps {
 }
 
 export const GifImage: React.FC<GifImageProps> = ({ exerciseName, originalUrl, className, fallbackSize = 24 }) => {
+  const { customGifs } = useStore();
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [hasError, setHasError] = useState(false);
   const [urls, setUrls] = useState<string[]>([]);
 
   useEffect(() => {
-    const potentialUrls = getExerciseGifUrlVariations(exerciseName, originalUrl);
+    const normalizedName = normalizeExerciseName(exerciseName);
+    const customGif = customGifs[normalizedName];
+    
+    let potentialUrls = getExerciseGifUrlVariations(exerciseName, originalUrl);
+    
+    if (customGif) {
+      // Put custom GIF at the beginning
+      potentialUrls = [customGif, ...potentialUrls.filter(u => u !== customGif)];
+    }
+    
     setUrls(potentialUrls);
     setCurrentUrlIndex(0);
     setHasError(false);
-    console.log(`[GifImage] Iniciando carregamento para: ${exerciseName}`, potentialUrls);
-  }, [exerciseName, originalUrl]);
+  }, [exerciseName, originalUrl, customGifs]);
 
   const handleError = () => {
     console.warn(`[GifImage] Falha ao carregar: ${urls[currentUrlIndex]}`);
