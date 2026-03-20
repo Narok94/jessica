@@ -79,9 +79,17 @@ export const GifImage: React.FC<GifImageProps> = ({
     };
   }, [currentUrlIndex, urls, isLoading]);
 
+  const handleLoad = () => {
+    console.log(`[GifImage] Carregado com sucesso: ${urls[currentUrlIndex]}`);
+    setIsLoading(false);
+    if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
+  };
+
   const handleError = () => {
     const firestoreId = normalizeExerciseName(exerciseName);
     const isCustom = customGifs[firestoreId] === urls[currentUrlIndex];
+    
+    console.warn(`[GifImage] Erro ao carregar: ${urls[currentUrlIndex]}`);
 
     // Se o GIF do Firebase falhar, tentamos 3 vezes antes de desistir e ir para o fallback
     if (isCustom && retryCount < 3) {
@@ -95,7 +103,7 @@ export const GifImage: React.FC<GifImageProps> = ({
 
     // Se falhou o customizado após retentativas, adiciona os fallbacks do GitHub na lista
     if (isCustom && urls.length === 1) {
-      console.warn(`[GifImage] GIF customizado falhou. Tentando fallbacks do GitHub...`);
+      console.warn(`[GifImage] GIF customizado falhou definitivamente. Tentando fallbacks do GitHub...`);
       const normalized = normalizeExerciseName(exerciseName);
       const fallbacks = [
         `https://raw.githubusercontent.com/Narok94/tatu-gym-assets/main/${encodeURIComponent(normalized)}.gif`,
@@ -109,18 +117,15 @@ export const GifImage: React.FC<GifImageProps> = ({
     }
 
     if (currentUrlIndex < urls.length - 1) {
+      console.log(`[GifImage] Tentando próxima URL: ${urls[currentUrlIndex + 1]}`);
       setCurrentUrlIndex(prev => prev + 1);
       setRetryCount(0);
       setIsLoading(true);
     } else {
+      console.error(`[GifImage] Todas as URLs falharam para: ${exerciseName}`);
       setHasError(true);
       setIsLoading(false);
     }
-  };
-
-  const handleLoad = () => {
-    setIsLoading(false);
-    if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
   };
 
   const isVideo = (url: string) => {
@@ -139,9 +144,9 @@ export const GifImage: React.FC<GifImageProps> = ({
   const currentUrl = urls[currentUrlIndex];
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full overflow-hidden rounded-2xl">
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/50 z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-zinc-900 z-10">
           <Loader2 className="text-emerald-500 animate-spin" size={24} />
         </div>
       )}
@@ -150,7 +155,7 @@ export const GifImage: React.FC<GifImageProps> = ({
         <video
           key={`${currentUrl}-${retryCount}`}
           src={currentUrl}
-          className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+          className={`${className} w-full h-full object-cover`}
           autoPlay
           muted
           loop
@@ -163,7 +168,7 @@ export const GifImage: React.FC<GifImageProps> = ({
           key={`${currentUrl}-${retryCount}`}
           src={currentUrl}
           alt={exerciseName}
-          className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+          className={`${className} w-full h-full object-cover`}
           onLoad={handleLoad}
           onError={handleError}
           referrerPolicy="no-referrer"

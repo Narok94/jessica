@@ -91,7 +91,7 @@ const AppContent: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(localStorage.getItem('tatugym_remembered') ? true : false);
 
   // Auto-save logic
   useEffect(() => {
@@ -131,6 +131,7 @@ const AppContent: React.FC = () => {
 
           setUser(finalUser);
           setIsLoggedIn(true);
+          setRememberMe(true);
           
           // Restore active session if exists and recent (within 5 mins)
           const activeSession = localStorage.getItem(`tatugym_active_session_${finalUser.username.toLowerCase()}`);
@@ -155,7 +156,8 @@ const AppContent: React.FC = () => {
       } finally {
         setIsLoading(false);
       }
-    }, 1500);
+    }, 500);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
