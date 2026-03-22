@@ -44,9 +44,6 @@ export const normalizeExerciseName = (name: string): string => {
     'Sissy Squat': 'agachamento-sissy',
     'Afundo com Halteres': 'afundo-com-halteres',
     'Agachamento Búlgaro': 'agachamento-bulgaro',
-    'Elevação Pélvica': 'elevacao-pelvica-com-barra',
-    'Cadeira Abdutora': 'abduçao-de-quadril-em-pé', // Fallback or specific
-    'Cadeira Adutora': 'adução-na-polia', // Fallback or specific
     'Supino Reto Barra': 'supino-reto-com-barra',
     'Supino Inclinado Barra': 'supino-inclinado-com-barra',
     'Supino Reto Halteres': 'supino-reto-com-halteres',
@@ -90,6 +87,12 @@ export const normalizeExerciseName = (name: string): string => {
     'Alongamento de Posterior': 'alongamento-de-isquiotibiais-em-pé',
     'Alongamento de Glúteos': 'alongamento-de-glúteos-deitado',
     'Alongamento de Ombros': 'alongamento-de-ombro-com-o-braço-cruzado',
+    'Abdução Solo Pilates': 'abdução-de-quadril-deitado-de-lado',
+    'Gluteo Máquina Coice': 'gluteo-na-maquina',
+    'Glúteo Cabo (Coice)': 'gluteo-no-cabo-coice',
+    'Elevação Pélvica': 'elevação-pélvica-com-barra',
+    'Cadeira Abdutora': 'abduçao-de-quadril-em-pé',
+    'Cadeira Adutora': 'adução-na-polia',
   };
 
   if (manualMap[name]) return manualMap[name];

@@ -80,8 +80,10 @@ export const exerciseDatabase: BaseExercise[] = [
 
   // GLÚTEOS
   { name: 'Elevação Pélvica', muscleGroup: 'Glúteos', defaultSets: 3, defaultReps: '12-15', defaultRest: 90, image: getExerciseGifUrl('Elevação Pélvica') },
+  { name: 'Abdução Solo Pilates', muscleGroup: 'Glúteos', defaultSets: 3, defaultReps: '15-20', defaultRest: 60, image: getExerciseGifUrl('Abdução Solo Pilates') },
+  { name: 'Gluteo Máquina Coice', muscleGroup: 'Glúteos', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Gluteo Máquina Coice') },
   { name: 'Cadeira Abdutora', muscleGroup: 'Glúteos', defaultSets: 3, defaultReps: '15-20', defaultRest: 60, image: getExerciseGifUrl('Cadeira Abdutora') },
-  { name: 'Glúteo Cabo (Coice)', muscleGroup: 'Glúteos', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Glúteo Cabo') },
+  { name: 'Glúteo Cabo (Coice)', muscleGroup: 'Glúteos', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Glúteo Cabo (Coice)') },
   { name: 'Abdução de Quadril com Cabo', muscleGroup: 'Glúteos', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Abdução de Quadril com Cabo') },
   { name: 'Abdução de Quadril com Ponte', muscleGroup: 'Glúteos', defaultSets: 3, defaultReps: '15-20', defaultRest: 60, image: getExerciseGifUrl('Abdução de Quadril com Ponte') },
   { name: 'Glúteo Máquina', muscleGroup: 'Glúteos', defaultSets: 3, defaultReps: '12-15', defaultRest: 60, image: getExerciseGifUrl('Glúteo Máquina') },
