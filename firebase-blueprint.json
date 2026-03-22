@@ -1,44 +1,71 @@
 {
   "entities": {
-    "exercise_gifs": {
-      "title": "Exercise Gifs",
-      "description": "Custom GIF URLs for exercises",
+    "Exercise": {
+      "title": "Exercise",
+      "description": "A single exercise with a name, category, muscle group, and GIF URL.",
       "type": "object",
       "properties": {
-        "url": {
-          "type": "string",
-          "format": "uri",
-          "description": "The download URL of the GIF"
-        },
-        "updatedAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "When the GIF was last updated"
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "muscleGroup": { "type": "string" },
+        "gifUrl": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "required": ["name", "category", "muscleGroup", "gifUrl"]
+    },
+    "Workout": {
+      "title": "Workout",
+      "description": "A workout session performed by a user.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "exercises": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "exerciseId": { "type": "string" },
+              "sets": { "type": "integer" },
+              "reps": { "type": "integer" },
+              "weight": { "type": "number" }
+            }
+          }
         }
       },
-      "required": ["url", "updatedAt"]
+      "required": ["userId", "name", "date", "exercises"]
     },
-    "user_profiles": {
-      "title": "User Profile",
-      "description": "Extended user profile data",
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "The profile of a user.",
       "type": "object",
       "properties": {
-        "username": { "type": "string" },
+        "id": { "type": "string" },
         "name": { "type": "string" },
-        "role": { "type": "string", "enum": ["student", "teacher"] },
-        "streak": { "type": "integer" },
-        "totalWorkouts": { "type": "integer" }
-      }
+        "email": { "type": "string", "format": "email" },
+        "photoUrl": { "type": "string" },
+        "goal": { "type": "string" },
+        "weight": { "type": "number" },
+        "height": { "type": "number" }
+      },
+      "required": ["name", "email"]
     }
   },
   "firestore": {
-    "exercise_gifs/{exerciseId}": {
-      "schema": "exercise_gifs",
-      "description": "Custom GIF for a specific exercise"
+    "/exercises": {
+      "schema": "Exercise",
+      "description": "A collection of all available exercises."
     },
-    "users/{userId}": {
-      "schema": "user_profiles",
-      "description": "User profile data"
+    "/workouts": {
+      "schema": "Workout",
+      "description": "A collection of all workouts performed by users."
+    },
+    "/users": {
+      "schema": "UserProfile",
+      "description": "A collection of all user profiles."
     }
   }
 }

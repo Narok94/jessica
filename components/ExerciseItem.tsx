@@ -48,7 +48,6 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
     return new Array(exercise.sets).fill(null).map(() => ({
       weight: savedWeight || 0,
       reps: parseInt(exercise.reps) || 0,
-      rpe: 8,
       completed: false
     }));
   });
@@ -140,7 +139,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
     });
   };
 
-  const adjustValue = (index: number, key: 'weight' | 'reps' | 'rpe', delta: number) => {
+  const adjustValue = (index: number, key: 'weight' | 'reps', delta: number) => {
     const currentVal = performance[index][key] || 0;
     const newVal = Math.max(0, currentVal + delta);
     updateSet(index, { [key]: newVal });
@@ -285,9 +284,8 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
           <div className="space-y-4">
             <div className="hidden md:grid grid-cols-12 gap-3 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] px-3">
               <div className="col-span-1 text-center">Set</div>
-              <div className="col-span-4 text-center">Peso (kg)</div>
-              <div className="col-span-4 text-center">Reps</div>
-              <div className="col-span-2 text-center">RPE</div>
+              <div className="col-span-5 text-center">Peso (kg)</div>
+              <div className="col-span-5 text-center">Reps</div>
               <div className="col-span-1 text-center">Ok</div>
             </div>
 
@@ -301,7 +299,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                 </div>
 
                 {/* Weight Stepper */}
-                <div className="col-span-5 md:col-span-4 flex flex-col gap-1">
+                <div className="col-span-5 md:col-span-5 flex flex-col gap-1">
                   <span className="md:hidden text-[7px] font-black text-zinc-600 uppercase tracking-widest text-center">Peso (kg)</span>
                   <div className={`flex items-center rounded-2xl border transition-all duration-300 overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}>
                     <button 
@@ -331,7 +329,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                 </div>
 
                 {/* Reps Input (Simple numeric field as requested) */}
-                <div className="col-span-3 md:col-span-4 flex flex-col gap-1">
+                <div className="col-span-3 md:col-span-5 flex flex-col gap-1">
                   <span className="md:hidden text-[7px] font-black text-zinc-600 uppercase tracking-widest text-center">Reps</span>
                   <div className={`flex items-center rounded-2xl border transition-all duration-300 overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}>
                     <input 
@@ -344,20 +342,6 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                       onChange={(e) => updateSet(idx, { reps: parseInt(e.target.value) || 0 })} 
                       className="w-full bg-transparent text-center text-sm font-black text-white outline-none px-2"
                     />
-                  </div>
-                </div>
-
-                {/* RPE Selector (Subtle on mobile) */}
-                <div className="hidden md:flex md:col-span-2 items-center justify-center">
-                  <div className="w-full relative">
-                    <select 
-                      disabled={set.completed}
-                      value={set.rpe}
-                      onChange={(e) => updateSet(idx, { rpe: parseInt(e.target.value) })}
-                      className={`w-full h-12 text-white font-black text-xs rounded-2xl border transition-all outline-none appearance-none text-center ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}
-                    >
-                      {[6,7,8,9,10].map(v => <option key={v} value={v}>RPE {v}</option>)}
-                    </select>
                   </div>
                 </div>
 

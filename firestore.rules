@@ -5,91 +5,96 @@ service cloud.firestore {
     // Assumed Data Model
     // ===============================================================
     //
-    // Collection: exercise_gifs
-    // Document ID: normalized exercise name
+    // Collection: exercises
+    // Document ID: auto-generated
     // Fields:
-    //   - url: string (required, uri)
-    //   - updatedAt: string (required, date-time)
+    //   - name: string (required)
+    //   - category: string (required)
+    //   - muscleGroup: string (required)
+    //   - gifUrl: string (required)
+    //   - description: string (optional)
+    //
+    // Collection: workouts
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required)
+    //   - name: string (required)
+    //   - date: timestamp (required)
+    //   - exercises: list (required)
     //
     // Collection: users
-    // Document ID: userId (uid)
+    // Document ID: userId
     // Fields:
-    //   - username: string
-    //   - name: string
-    //   - role: string (student, teacher)
-    //   - streak: number
-    //   - totalWorkouts: number
+    //   - name: string (required)
+    //   - email: string (required)
+    //   - photoUrl: string (optional)
+    //   - goal: string (optional)
+    //   - weight: number (optional)
+    //   - height: number (optional)
     //
     // ===============================================================
 
     // ===============================================================
     // Helper Functions
     // ===============================================================
-    
     function isAuthenticated() {
       return request.auth != null;
     }
-    
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
     function isAdmin() {
-      return isAuthenticated() && 
-        ((exists(/databases/$(database)/documents/uids/$(request.auth.uid)) && 
-          (get(/databases/$(database)/documents/uids/$(request.auth.uid)).data.role == 'teacher' || 
-           get(/databases/$(database)/documents/uids/$(request.auth.uid)).data.role == 'admin')) ||
-         request.auth.token.email == "hollyood.caribe@gmail.com");
-    }
-    
-    function isUserOwner(username) {
-      return isAuthenticated() && 
-        ((exists(/databases/$(database)/documents/uids/$(request.auth.uid)) && 
-          get(/databases/$(database)/documents/uids/$(request.auth.uid)).data.username == username) ||
-         request.auth.token.email == "hollyood.caribe@gmail.com");
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "hollyood.caribe@gmail.com" && request.auth.token.email_verified == true));
     }
 
-    function hasOnlyAllowedFields(fields) {
-      return request.resource.data.keys().hasOnly(fields);
+    function isValidExercise(data) {
+      return data.keys().hasAll(['name', 'category', 'muscleGroup', 'gifUrl']) &&
+        data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+        data.category is string && data.category.size() > 0 && data.category.size() < 50 &&
+        data.muscleGroup is string && data.muscleGroup.size() > 0 && data.muscleGroup.size() < 50 &&
+        data.gifUrl is string && data.gifUrl.size() > 0 && data.gifUrl.size() < 500;
     }
 
-    // ===============================================================
-    // Domain Validators
-    // ===============================================================
-
-    function isValidGif(data) {
-      return hasOnlyAllowedFields(['url', 'updatedAt']) &&
-             data.url is string && data.url.size() < 1000 &&
-             data.updatedAt is string;
+    function isValidWorkout(data) {
+      return data.keys().hasAll(['userId', 'name', 'date', 'exercises']) &&
+        data.userId == request.auth.uid &&
+        data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+        data.date is timestamp &&
+        data.exercises is list && data.exercises.size() < 50;
     }
 
     function isValidUser(data) {
-      // Allow all fields since the user object is complex and evolves
-      return data.username is string && data.username.size() < 50 &&
-             data.name is string && data.name.size() < 100 &&
-             data.role in ['student', 'teacher'];
+      return data.keys().hasAll(['name', 'email']) &&
+        data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+        data.email is string && data.email.size() > 0 && data.email.size() < 100;
     }
 
     // ===============================================================
     // Rules
     // ===============================================================
 
-    match /uids/{uid} {
+    match /exercises/{exerciseId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && request.auth.uid == uid;
-    }
-
-    match /exercise_gifs/{exerciseId} {
-      allow read: if true; // Publicly readable so all users see GIFs
-      allow write: if isAdmin() && isValidGif(request.resource.data);
-    }
-
-    match /users/{username} {
-      allow read: if isUserOwner(username) || isAdmin();
-      allow create: if (isUserOwner(username) || isAdmin()) && isValidUser(request.resource.data);
-      allow update: if (isUserOwner(username) || isAdmin()) && isValidUser(request.resource.data);
+      allow create, update: if isAdmin() && isValidExercise(request.resource.data);
       allow delete: if isAdmin();
     }
 
-    // Default deny
-    match /{document=**} {
-      allow read, write: if false;
+    match /workouts/{workoutId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && isValidWorkout(request.resource.data);
+      allow update: if isAuthenticated() && isOwner(resource.data.userId) && isValidWorkout(request.resource.data);
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+      allow delete: if isAdmin();
     }
   }
 }
