@@ -252,6 +252,16 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                    )}
                 </div>
              </div>
+             <a 
+               href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
+               target="_blank"
+               rel="noopener noreferrer"
+               onClick={(e) => e.stopPropagation()}
+               className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] hover:bg-blue-500/20 transition-all shadow-lg shadow-blue-500/5"
+             >
+               <Search size={14} strokeWidth={3} />
+               Ver execução no Google
+             </a>
           </div>
 
           <div className="space-y-4">
@@ -356,19 +366,10 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
 
             <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-2xl p-4 flex items-start gap-3">
               <Info size={16} className="text-indigo-400 mt-0.5 shrink-0" />
-              <div className="flex-1 space-y-2">
+              <div className="flex-1">
                 <p className="text-[11px] font-medium text-zinc-400 leading-relaxed">
                   {exercise.notes || 'Foque no controle motor. Sinta o músculo trabalhar em cada fase.'}
                 </p>
-                <a 
-                  href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[10px] font-bold text-blue-400 uppercase tracking-widest hover:bg-blue-500/20 transition-all"
-                >
-                  <Search size={12} />
-                  Ver execução no Google
-                </a>
               </div>
             </div>
           </div>
