@@ -3,7 +3,7 @@ import { db, auth, collection, getDocs, query, where, orderBy, handleFirestoreEr
 import { Workout, Exercise } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Calendar, ChevronDown, ChevronUp, History, Search } from 'lucide-react';
+import { Calendar, ChevronDown, ChevronUp, History, Search, Dumbbell } from 'lucide-react';
 
 export const WorkoutHistory: React.FC = () => {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
@@ -99,19 +99,22 @@ export const WorkoutHistory: React.FC = () => {
                     const exerciseInfo = exercises[ex.exerciseId];
                     return (
                       <div key={idx} className="flex gap-4 p-4 border border-line/10 bg-bg">
-                        <div className="w-12 h-12 bg-line/10 overflow-hidden flex-shrink-0 flex items-center justify-center">
-                          <a 
-                            href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exerciseInfo?.name || '')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 hover:bg-ink hover:text-bg transition-all rounded-full"
-                            title="Ver Execução"
-                          >
-                            <Search className="w-4 h-4" />
-                          </a>
+                        <div className="w-12 h-12 bg-line/10 overflow-hidden flex-shrink-0 flex items-center justify-center rounded-lg">
+                          <Dumbbell className="w-6 h-6 opacity-10" />
                         </div>
                         <div className="flex-1 space-y-1">
-                          <h4 className="text-lg leading-tight">{exerciseInfo?.name || 'Exercício Removido'}</h4>
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-lg leading-tight">{exerciseInfo?.name || 'Exercício Removido'}</h4>
+                            <a 
+                              href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exerciseInfo?.name || '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 opacity-30 hover:opacity-100 hover:text-blue-400 transition-all"
+                              title="Ver Execução"
+                            >
+                              <Search className="w-3 h-3" />
+                            </a>
+                          </div>
                           <div className="flex gap-4 font-mono text-[10px] uppercase opacity-60">
                             <span>{ex.sets} SETS</span>
                             <span>{ex.reps} REPS</span>

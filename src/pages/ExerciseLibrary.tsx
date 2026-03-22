@@ -22,6 +22,7 @@ export const ExerciseLibrary: React.FC = () => {
   const [search, setSearch] = useState('');
   const [selectedMuscle, setSelectedMuscle] = useState<string | null>(null);
   const [seeding, setSeeding] = useState(false);
+  const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
 
   const isAdmin = auth.currentUser?.email === 'hollyood.caribe@gmail.com';
 
@@ -116,10 +117,14 @@ export const ExerciseLibrary: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-line border border-line">
         {filteredExercises.map(exercise => (
-          <div key={exercise.id} className="bg-bg p-6 space-y-4 group hover:bg-ink hover:text-bg transition-colors">
+          <div 
+            key={exercise.id} 
+            onClick={() => setExpandedExercise(expandedExercise === exercise.id ? null : exercise.id)}
+            className="bg-bg p-6 space-y-4 group hover:bg-ink hover:text-bg transition-colors cursor-pointer"
+          >
             <div className="flex justify-between items-start">
               <span className="font-serif italic text-xs opacity-50">{exercise.category}</span>
-              <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${expandedExercise === exercise.id ? 'rotate-90' : ''}`} />
             </div>
             
             <div className="space-y-1">
@@ -127,20 +132,28 @@ export const ExerciseLibrary: React.FC = () => {
               <p className="font-mono text-[10px] uppercase tracking-widest opacity-60">{exercise.muscleGroup}</p>
             </div>
 
-            <div className="aspect-video bg-line/10 overflow-hidden flex items-center justify-center">
-              <div className="flex flex-col items-center gap-4">
-                <Dumbbell className="w-12 h-12 opacity-20" />
-                <a 
-                  href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 bg-line text-bg text-[10px] font-mono uppercase tracking-widest hover:bg-ink hover:text-bg transition-all"
-                >
-                  <Search className="w-3 h-3" />
-                  Ver Execução
-                </a>
+            {expandedExercise === exercise.id && (
+              <div className="pt-4 border-t border-line/10 animate-slide-up space-y-4">
+                <p className="text-xs leading-relaxed opacity-70">
+                  {exercise.description || 'Nenhuma descrição técnica disponível para este exercício.'}
+                </p>
+                <div className="aspect-video bg-line/5 overflow-hidden flex items-center justify-center rounded-xl">
+                  <div className="flex flex-col items-center gap-2">
+                    <Dumbbell className="w-8 h-8 opacity-10" />
+                    <a 
+                      href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest hover:text-blue-400 transition-colors"
+                    >
+                      <Search className="w-3 h-3" />
+                      Ajuda Visual (Google)
+                    </a>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         ))}
       </div>

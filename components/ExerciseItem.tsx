@@ -210,17 +210,6 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
               <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
                 {exercise.reps} reps
               </p>
-              
-              <a 
-                href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-[9px] font-black text-blue-400 uppercase tracking-widest hover:bg-blue-500/20 transition-colors"
-              >
-                <Search size={10} />
-                Ajuda
-              </a>
             </div>
           </div>
         </div>
@@ -367,9 +356,20 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
 
             <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-2xl p-4 flex items-start gap-3">
               <Info size={16} className="text-indigo-400 mt-0.5 shrink-0" />
-              <p className="text-[11px] font-medium text-zinc-400 leading-relaxed">
-                {exercise.notes || 'Foque no controle motor. Sinta o músculo trabalhar em cada fase.'}
-              </p>
+              <div className="flex-1 space-y-2">
+                <p className="text-[11px] font-medium text-zinc-400 leading-relaxed">
+                  {exercise.notes || 'Foque no controle motor. Sinta o músculo trabalhar em cada fase.'}
+                </p>
+                <a 
+                  href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-[9px] font-bold text-zinc-500 uppercase tracking-widest hover:text-blue-400 transition-colors"
+                >
+                  <Search size={10} />
+                  Precisa de ajuda visual? Buscar no Google
+                </a>
+              </div>
             </div>
           </div>
         </div>

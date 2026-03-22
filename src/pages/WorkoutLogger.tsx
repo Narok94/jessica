@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth, collection, getDocs, addDoc, Timestamp, handleFirestoreError, OperationType } from '../firebase';
 import { Exercise, WorkoutExercise, Workout } from '../types';
-import { Plus, Trash2, Play, Save, X, Search } from 'lucide-react';
+import { Plus, Trash2, Play, Save, X, Search, Dumbbell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const WorkoutLogger: React.FC = () => {
@@ -12,6 +12,7 @@ export const WorkoutLogger: React.FC = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -105,60 +106,71 @@ export const WorkoutLogger: React.FC = () => {
 
       <div className="space-y-px bg-line border border-line">
         {sessionExercises.map((ex, idx) => (
-          <div key={idx} className="bg-bg p-6 flex flex-col md:flex-row gap-6 items-center group">
-            <div className="w-16 h-16 bg-line/10 overflow-hidden flex-shrink-0 flex items-center justify-center">
-              <a 
-                href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(ex.name || '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3 hover:bg-ink hover:text-bg transition-all rounded-full flex flex-col items-center gap-1"
-                title="Ver Execução"
-              >
-                <Search className="w-5 h-5" />
-                <span className="text-[8px] font-mono uppercase">Ajuda</span>
-              </a>
-            </div>
-            
-            <div className="flex-1 space-y-1">
-              <h4 className="text-xl">{ex.name}</h4>
-              <p className="font-mono text-[10px] uppercase opacity-50">Série {idx + 1}</p>
+          <div key={idx} className="bg-bg overflow-hidden">
+            <div 
+              onClick={() => setExpandedIndex(expandedIndex === idx ? null : idx)}
+              className="p-6 flex flex-col md:flex-row gap-6 items-center group cursor-pointer hover:bg-ink hover:text-bg transition-colors"
+            >
+              <div className="w-12 h-12 bg-line/10 overflow-hidden flex-shrink-0 flex items-center justify-center rounded-xl">
+                <Dumbbell className="w-6 h-6 opacity-20" />
+              </div>
+              
+              <div className="flex-1 space-y-1">
+                <h4 className="text-xl">{ex.name}</h4>
+                <p className="font-mono text-[10px] uppercase opacity-50">Série {idx + 1}</p>
+              </div>
+
+              <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
+                <div className="flex flex-col items-center">
+                  <span className="font-mono text-[9px] uppercase opacity-40">Sets</span>
+                  <input
+                    type="number"
+                    value={ex.sets}
+                    onChange={(e) => updateExercise(idx, 'sets', parseInt(e.target.value) || 0)}
+                    className="w-12 bg-transparent border-b border-line text-center font-mono text-sm p-1"
+                  />
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="font-mono text-[9px] uppercase opacity-40">Reps</span>
+                  <input
+                    type="number"
+                    value={ex.reps}
+                    onChange={(e) => updateExercise(idx, 'reps', parseInt(e.target.value) || 0)}
+                    className="w-12 bg-transparent border-b border-line text-center font-mono text-sm p-1"
+                  />
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="font-mono text-[9px] uppercase opacity-40">Peso (kg)</span>
+                  <input
+                    type="number"
+                    value={ex.weight}
+                    onChange={(e) => updateExercise(idx, 'weight', parseFloat(e.target.value) || 0)}
+                    className="w-16 bg-transparent border-b border-line text-center font-mono text-sm p-1"
+                  />
+                </div>
+                <button
+                  onClick={() => removeExerciseFromSession(idx)}
+                  className="p-2 opacity-30 hover:opacity-100 hover:text-red-500 transition-all"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="flex flex-col items-center">
-                <span className="font-mono text-[9px] uppercase opacity-40">Sets</span>
-                <input
-                  type="number"
-                  value={ex.sets}
-                  onChange={(e) => updateExercise(idx, 'sets', parseInt(e.target.value) || 0)}
-                  className="w-12 bg-transparent border-b border-line text-center font-mono text-sm p-1"
-                />
+            {expandedIndex === idx && (
+              <div className="px-6 pb-6 pt-2 border-t border-line/10 animate-slide-up">
+                <a 
+                  href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(ex.name || '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-[9px] font-bold text-zinc-500 uppercase tracking-widest hover:text-blue-400 transition-colors"
+                  title="Ver Execução"
+                >
+                  <Search className="w-3 h-3" />
+                  Ajuda Visual (Google)
+                </a>
               </div>
-              <div className="flex flex-col items-center">
-                <span className="font-mono text-[9px] uppercase opacity-40">Reps</span>
-                <input
-                  type="number"
-                  value={ex.reps}
-                  onChange={(e) => updateExercise(idx, 'reps', parseInt(e.target.value) || 0)}
-                  className="w-12 bg-transparent border-b border-line text-center font-mono text-sm p-1"
-                />
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="font-mono text-[9px] uppercase opacity-40">Peso (kg)</span>
-                <input
-                  type="number"
-                  value={ex.weight}
-                  onChange={(e) => updateExercise(idx, 'weight', parseFloat(e.target.value) || 0)}
-                  className="w-16 bg-transparent border-b border-line text-center font-mono text-sm p-1"
-                />
-              </div>
-              <button
-                onClick={() => removeExerciseFromSession(idx)}
-                className="p-2 opacity-30 hover:opacity-100 hover:text-red-500 transition-all"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
+            )}
           </div>
         ))}
 
