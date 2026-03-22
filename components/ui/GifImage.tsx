@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Dumbbell, Loader2 } from 'lucide-react';
+import { Dumbbell, Loader2, Search } from 'lucide-react';
 import { getExerciseGifUrlVariations, normalizeExerciseName } from '../../src/utils/exerciseUtils';
 import { useStore } from '../../store';
 
@@ -92,21 +92,36 @@ export const GifImage: React.FC<GifImageProps> = ({
   };
 
   if (hasError) {
+    const googleSearchUrl = `https://www.google.com/search?q=execução+exercicio+${encodeURIComponent(exerciseName)}`;
+
     return (
-      <div className={`flex flex-col items-center justify-center bg-zinc-900 rounded-2xl gap-2 ${className}`}>
+      <div className={`flex flex-col items-center justify-center bg-zinc-900 rounded-2xl gap-3 p-4 ${className}`}>
         <Dumbbell size={fallbackSize} className="text-zinc-700" />
-        <button 
-          onClick={(e) => {
-            e.stopPropagation();
-            setHasError(false);
-            setIsLoading(true);
-            setCurrentUrlIndex(0);
-            setRetryCount(0);
-          }}
-          className="text-[8px] font-black text-blue-500 uppercase tracking-widest hover:text-blue-400 transition-colors"
-        >
-          Tentar Novamente
-        </button>
+        <div className="flex flex-col gap-2 w-full">
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              setHasError(false);
+              setIsLoading(true);
+              setCurrentUrlIndex(0);
+              setRetryCount(0);
+            }}
+            className="w-full py-2 bg-zinc-800 text-[9px] font-black text-white uppercase tracking-widest rounded-xl border border-white/5 hover:bg-zinc-700 transition-colors"
+          >
+            Tentar Novamente
+          </button>
+          
+          <a 
+            href={googleSearchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="w-full py-2 bg-blue-600 text-[9px] font-black text-white uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 hover:bg-blue-500 transition-colors shadow-lg shadow-blue-600/20"
+          >
+            <Search size={12} />
+            Buscar no Google
+          </a>
+        </div>
       </div>
     );
   }
