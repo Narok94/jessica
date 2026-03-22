@@ -109,7 +109,7 @@ export const WorkoutHistory: React.FC = () => {
                               href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exerciseInfo?.name || '')}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="p-1.5 opacity-30 hover:opacity-100 hover:text-blue-400 transition-all"
+                              className="p-1.5 text-blue-400/50 hover:text-blue-400 transition-all"
                               title="Ver Execução"
                             >
                               <Search className="w-3 h-3" />

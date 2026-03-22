@@ -145,10 +145,10 @@ export const ExerciseLibrary: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest hover:text-blue-400 transition-colors"
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[10px] font-bold text-blue-400 uppercase tracking-widest hover:bg-blue-500/20 transition-all"
                     >
                       <Search className="w-3 h-3" />
-                      Ajuda Visual (Google)
+                      Ver execução no Google
                     </a>
                   </div>
                 </div>
