@@ -32,7 +32,6 @@ export const WorkoutLogger: React.FC = () => {
     setSessionExercises([...sessionExercises, {
       exerciseId: exercise.id,
       name: exercise.name,
-      gifUrl: exercise.gifUrl,
       sets: 1,
       reps: 10,
       weight: 0
@@ -107,8 +106,17 @@ export const WorkoutLogger: React.FC = () => {
       <div className="space-y-px bg-line border border-line">
         {sessionExercises.map((ex, idx) => (
           <div key={idx} className="bg-bg p-6 flex flex-col md:flex-row gap-6 items-center group">
-            <div className="w-16 h-16 bg-line/10 overflow-hidden flex-shrink-0">
-              <img src={ex.gifUrl} alt={ex.name} className="w-full h-full object-cover grayscale" referrerPolicy="no-referrer" />
+            <div className="w-16 h-16 bg-line/10 overflow-hidden flex-shrink-0 flex items-center justify-center">
+              <a 
+                href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(ex.name || '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 hover:bg-ink hover:text-bg transition-all rounded-full flex flex-col items-center gap-1"
+                title="Ver Execução"
+              >
+                <Search className="w-5 h-5" />
+                <span className="text-[8px] font-mono uppercase">Ajuda</span>
+              </a>
             </div>
             
             <div className="flex-1 space-y-1">

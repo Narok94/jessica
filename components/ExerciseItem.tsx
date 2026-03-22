@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { Exercise, SetPerformance } from '../types';
-import { GifImage } from './ui/GifImage';
 import { 
   ChevronDown, 
   Timer, 
@@ -196,20 +195,6 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center gap-4 flex-1 min-w-0">
-          {/* Small GIF Preview Thumbnail */}
-          {!isOpen && (
-            <div className="w-12 h-12 rounded-xl overflow-hidden border border-white/10 bg-zinc-800 shrink-0 relative group">
-              <GifImage 
-                exerciseName={exercise.name} 
-                originalUrl={exercise.image || exercise.videoUrl}
-                className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity"
-              />
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <Play size={10} className="text-white fill-white opacity-40" />
-              </div>
-            </div>
-          )}
-          
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2.5 mb-1">
                <h3 className={`text-lg font-black tracking-tight leading-none truncate transition-all duration-300 ${allSetsDone ? 'text-emerald-500 line-through' : 'text-white'}`}>
@@ -225,6 +210,17 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
               <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
                 {exercise.reps} reps
               </p>
+              
+              <a 
+                href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-[9px] font-black text-blue-400 uppercase tracking-widest hover:bg-blue-500/20 transition-colors"
+              >
+                <Search size={10} />
+                Ajuda
+              </a>
             </div>
           </div>
         </div>
@@ -242,18 +238,6 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
               <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Parabéns! Exercício Finalizado</span>
             </div>
           )}
-
-          <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-white/10 bg-zinc-950 shadow-inner group">
-            <div className="absolute top-4 left-4 z-10 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[8px] font-black text-white uppercase tracking-[0.2em]">Demonstração</span>
-            </div>
-            <GifImage 
-              exerciseName={exercise.name} 
-              originalUrl={exercise.image || exercise.videoUrl}
-              className="w-full h-full object-cover"
-            />
-          </div>
 
           <div className="flex flex-col gap-3">
              <div className="bg-zinc-950/80 border border-white/10 rounded-[1.5rem] p-4 flex items-center justify-between shadow-xl">
@@ -415,11 +399,23 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                   allowFullScreen
                 ></iframe>
               ) : (
-                <GifImage 
-                  exerciseName={exercise.name} 
-                  originalUrl={exercise.videoUrl || exercise.image} 
-                  className="w-full h-full object-contain mx-auto"
-                />
+                <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-zinc-900 p-8 text-center">
+                  <Search size={48} className="text-zinc-700" />
+                  <div>
+                    <p className="text-white font-black uppercase tracking-widest mb-2">Vídeo não disponível</p>
+                    <p className="text-zinc-500 text-xs font-medium max-w-xs mx-auto">
+                      Não encontramos um vídeo direto para este exercício, mas você pode buscar no Google.
+                    </p>
+                  </div>
+                  <a 
+                    href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20"
+                  >
+                    Buscar no Google
+                  </a>
+                </div>
               )}
             </div>
             <div className="p-6 bg-zinc-900/50">

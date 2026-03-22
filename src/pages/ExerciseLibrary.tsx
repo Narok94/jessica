@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth, collection, getDocs, addDoc, query, orderBy, handleFirestoreError, OperationType } from '../firebase';
 import { Exercise, MUSCLE_GROUPS } from '../types';
-import { Search, Filter, ChevronRight, Database } from 'lucide-react';
+import { Search, Filter, ChevronRight, Database, Dumbbell } from 'lucide-react';
 
 const INITIAL_EXERCISES: Omit<Exercise, 'id'>[] = [
-  { name: 'Supino Reto', category: 'Força', muscleGroup: 'Peito', gifUrl: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHR4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKv6eZJzJzJzJzJ/giphy.gif', description: 'Exercício básico para peitoral.' },
-  { name: 'Agachamento Livre', category: 'Força', muscleGroup: 'Pernas', gifUrl: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHR4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKv6eZJzJzJzJzJ/giphy.gif', description: 'Rei dos exercícios de perna.' },
-  { name: 'Levantamento Terra', category: 'Força', muscleGroup: 'Costas', gifUrl: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHR4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKv6eZJzJzJzJzJ/giphy.gif', description: 'Exercício composto para cadeia posterior.' },
-  { name: 'Desenvolvimento Militar', category: 'Força', muscleGroup: 'Ombros', gifUrl: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHR4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKv6eZJzJzJzJzJ/giphy.gif', description: 'Foco em deltoides.' },
-  { name: 'Rosca Direta', category: 'Hipertrofia', muscleGroup: 'Bíceps', gifUrl: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHR4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKv6eZJzJzJzJzJ/giphy.gif', description: 'Isolador de bíceps.' },
-  { name: 'Tríceps Pulley', category: 'Hipertrofia', muscleGroup: 'Tríceps', gifUrl: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHR4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKv6eZJzJzJzJzJ/giphy.gif', description: 'Isolador de tríceps.' },
-  { name: 'Puxada Frontal', category: 'Força', muscleGroup: 'Costas', gifUrl: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHR4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKv6eZJzJzJzJzJ/giphy.gif', description: 'Foco em latíssimo do dorso.' },
-  { name: 'Leg Press 45', category: 'Hipertrofia', muscleGroup: 'Pernas', gifUrl: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHR4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKv6eZJzJzJzJzJ/giphy.gif', description: 'Foco em quadríceps.' },
-  { name: 'Elevação Lateral', category: 'Hipertrofia', muscleGroup: 'Ombros', gifUrl: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHR4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKv6eZJzJzJzJzJ/giphy.gif', description: 'Isolador de deltoide lateral.' },
-  { name: 'Abdominal Supra', category: 'Resistência', muscleGroup: 'Abdômen', gifUrl: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHR4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4eGZ4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKv6eZJzJzJzJzJ/giphy.gif', description: 'Foco em reto abdominal.' },
+  { name: 'Supino Reto', category: 'Força', muscleGroup: 'Peito', description: 'Exercício básico para peitoral.' },
+  { name: 'Agachamento Livre', category: 'Força', muscleGroup: 'Pernas', description: 'Rei dos exercícios de perna.' },
+  { name: 'Levantamento Terra', category: 'Força', muscleGroup: 'Costas', description: 'Exercício composto para cadeia posterior.' },
+  { name: 'Desenvolvimento Militar', category: 'Força', muscleGroup: 'Ombros', description: 'Foco em deltoides.' },
+  { name: 'Rosca Direta', category: 'Hipertrofia', muscleGroup: 'Bíceps', description: 'Isolador de bíceps.' },
+  { name: 'Tríceps Pulley', category: 'Hipertrofia', muscleGroup: 'Tríceps', description: 'Isolador de tríceps.' },
+  { name: 'Puxada Frontal', category: 'Força', muscleGroup: 'Costas', description: 'Foco em latíssimo do dorso.' },
+  { name: 'Leg Press 45', category: 'Hipertrofia', muscleGroup: 'Pernas', description: 'Foco em quadríceps.' },
+  { name: 'Elevação Lateral', category: 'Hipertrofia', muscleGroup: 'Ombros', description: 'Isolador de deltoide lateral.' },
+  { name: 'Abdominal Supra', category: 'Resistência', muscleGroup: 'Abdômen', description: 'Foco em reto abdominal.' },
 ];
 
 export const ExerciseLibrary: React.FC = () => {
@@ -127,13 +127,19 @@ export const ExerciseLibrary: React.FC = () => {
               <p className="font-mono text-[10px] uppercase tracking-widest opacity-60">{exercise.muscleGroup}</p>
             </div>
 
-            <div className="aspect-video bg-line/10 overflow-hidden">
-              <img
-                src={exercise.gifUrl}
-                alt={exercise.name}
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-              />
+            <div className="aspect-video bg-line/10 overflow-hidden flex items-center justify-center">
+              <div className="flex flex-col items-center gap-4">
+                <Dumbbell className="w-12 h-12 opacity-20" />
+                <a 
+                  href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 bg-line text-bg text-[10px] font-mono uppercase tracking-widest hover:bg-ink hover:text-bg transition-all"
+                >
+                  <Search className="w-3 h-3" />
+                  Ver Execução
+                </a>
+              </div>
             </div>
           </div>
         ))}

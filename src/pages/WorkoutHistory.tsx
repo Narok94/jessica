@@ -3,7 +3,7 @@ import { db, auth, collection, getDocs, query, where, orderBy, handleFirestoreEr
 import { Workout, Exercise } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Calendar, ChevronDown, ChevronUp, History } from 'lucide-react';
+import { Calendar, ChevronDown, ChevronUp, History, Search } from 'lucide-react';
 
 export const WorkoutHistory: React.FC = () => {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
@@ -99,10 +99,16 @@ export const WorkoutHistory: React.FC = () => {
                     const exerciseInfo = exercises[ex.exerciseId];
                     return (
                       <div key={idx} className="flex gap-4 p-4 border border-line/10 bg-bg">
-                        <div className="w-12 h-12 bg-line/10 overflow-hidden flex-shrink-0">
-                          {exerciseInfo?.gifUrl && (
-                            <img src={exerciseInfo.gifUrl} alt={exerciseInfo.name} className="w-full h-full object-cover grayscale" referrerPolicy="no-referrer" />
-                          )}
+                        <div className="w-12 h-12 bg-line/10 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                          <a 
+                            href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exerciseInfo?.name || '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 hover:bg-ink hover:text-bg transition-all rounded-full"
+                            title="Ver Execução"
+                          >
+                            <Search className="w-4 h-4" />
+                          </a>
                         </div>
                         <div className="flex-1 space-y-1">
                           <h4 className="text-lg leading-tight">{exerciseInfo?.name || 'Exercício Removido'}</h4>

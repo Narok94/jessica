@@ -21,20 +21,17 @@ import {
   MoreVertical,
   ChevronDown,
   ChevronUp,
-  Upload,
   Loader2
 } from 'lucide-react';
 import { useStore } from '../../store';
 import { User, WorkoutRoutine, Exercise, AppTab } from '../../types';
 import { exerciseDatabase, BaseExercise } from '../../data/exerciseDatabase';
-import { GifImage } from '../ui/GifImage';
 import { storage, db, auth } from '../../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, setDoc, getDoc, collection, getDocs, onSnapshot } from 'firebase/firestore';
-import { normalizeExerciseName } from '../../src/utils/exerciseUtils';
 
 export const TeacherView: React.FC = () => {
-  const { allWorkouts, setAllWorkouts, user: currentUser, addToast, customGifs, setCustomGifs } = useStore();
+  const { allWorkouts, setAllWorkouts, user: currentUser, addToast } = useStore();
   const [activeSubTab, setActiveSubTab] = useState<'students' | 'database'>('students');
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,48 +54,6 @@ export const TeacherView: React.FC = () => {
 
   const [isExercisePickerOpen, setIsExercisePickerOpen] = useState(false);
   const [exerciseSearch, setExerciseSearch] = useState('');
-  const [uploadingExercise, setUploadingExercise] = useState<string | null>(null);
-
-  const handleGifUpload = async (exerciseName: string, file: File) => {
-    console.log(`[TeacherView] Iniciando upload para: ${exerciseName}`, file.name);
-    setUploadingExercise(exerciseName);
-    try {
-      const normalizedName = normalizeExerciseName(exerciseName);
-      const storageRef = ref(storage, `exercise_gifs/${normalizedName}.gif`);
-      
-      console.log(`[TeacherView] Enviando para Storage: exercise_gifs/${normalizedName}.gif`);
-      await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(storageRef);
-      console.log(`[TeacherView] Upload concluído. URL: ${downloadURL}`);
-      
-      // Save to Firestore so all users get it
-      console.log(`[TeacherView] Salvando no Firestore: exercise_gifs/${normalizedName}`);
-      try {
-        await setDoc(doc(db, 'exercise_gifs', normalizedName), {
-          url: downloadURL,
-          updatedAt: new Date().toISOString()
-        });
-        console.log(`[TeacherView] Firestore atualizado com sucesso.`);
-      } catch (fsError: any) {
-        console.error('[TeacherView] Erro ao salvar no Firestore:', fsError);
-        if (fsError.message?.includes('permission-denied')) {
-          console.error('[TeacherView] Erro de permissão. Verifique se o usuário tem papel de "teacher" ou "admin" no Firestore.');
-          // Tenta logar o UID atual para depuração
-          const currentUid = auth.currentUser?.uid;
-          console.log(`[TeacherView] UID atual: ${currentUid}`);
-        }
-        throw fsError;
-      }
-
-      if (addToast) addToast('GIF enviado com sucesso!', 'success');
-      console.log(`[TeacherView] Processo completo para: ${exerciseName}`);
-    } catch (error) {
-      console.error('[TeacherView] Erro no upload do GIF:', error);
-      if (addToast) addToast('Erro ao enviar GIF. Verifique o console para detalhes.', 'error');
-    } finally {
-      setUploadingExercise(null);
-    }
-  };
 
   // Get all students from localStorage profiles + allWorkouts keys
   const [students, setStudents] = useState<User[]>([]);
@@ -446,7 +401,9 @@ export const TeacherView: React.FC = () => {
                     {(editingWorkout ? editingWorkout.exercises : newWorkoutData.exercises || []).map((ex, idx) => (
                       <div key={ex.id} className="bg-zinc-900/50 p-4 rounded-2xl border border-white/5 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4 flex-1">
-                          <GifImage exerciseName={ex.name} originalUrl={ex.image} className="w-12 h-12 rounded-lg object-cover bg-zinc-800" />
+                        <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center border border-white/5">
+                          <Dumbbell size={24} className="text-zinc-600" />
+                        </div>
                           <div className="flex-1">
                             <p className="text-xs font-black text-white uppercase tracking-tight">{ex.name}</p>
                             <div className="flex gap-3 mt-1">
@@ -532,7 +489,9 @@ export const TeacherView: React.FC = () => {
                     onClick={() => addExerciseToWorkout(ex)}
                     className="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-white/5 transition-colors text-left group"
                   >
-                    <GifImage exerciseName={ex.name} originalUrl={ex.image} className="w-12 h-12 rounded-lg object-cover bg-zinc-900" />
+                    <div className="w-12 h-12 rounded-xl bg-zinc-900 flex items-center justify-center border border-white/5">
+                      <Dumbbell size={24} className="text-zinc-700" />
+                    </div>
                     <div className="flex-1">
                       <p className="text-xs font-black text-white uppercase tracking-tight group-hover:text-blue-400 transition-colors">{ex.name}</p>
                       <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{ex.muscleGroup}</p>
@@ -656,35 +615,10 @@ export const TeacherView: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredExercises.map((ex, i) => {
-              const normalizedName = normalizeExerciseName(ex.name);
-              const hasCustomGif = !!customGifs[normalizedName];
-              
               return (
                 <div key={i} className="glass-card p-4 rounded-3xl border border-white/5 flex items-center gap-4 bg-zinc-900/20">
-                  <div className="relative group/gif">
-                    <GifImage 
-                      exerciseName={ex.name} 
-                      originalUrl={hasCustomGif ? customGifs[normalizedName] : ex.image} 
-                      className="w-20 h-20 rounded-2xl object-cover bg-zinc-950 border border-white/5" 
-                    />
-                    <label className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover/gif:opacity-100 transition-opacity rounded-2xl cursor-pointer">
-                      {uploadingExercise === ex.name ? (
-                        <Loader2 size={24} className="text-white animate-spin" />
-                      ) : (
-                        <>
-                          <Upload size={24} className="text-white" />
-                          <input 
-                            type="file" 
-                            accept="image/gif" 
-                            className="hidden" 
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) handleGifUpload(ex.name, file);
-                            }}
-                          />
-                        </>
-                      )}
-                    </label>
+                  <div className="w-20 h-20 rounded-2xl bg-zinc-950 border border-white/5 flex items-center justify-center">
+                    <Dumbbell size={40} className="text-zinc-800" />
                   </div>
                   <div className="flex-1">
                     <h4 className="font-black text-white uppercase tracking-tight italic">{ex.name}</h4>

@@ -5,7 +5,6 @@ export interface Exercise {
   name: string;
   category: string;
   muscleGroup: string;
-  gifUrl: string;
   description?: string;
 }
 
@@ -15,7 +14,6 @@ export interface WorkoutExercise {
   reps: number;
   weight: number;
   name?: string; // Denormalized for display
-  gifUrl?: string; // Denormalized for display
 }
 
 export interface Workout {

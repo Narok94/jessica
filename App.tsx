@@ -45,8 +45,7 @@ const AppContent: React.FC = () => {
     setIsWorkoutActive,
     setWorkoutStartTime,
     addToast,
-    setAddToast,
-    setCustomGifs
+    setAddToast
   } = useStore();
 
   const { addToast: toastFn } = useToast();
@@ -54,26 +53,6 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     setAddToast(toastFn);
   }, [toastFn, setAddToast]);
-
-  // Load custom gifs from Firestore with real-time updates (v2.2.1)
-  useEffect(() => {
-    console.log('[App] Iniciando listener de GIFs customizados...');
-    const unsubscribe = onSnapshot(collection(db, 'exercise_gifs'), (querySnapshot) => {
-      const gifs: Record<string, string> = {};
-      querySnapshot.forEach((doc) => {
-        gifs[doc.id] = doc.data().url;
-      });
-      console.log(`[App] Recebidos ${querySnapshot.size} GIFs customizados do Firestore.`);
-      setCustomGifs(gifs);
-    }, (error) => {
-      console.error('[App] Erro ao carregar GIFs customizados:', error);
-      if (error.message.includes('permission-denied')) {
-        console.error('[App] Erro de permissão no Firestore. Verifique as Security Rules.');
-      }
-    });
-    
-    return () => unsubscribe();
-  }, [setCustomGifs]);
 
   // Safety sync for already logged-in users to ensure security rules work
   useEffect(() => {
