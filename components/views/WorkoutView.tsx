@@ -88,12 +88,19 @@ export const WorkoutView: React.FC = () => {
     setWorkoutDuration(duration);
     setIsWorkoutActive(false);
 
+    // Calculate muscle groups summary
+    const muscleGroups = new Set<string>();
+    selectedWorkout.exercises.forEach(ex => {
+      if (ex.muscleGroup) muscleGroups.add(ex.muscleGroup);
+    });
+
     const historyEntry: WorkoutHistoryEntry = {
       id: Date.now().toString(),
       date: new Date().toISOString(),
       workoutId: selectedWorkout.id,
       workoutTitle: selectedWorkout.title,
       duration: duration,
+      muscleGroups: Array.from(muscleGroups),
       exercises: selectedWorkout.exercises.map(ex => ({
         exerciseId: ex.id,
         name: ex.name,
@@ -173,6 +180,20 @@ export const WorkoutView: React.FC = () => {
             </div>
          </div>
 
+         <div className="glass-card p-6 rounded-[2rem] border border-indigo-500/10 bg-indigo-500/5">
+            <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-3">Regiões Treinadas</p>
+            <div className="flex flex-wrap justify-center gap-2">
+               {selectedWorkout.exercises.reduce((acc, ex) => {
+                 if (ex.muscleGroup && !acc.includes(ex.muscleGroup)) acc.push(ex.muscleGroup);
+                 return acc;
+               }, [] as string[]).map(muscle => (
+                 <span key={muscle} className="px-3 py-1 bg-indigo-500/20 text-indigo-400 rounded-full text-[9px] font-black uppercase tracking-widest border border-indigo-500/20">
+                   {muscle}
+                 </span>
+               ))}
+            </div>
+         </div>
+
          <div className="glass-card p-8 rounded-[2.5rem] space-y-4 relative overflow-hidden">
             <Quote className="absolute -top-4 -left-4 text-white/5 w-24 h-24" />
             <div className="relative z-10">
@@ -195,6 +216,15 @@ export const WorkoutView: React.FC = () => {
   const totalSets = selectedWorkout.exercises.reduce((acc, ex) => acc + ex.sets, 0);
   const completedSets = (Object.values(currentSessionProgress) as SetPerformance[][]).reduce((acc, perf) => acc + (perf ? perf.filter(p => p.completed).length : 0), 0);
   const progressPercent = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
+
+  const getSavedWeight = (exerciseId: string) => {
+    const localWeights = localStorage.getItem('tatugym_last_weights');
+    if (localWeights) {
+      const weights = JSON.parse(localWeights);
+      if (weights[exerciseId] !== undefined) return weights[exerciseId];
+    }
+    return user.weights?.[exerciseId];
+  };
 
   return (
     <div className="space-y-6 animate-slide-up pb-64">
@@ -271,7 +301,7 @@ export const WorkoutView: React.FC = () => {
               key={ex.id} 
               exercise={ex} 
               onSaveProgress={handleSaveProgress} 
-              savedWeight={user.weights?.[ex.id]} 
+              savedWeight={getSavedWeight(ex.id)} 
               initialPerformance={currentSessionProgress[ex.id]}
             />
           ))}

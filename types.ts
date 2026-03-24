@@ -32,6 +32,7 @@ export interface WorkoutHistoryEntry {
   workoutId: string;
   workoutTitle: string;
   duration?: number; // in seconds
+  muscleGroups?: string[];
   exercises: {
     exerciseId: string;
     name: string;

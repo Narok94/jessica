@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth, collection, getDocs, addDoc, Timestamp, handleFirestoreError, OperationType } from '../firebase';
 import { Exercise, WorkoutExercise, Workout } from '../types';
-import { Plus, Trash2, Play, Save, X, Search, Dumbbell } from 'lucide-react';
+import { Plus, Trash2, Play, Save, X, Search, Dumbbell, Sparkles } from 'lucide-react';
+import { AIExecutionModal } from '../components/AIExecutionModal';
 import { useNavigate } from 'react-router-dom';
 
 export const WorkoutLogger: React.FC = () => {
@@ -13,6 +14,8 @@ export const WorkoutLogger: React.FC = () => {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [showAI, setShowAI] = useState(false);
+  const [aiExerciseName, setAiExerciseName] = useState('');
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -158,21 +161,40 @@ export const WorkoutLogger: React.FC = () => {
             </div>
 
             {expandedIndex === idx && (
-              <div className="px-6 pb-6 pt-2 border-t border-line/10 animate-slide-up">
-                <a 
-                  href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(ex.name || '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[10px] font-bold text-blue-400 uppercase tracking-widest hover:bg-blue-500/20 transition-all"
-                  title="Ver Execução"
-                >
-                  <Search className="w-3 h-3" />
-                  Ver execução no Google
-                </a>
+              <div className="px-6 pb-6 pt-2 border-t border-line/10 animate-slide-up space-y-4">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <a 
+                    href={`https://www.google.com/search?q=execução+correta+exercício+${encodeURIComponent(ex.name || '')}+musculação+técnica`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[10px] font-bold text-blue-400 uppercase tracking-widest hover:bg-blue-500/20 transition-all"
+                    title="Ver Execução"
+                  >
+                    <Search className="w-3 h-3" />
+                    Google
+                  </a>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setAiExerciseName(ex.name || '');
+                      setShowAI(true);
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold text-indigo-400 uppercase tracking-widest hover:bg-indigo-500/20 transition-all"
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    IA Técnica
+                  </button>
+                </div>
               </div>
             )}
           </div>
         ))}
+
+        <AIExecutionModal 
+          exerciseName={aiExerciseName}
+          isOpen={showAI}
+          onClose={() => setShowAI(false)}
+        />
 
         {sessionExercises.length === 0 && (
           <div className="bg-bg p-12 text-center">

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth, collection, getDocs, addDoc, query, orderBy, handleFirestoreError, OperationType } from '../firebase';
 import { Exercise, MUSCLE_GROUPS } from '../types';
-import { Search, Filter, ChevronRight, Database, Dumbbell } from 'lucide-react';
+import { Search, Filter, ChevronRight, Database, Dumbbell, Sparkles } from 'lucide-react';
+import { AIExecutionModal } from '../components/AIExecutionModal';
 
 const INITIAL_EXERCISES: Omit<Exercise, 'id'>[] = [
   { name: 'Supino Reto', category: 'Força', muscleGroup: 'Peito', description: 'Exercício básico para peitoral.' },
@@ -23,6 +24,8 @@ export const ExerciseLibrary: React.FC = () => {
   const [selectedMuscle, setSelectedMuscle] = useState<string | null>(null);
   const [seeding, setSeeding] = useState(false);
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
+  const [showAI, setShowAI] = useState(false);
+  const [aiExerciseName, setAiExerciseName] = useState('');
 
   const isAdmin = auth.currentUser?.email === 'hollyood.caribe@gmail.com';
 
@@ -138,18 +141,31 @@ export const ExerciseLibrary: React.FC = () => {
                   {exercise.description || 'Nenhuma descrição técnica disponível para este exercício.'}
                 </p>
                 <div className="aspect-video bg-line/5 overflow-hidden flex items-center justify-center rounded-xl">
-                  <div className="flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-center gap-3 w-full px-4">
                     <Dumbbell className="w-8 h-8 opacity-10" />
-                    <a 
-                      href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[10px] font-bold text-blue-400 uppercase tracking-widest hover:bg-blue-500/20 transition-all"
-                    >
-                      <Search className="w-3 h-3" />
-                      Ver execução no Google
-                    </a>
+                    <div className="flex flex-col sm:flex-row gap-2 w-full">
+                      <a 
+                        href={`https://www.google.com/search?q=execução+correta+exercício+${encodeURIComponent(exercise.name)}+musculação+técnica`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[10px] font-bold text-blue-400 uppercase tracking-widest hover:bg-blue-500/20 transition-all"
+                      >
+                        <Search className="w-3 h-3" />
+                        Google
+                      </a>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setAiExerciseName(exercise.name);
+                          setShowAI(true);
+                        }}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold text-indigo-400 uppercase tracking-widest hover:bg-indigo-500/20 transition-all"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        IA Técnica
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -157,6 +173,12 @@ export const ExerciseLibrary: React.FC = () => {
           </div>
         ))}
       </div>
+
+      <AIExecutionModal 
+        exerciseName={aiExerciseName}
+        isOpen={showAI}
+        onClose={() => setShowAI(false)}
+      />
 
       {filteredExercises.length === 0 && (
         <div className="text-center py-24 border border-dashed border-line/30">
