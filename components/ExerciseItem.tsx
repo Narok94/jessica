@@ -19,10 +19,8 @@ import {
   Trophy,
   PlayCircle,
   ExternalLink,
-  Search,
-  Sparkles
+  Search
 } from 'lucide-react';
-import { AIExecutionModal } from '../src/components/AIExecutionModal';
 
 interface ExerciseItemProps {
   exercise: Exercise;
@@ -41,7 +39,6 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   const [restTimeLeft, setRestTimeLeft] = useState<number | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
-  const [showAI, setShowAI] = useState(false);
   const timerRef = useRef<number | null>(null);
 
   const [performance, setPerformance] = useState<SetPerformance[]>(() => {
@@ -255,28 +252,16 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                    )}
                 </div>
              </div>
-             <div className="flex flex-col sm:flex-row gap-2">
-               <a 
-                 href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
-                 target="_blank"
-                 rel="noopener noreferrer"
-                 onClick={(e) => e.stopPropagation()}
-                 className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] hover:bg-blue-500/20 transition-all shadow-lg shadow-blue-500/5"
-               >
-                 <Search size={14} strokeWidth={3} />
-                 Google
-               </a>
-               <button 
-                 onClick={(e) => {
-                   e.stopPropagation();
-                   setShowAI(true);
-                 }}
-                 className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] hover:bg-indigo-500/20 transition-all shadow-lg shadow-indigo-500/5"
-               >
-                 <Sparkles size={14} strokeWidth={3} />
-                 IA Técnica
-               </button>
-             </div>
+             <a 
+               href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
+               target="_blank"
+               rel="noopener noreferrer"
+               onClick={(e) => e.stopPropagation()}
+               className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] hover:bg-blue-500/20 transition-all shadow-lg shadow-blue-500/5"
+             >
+               <Search size={14} strokeWidth={3} />
+               Ver execução no Google
+             </a>
           </div>
 
           <div className="space-y-4">
@@ -390,13 +375,6 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
           </div>
         </div>
       )}
-
-      {/* AI Modal */}
-      <AIExecutionModal 
-        exerciseName={exercise.name}
-        isOpen={showAI}
-        onClose={() => setShowAI(false)}
-      />
 
       {/* Video Modal */}
       {showVideo && (
