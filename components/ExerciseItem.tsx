@@ -138,10 +138,14 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
     
     // Save weight immediately if updated
     if (updates.weight !== undefined) {
-      const savedWeights = localStorage.getItem('tatugym_last_weights');
-      const weights = savedWeights ? JSON.parse(savedWeights) : {};
-      weights[exercise.id] = updates.weight;
-      localStorage.setItem('tatugym_last_weights', JSON.stringify(weights));
+      try {
+        const savedWeights = localStorage.getItem('tatugym_last_weights');
+        const weights = savedWeights ? JSON.parse(savedWeights) : {};
+        weights[exercise.id] = updates.weight;
+        localStorage.setItem('tatugym_last_weights', JSON.stringify(weights));
+      } catch (e) {
+        console.error('Error saving weights to localStorage:', e);
+      }
     }
     
     if (updates.completed) {

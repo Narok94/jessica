@@ -110,46 +110,71 @@ const AppContent: React.FC = () => {
         console.log('[App] Verificando auto-login...');
         const remembered = localStorage.getItem('tatugym_remembered');
         if (remembered) {
-          const userData = JSON.parse(remembered);
-          console.log(`[App] Usuário lembrado encontrado: ${userData.username}`);
-          
-          const profile = localStorage.getItem(`tatugym_user_profile_${userData.username.toLowerCase()}`);
-          const finalUser = profile ? JSON.parse(profile) : userData;
-          
-          // Ensure Firebase Auth session for security rules
+          let userData: User | null = null;
           try {
-            const userCredential = await signInAnonymously(auth);
-            const uid = userCredential.user.uid;
-            console.log(`[App] Auto-login Firebase sync UID: ${uid}`);
-            
-            // Sync role to uids collection for security rules
-            await setDoc(doc(db, 'uids', uid), { 
-              role: finalUser.role,
-              username: finalUser.username,
-              updatedAt: new Date().toISOString()
-            });
-          } catch (err) {
-            console.error('[App] Erro na sincronização Firebase durante auto-login:', err);
+            userData = JSON.parse(remembered);
+          } catch (e) {
+            console.error('[App] Erro ao analisar tatugym_remembered:', e);
+            localStorage.removeItem('tatugym_remembered');
+            setIsLoading(false);
+            return;
           }
 
-          setUser(finalUser);
-          setIsLoggedIn(true);
-          
-          // Restore active session if exists and recent (within 5 mins)
-          const activeSession = localStorage.getItem(`tatugym_active_session_${finalUser.username.toLowerCase()}`);
-          if (activeSession) {
-            const session = JSON.parse(activeSession);
-            if (Date.now() - session.timestamp < 300000) {
-              const workout = allWorkouts[finalUser.username.toLowerCase() as keyof typeof allWorkouts]?.find(w => w.id === session.workoutId);
-              if (workout) {
-                setSelectedWorkout(workout);
-                setCurrentSessionProgress(session.progress);
-                setWorkoutStartTime(session.startTime);
-                setIsWorkoutActive(true);
-                setActiveTab(AppTab.WORKOUT);
-                if (addToast) addToast('Sessão de treino restaurada!', 'info');
+          if (userData && userData.username) {
+            console.log(`[App] Usuário lembrado encontrado: ${userData.username}`);
+            
+            let finalUser = userData;
+            const profile = localStorage.getItem(`tatugym_user_profile_${userData.username.toLowerCase()}`);
+            if (profile) {
+              try {
+                finalUser = JSON.parse(profile);
+              } catch (e) {
+                console.error('[App] Erro ao analisar perfil do usuário:', e);
               }
             }
+            
+            // Ensure Firebase Auth session for security rules
+            try {
+              const userCredential = await signInAnonymously(auth);
+              const uid = userCredential.user.uid;
+              console.log(`[App] Auto-login Firebase sync UID: ${uid}`);
+              
+              // Sync role to uids collection for security rules
+              await setDoc(doc(db, 'uids', uid), { 
+                role: finalUser.role,
+                username: finalUser.username,
+                updatedAt: new Date().toISOString()
+              });
+            } catch (err) {
+              console.error('[App] Erro na sincronização Firebase durante auto-login:', err);
+            }
+
+            setUser(finalUser);
+            setIsLoggedIn(true);
+            
+            // Restore active session if exists and recent (within 5 mins)
+            const activeSession = localStorage.getItem(`tatugym_active_session_${finalUser.username.toLowerCase()}`);
+            if (activeSession) {
+              try {
+                const session = JSON.parse(activeSession);
+                if (Date.now() - session.timestamp < 300000) {
+                  const workout = allWorkouts[finalUser.username.toLowerCase() as keyof typeof allWorkouts]?.find(w => w.id === session.workoutId);
+                  if (workout) {
+                    setSelectedWorkout(workout);
+                    setCurrentSessionProgress(session.progress);
+                    setWorkoutStartTime(session.startTime);
+                    setIsWorkoutActive(true);
+                    setActiveTab(AppTab.WORKOUT);
+                    if (addToast) addToast('Sessão de treino restaurada!', 'info');
+                  }
+                }
+              } catch (e) {
+                console.error('[App] Erro ao analisar sessão ativa:', e);
+                localStorage.removeItem(`tatugym_active_session_${finalUser.username.toLowerCase()}`);
+              }
+            }
+          } else {
+            localStorage.removeItem('tatugym_remembered');
           }
         } else {
           console.log('[App] Nenhum usuário lembrado encontrado.');

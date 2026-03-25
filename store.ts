@@ -83,15 +83,43 @@ export const useStore = create<AppState>((set, get) => ({
 
   setUser: (user) => {
     set({ user });
-    if (user) {
-      // Load active session if exists
-      const progress = localStorage.getItem(`tatugym_active_progress_${user.username.toLowerCase()}`);
-      const status = localStorage.getItem(`tatugym_active_status_${user.username.toLowerCase()}`);
-      const start = localStorage.getItem(`tatugym_active_start_${user.username.toLowerCase()}`);
-      
-      if (progress) set({ currentSessionProgress: JSON.parse(progress) });
-      if (status) set({ isWorkoutActive: JSON.parse(status) });
-      if (start) set({ workoutStartTime: JSON.parse(start) });
+    if (user && user.username) {
+      try {
+        // Load active session if exists
+        const username = user.username.toLowerCase();
+        const progress = localStorage.getItem(`tatugym_active_progress_${username}`);
+        const status = localStorage.getItem(`tatugym_active_status_${username}`);
+        const start = localStorage.getItem(`tatugym_active_start_${username}`);
+        
+        if (progress) {
+          try {
+            set({ currentSessionProgress: JSON.parse(progress) });
+          } catch (e) {
+            console.error('Error parsing progress:', e);
+            localStorage.removeItem(`tatugym_active_progress_${username}`);
+          }
+        }
+        
+        if (status) {
+          try {
+            set({ isWorkoutActive: JSON.parse(status) });
+          } catch (e) {
+            console.error('Error parsing status:', e);
+            localStorage.removeItem(`tatugym_active_status_${username}`);
+          }
+        }
+        
+        if (start) {
+          try {
+            set({ workoutStartTime: JSON.parse(start) });
+          } catch (e) {
+            console.error('Error parsing start:', e);
+            localStorage.removeItem(`tatugym_active_start_${username}`);
+          }
+        }
+      } catch (e) {
+        console.error('Error in setUser persistence logic:', e);
+      }
     }
   },
   setIsLoggedIn: (isLoggedIn) => set({ isLoggedIn }),

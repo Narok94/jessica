@@ -56,5 +56,10 @@ export const getExerciseGuidance = async (exerciseName: string): Promise<Exercis
     throw new Error("Resposta da IA vazia.");
   }
 
-  return JSON.parse(response.text);
+  try {
+    return JSON.parse(response.text);
+  } catch (e) {
+    console.error('Error parsing AI response:', e);
+    throw new Error("Erro ao processar a resposta da IA. Tente novamente.");
+  }
 };

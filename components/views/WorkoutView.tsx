@@ -218,10 +218,14 @@ export const WorkoutView: React.FC = () => {
   const progressPercent = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
 
   const getSavedWeight = (exerciseId: string) => {
-    const localWeights = localStorage.getItem('tatugym_last_weights');
-    if (localWeights) {
-      const weights = JSON.parse(localWeights);
-      if (weights[exerciseId] !== undefined) return weights[exerciseId];
+    try {
+      const localWeights = localStorage.getItem('tatugym_last_weights');
+      if (localWeights) {
+        const weights = JSON.parse(localWeights);
+        if (weights && weights[exerciseId] !== undefined) return weights[exerciseId];
+      }
+    } catch (e) {
+      console.error('Error parsing local weights:', e);
     }
     return user.weights?.[exerciseId];
   };
