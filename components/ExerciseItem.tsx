@@ -39,7 +39,6 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [restTimeLeft, setRestTimeLeft] = useState<number | null>(null);
-  const [restEndTime, setRestEndTime] = useState<number | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [showAI, setShowAI] = useState(false);
@@ -85,49 +84,28 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   };
 
   useEffect(() => {
-    const savedEndTime = localStorage.getItem(`tatugym_rest_end_${exercise.id}`);
-    if (savedEndTime) {
-      const endTime = parseInt(savedEndTime);
-      const timeLeft = Math.ceil((endTime - Date.now()) / 1000);
-      if (timeLeft > 0) {
-        setRestEndTime(endTime);
-        setRestTimeLeft(timeLeft);
-      } else {
-        localStorage.removeItem(`tatugym_rest_end_${exercise.id}`);
-      }
-    }
-  }, [exercise.id]);
-
-  useEffect(() => {
-    if (restEndTime !== null) {
-      const interval = window.setInterval(() => {
-        const timeLeft = Math.ceil((restEndTime - Date.now()) / 1000);
-        if (timeLeft <= 0) {
-          if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200]);
-          playBeep();
-          setRestTimeLeft(null);
-          setRestEndTime(null);
-          localStorage.removeItem(`tatugym_rest_end_${exercise.id}`);
-          clearInterval(interval);
-        } else {
-          setRestTimeLeft(timeLeft);
-        }
+    if (restTimeLeft !== null && restTimeLeft > 0) {
+      timerRef.current = window.setTimeout(() => {
+        setRestTimeLeft(restTimeLeft - 1);
       }, 1000);
-      return () => clearInterval(interval);
+    } else if (restTimeLeft === 0) {
+      if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200]);
+      playBeep();
+      setRestTimeLeft(null);
     }
-  }, [restEndTime, exercise.id]);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [restTimeLeft]);
 
   const startRestTimer = () => {
-    const endTime = Date.now() + exercise.rest * 1000;
-    setRestEndTime(endTime);
+    if (timerRef.current) clearTimeout(timerRef.current);
     setRestTimeLeft(exercise.rest);
-    localStorage.setItem(`tatugym_rest_end_${exercise.id}`, endTime.toString());
   };
 
   const cancelRestTimer = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
     setRestTimeLeft(null);
-    setRestEndTime(null);
-    localStorage.removeItem(`tatugym_rest_end_${exercise.id}`);
   };
 
   const updateSet = (index: number, updates: Partial<SetPerformance>) => {
@@ -135,18 +113,6 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
     newPerf[index] = { ...newPerf[index], ...updates };
     setPerformance(newPerf);
     onSaveProgress(exercise.id, newPerf);
-    
-    // Save weight immediately if updated
-    if (updates.weight !== undefined) {
-      try {
-        const savedWeights = localStorage.getItem('tatugym_last_weights');
-        const weights = savedWeights ? JSON.parse(savedWeights) : {};
-        weights[exercise.id] = updates.weight;
-        localStorage.setItem('tatugym_last_weights', JSON.stringify(weights));
-      } catch (e) {
-        console.error('Error saving weights to localStorage:', e);
-      }
-    }
     
     if (updates.completed) {
       if (window.navigator.vibrate) window.navigator.vibrate(20);
@@ -465,7 +431,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                     </p>
                   </div>
                   <a 
-                    href={`https://www.google.com/search?q=execução+correta+exercício+${encodeURIComponent(exercise.name)}+musculação+técnica`}
+                    href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20"

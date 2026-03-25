@@ -145,7 +145,7 @@ export const ExerciseLibrary: React.FC = () => {
                     <Dumbbell className="w-8 h-8 opacity-10" />
                     <div className="flex flex-col sm:flex-row gap-2 w-full">
                       <a 
-                        href={`https://www.google.com/search?q=execução+correta+exercício+${encodeURIComponent(exercise.name)}+musculação+técnica`}
+                        href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}

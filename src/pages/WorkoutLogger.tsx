@@ -164,7 +164,7 @@ export const WorkoutLogger: React.FC = () => {
               <div className="px-6 pb-6 pt-2 border-t border-line/10 animate-slide-up space-y-4">
                 <div className="flex flex-col sm:flex-row gap-2">
                   <a 
-                    href={`https://www.google.com/search?q=execução+correta+exercício+${encodeURIComponent(ex.name || '')}+musculação+técnica`}
+                    href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(ex.name || '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[10px] font-bold text-blue-400 uppercase tracking-widest hover:bg-blue-500/20 transition-all"

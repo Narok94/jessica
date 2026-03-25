@@ -81,47 +81,7 @@ export const useStore = create<AppState>((set, get) => ({
   })(),
   addToast: undefined,
 
-  setUser: (user) => {
-    set({ user });
-    if (user && user.username) {
-      try {
-        // Load active session if exists
-        const username = user.username.toLowerCase();
-        const progress = localStorage.getItem(`tatugym_active_progress_${username}`);
-        const status = localStorage.getItem(`tatugym_active_status_${username}`);
-        const start = localStorage.getItem(`tatugym_active_start_${username}`);
-        
-        if (progress) {
-          try {
-            set({ currentSessionProgress: JSON.parse(progress) });
-          } catch (e) {
-            console.error('Error parsing progress:', e);
-            localStorage.removeItem(`tatugym_active_progress_${username}`);
-          }
-        }
-        
-        if (status) {
-          try {
-            set({ isWorkoutActive: JSON.parse(status) });
-          } catch (e) {
-            console.error('Error parsing status:', e);
-            localStorage.removeItem(`tatugym_active_status_${username}`);
-          }
-        }
-        
-        if (start) {
-          try {
-            set({ workoutStartTime: JSON.parse(start) });
-          } catch (e) {
-            console.error('Error parsing start:', e);
-            localStorage.removeItem(`tatugym_active_start_${username}`);
-          }
-        }
-      } catch (e) {
-        console.error('Error in setUser persistence logic:', e);
-      }
-    }
-  },
+  setUser: (user) => set({ user }),
   setIsLoggedIn: (isLoggedIn) => set({ isLoggedIn }),
   setActiveTab: (activeTab) => set({ activeTab }),
   setSelectedWorkout: (selectedWorkout) => set({ selectedWorkout }),
@@ -130,27 +90,9 @@ export const useStore = create<AppState>((set, get) => ({
     set({ allWorkouts });
     localStorage.setItem('tatugym_all_workouts', JSON.stringify(allWorkouts));
   },
-  setCurrentSessionProgress: (currentSessionProgress) => {
-    set({ currentSessionProgress });
-    const { user } = get();
-    if (user) {
-      localStorage.setItem(`tatugym_active_progress_${user.username.toLowerCase()}`, JSON.stringify(currentSessionProgress));
-    }
-  },
-  setIsWorkoutActive: (isWorkoutActive) => {
-    set({ isWorkoutActive });
-    const { user } = get();
-    if (user) {
-      localStorage.setItem(`tatugym_active_status_${user.username.toLowerCase()}`, JSON.stringify(isWorkoutActive));
-    }
-  },
-  setWorkoutStartTime: (workoutStartTime) => {
-    set({ workoutStartTime });
-    const { user } = get();
-    if (user) {
-      localStorage.setItem(`tatugym_active_start_${user.username.toLowerCase()}`, JSON.stringify(workoutStartTime));
-    }
-  },
+  setCurrentSessionProgress: (currentSessionProgress) => set({ currentSessionProgress }),
+  setIsWorkoutActive: (isWorkoutActive) => set({ isWorkoutActive }),
+  setWorkoutStartTime: (workoutStartTime) => set({ workoutStartTime }),
   setElapsedTime: (elapsedTime) => set({ elapsedTime }),
   setShowSummary: (showSummary) => set({ showSummary }),
   setLastWorkoutVolume: (lastWorkoutVolume) => set({ lastWorkoutVolume }),
