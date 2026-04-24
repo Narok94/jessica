@@ -6,19 +6,19 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   --font-serif: "Cormorant Garamond", serif;
 
-  --color-bg: #050505;
-  --color-ink: #fafafa;
+  --color-bg: #080808;
+  --color-ink: #ffffff;
   --color-line: rgba(255, 255, 255, 0.1);
 }
 
 @layer base {
   body {
-    @apply bg-bg text-ink font-sans antialiased selection:bg-blue-500/30;
+    @apply bg-bg text-ink font-sans antialiased selection:bg-emerald-500/30;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   h1, h2, h3, h4 {
-    @apply font-sans font-black tracking-tighter uppercase italic;
+    @apply font-sans font-extrabold tracking-tighter uppercase italic;
   }
 
   .serif-heading {
@@ -28,15 +28,15 @@
 
 @layer components {
   .glass-card {
-    @apply bg-zinc-900/40 backdrop-blur-2xl border border-white/5 shadow-2xl;
+    @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] shadow-none;
   }
 
   .input-field {
-    @apply w-full bg-transparent border-b border-white/10 p-2 font-sans text-sm focus:outline-none focus:border-blue-500 transition-colors placeholder:text-zinc-600;
+    @apply w-full bg-transparent border-b border-white/10 p-2 font-sans text-sm focus:outline-none focus:border-emerald-500 transition-colors placeholder:text-zinc-600;
   }
 
   .btn-primary {
-    @apply px-6 py-3 bg-white text-black font-sans font-black text-[10px] uppercase tracking-[0.2em] hover:bg-zinc-200 transition-all active:scale-95 disabled:opacity-50 rounded-2xl;
+    @apply px-6 py-3 bg-emerald-500 text-bg font-sans font-black text-[10px] uppercase tracking-[0.3em] hover:bg-emerald-400 transition-all active:scale-95 disabled:opacity-50 rounded-2xl;
   }
 
   .btn-secondary {

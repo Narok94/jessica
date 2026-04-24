@@ -158,137 +158,79 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   };
 
   return (
-    <div className={`glass-card glass-card-hover rounded-[2.5rem] border transition-all duration-500 mb-4 overflow-hidden relative ${
+    <div className={`glass-card rounded-[2rem] border transition-all duration-500 overflow-hidden relative ${
       isOpen 
-      ? 'border-emerald-500/40 bg-zinc-900/90 ring-1 ring-emerald-500/10' 
-      : 'border-white/5'
-    } ${allSetsDone && !isOpen ? 'opacity-50 grayscale-[0.2] scale-[0.98]' : 'opacity-100 scale-100'} 
-      ${isFinishing ? 'scale-[1.03] !border-emerald-400 !bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.3)] z-10' : ''}`}
-    >
-      <style>{`
-        @keyframes success-pulse {
-          0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-          70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
-        .animate-success { animation: success-pulse 1.2s cubic-bezier(0.66, 0, 0, 1); }
-        @keyframes bounce-subtle {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-2px); }
-        }
-        .animate-bounce-subtle { animation: bounce-subtle 2s infinite; }
-      `}</style>
+      ? 'bg-white/[0.05] border-white/20' 
+      : 'border-white/[0.05]'
+    } ${allSetsDone && !isOpen ? 'opacity-60' : 'opacity-100'}`}>
       
-      {isFinishing && <div className="absolute inset-0 animate-success pointer-events-none rounded-[2rem]" />}
-
-      {restTimeLeft !== null && (
-        <div className="bg-emerald-500 text-zinc-950 flex items-center justify-between py-1.5 px-5 text-[9px] font-black uppercase tracking-[0.2em] animate-pulse">
-          <div className="flex items-center gap-2">
-            <Timer size={12} strokeWidth={3} /> Descanso em curso
-          </div>
-          <span className="text-sm font-black">{restTimeLeft}s</span>
-        </div>
-      )}
-
       <div 
-        className="p-5 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
         onClick={() => setIsOpen(!isOpen)}
+        className="p-5 flex items-center justify-between cursor-pointer group"
       >
         <div className="flex items-center gap-4 flex-1 min-w-0">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2.5 mb-1">
-               <h3 className={`text-lg font-black tracking-tight leading-none italic truncate transition-all duration-300 ${allSetsDone ? 'text-emerald-500' : 'text-white'}`}>
-                {exercise.name}
-              </h3>
-              {allSetsDone && <CheckCircle2 size={18} className="text-emerald-500 shrink-0 fill-emerald-500/20" strokeWidth={3} />}
-            </div>
-            <div className="flex items-center gap-2">
-               <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full border transition-colors ${allSetsDone ? 'bg-emerald-500/20 border-emerald-500/30' : 'bg-zinc-800/80 border-white/5'}`}>
-                   <span className={`text-[10px] font-black ${allSetsDone ? 'text-emerald-400' : 'text-emerald-500'}`}>{completedCount}</span>
-                   <span className="text-[9px] font-black text-zinc-600 uppercase">/ {exercise.sets} séries</span>
-               </div>
-               <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest italic">
-                 {exercise.reps} reps
-               </p>
+            <h3 className={`text-xl font-black italic tracking-tight leading-none truncate transition-colors duration-300 ${allSetsDone ? 'text-emerald-500' : 'text-white'}`}>
+              {exercise.name}
+            </h3>
+            <div className="flex items-center gap-2 mt-2">
+               <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{exercise.sets} SÉRIES</span>
+               <div className="w-1 h-1 rounded-full bg-zinc-800"></div>
+               <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{exercise.reps} REPS</span>
             </div>
           </div>
         </div>
         
-        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${isOpen ? 'bg-emerald-500 text-zinc-950 rotate-180' : 'bg-zinc-800/50 text-zinc-500'}`}>
-          <ChevronDown size={22} strokeWidth={4} />
+        <div className="flex items-center gap-3">
+           {allSetsDone && !isOpen && (
+             <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-bg shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+                <Check size={18} strokeWidth={4} />
+             </div>
+           )}
+           <div className={`w-8 h-8 rounded-full border border-white/5 flex items-center justify-center transition-all ${isOpen ? 'rotate-180 bg-white/10 text-white' : 'text-zinc-600'}`}>
+             <ChevronDown size={18} strokeWidth={3} />
+           </div>
         </div>
       </div>
-
-      {isOpen && (
-        <div className="px-5 pb-6 pt-2 animate-slide-up space-y-6">
-          <div className="flex flex-col gap-3">
-             <div className="bg-zinc-950/80 border border-white/10 rounded-[2rem] p-4 flex flex-col gap-3 shadow-xl">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                     <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${restTimeLeft !== null ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/30' : 'bg-zinc-900 text-zinc-600 border border-white/5'}`}>
-                        <Timer size={28} strokeWidth={2.5} />
-                     </div>
-                     <div>
-                        <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-0.5">Descanso</p>
-                        <p className="text-2xl font-black text-white font-mono leading-none">{restTimeLeft !== null ? `${restTimeLeft}s` : `${exercise.rest}s`}</p>
-                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                     {restTimeLeft !== null ? (
-                        <>
-                         <button onClick={cancelRestTimer} className="w-12 h-12 bg-zinc-900 text-zinc-400 rounded-2xl flex items-center justify-center border border-white/10 active:scale-90 transition-transform"><X size={22} /></button>
-                         <button onClick={startRestTimer} className="w-12 h-12 bg-emerald-500 text-zinc-950 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-90 transition-transform"><RotateCcw size={22} /></button>
-                        </>
-                     ) : (
-                       <button onClick={startRestTimer} className="flex items-center gap-3 px-6 py-4 bg-emerald-500 text-zinc-950 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-emerald-500/20">
-                         <Play size={16} fill="currentColor" /> Iniciar Timer
-                       </button>
-                     )}
-                  </div>
+      <div className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[1000px] opacity-100 border-t border-white/5' : 'max-h-0 opacity-0 pointer-events-none overflow-hidden'}`}>
+        <div className="px-5 pb-6 pt-5 space-y-6">
+          <div className="flex items-center justify-between bg-white/[0.02] p-4 rounded-2xl border border-white/[0.05]">
+             <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${restTimeLeft !== null ? 'bg-emerald-500 text-bg' : 'bg-white/5 text-zinc-500'}`}>
+                   <Timer size={20} strokeWidth={2.5} />
                 </div>
-
-                <a 
-                  href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="flex items-center justify-center gap-3 py-3 rounded-xl bg-blue-500/5 border border-blue-500/20 text-[10px] font-black text-blue-400 uppercase tracking-[0.3em] hover:bg-blue-500/10 transition-all"
-                >
-                  <Search size={14} strokeWidth={3} />
-                  Ver execução no Google
-                </a>
+                <div>
+                   <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Descanso</p>
+                   <p className="text-xl font-black text-white font-mono leading-none">{restTimeLeft !== null ? `${restTimeLeft}s` : `${exercise.rest}s`}</p>
+                </div>
              </div>
+             <button onClick={restTimeLeft !== null ? cancelRestTimer : startRestTimer} className={`px-4 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all ${restTimeLeft !== null ? 'bg-white/5 text-zinc-400' : 'bg-emerald-500 text-bg'}`}>
+                {restTimeLeft !== null ? 'STOP' : 'START TIMER'}
+             </button>
           </div>
 
           <div className="space-y-3">
             {performance.map((set, idx) => (
-              <div key={idx} className={`grid grid-cols-12 items-center gap-2 p-3 rounded-[1.8rem] border transition-all duration-300 ${set.completed ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-zinc-900/60 border-white/10'}`}>
-                {/* Set Number */}
-                <div className="col-span-2 flex items-center justify-center">
-                  <div className={`w-9 h-9 flex items-center justify-center rounded-xl text-xs font-black transition-all ${set.completed ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/20' : 'bg-zinc-800 text-zinc-500'}`}>
-                    {idx + 1}
-                  </div>
+              <div key={idx} className={`grid grid-cols-12 items-center gap-3 p-2 rounded-2xl border transition-all duration-300 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-white/[0.02] border-white/[0.05]'}`}>
+                <div className="col-span-2 flex items-center justify-center font-mono text-[10px] font-black text-zinc-600">
+                  #{idx + 1}
                 </div>
-
-                {/* Weight Input */}
-                <div className="col-span-4 flex flex-col gap-1">
-                  <div className={`flex items-center rounded-2xl border transition-all overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800 border-white/5'}`}>
-                    <input 
+                
+                <div className="col-span-4 h-11 relative">
+                   <input 
                       type="number" 
-                      inputMode="decimal" 
+                      inputMode="decimal"
                       value={set.weight === 0 ? '' : set.weight} 
                       disabled={set.completed} 
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => updateSet(idx, { weight: parseFloat(e.target.value) || 0 })} 
-                      className="w-full bg-transparent text-center text-sm font-black text-white outline-none font-mono"
-                      placeholder="Peso"
+                      className="w-full h-full bg-white/5 border border-white/5 rounded-xl text-center text-sm font-bold text-white outline-none focus:border-emerald-500/50 transition-all font-mono"
+                      placeholder="0"
                     />
-                  </div>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-zinc-700 pointer-events-none">KG</span>
                 </div>
 
-                {/* Reps Input */}
-                <div className="col-span-4 flex flex-col gap-1">
-                  <div className={`flex items-center rounded-2xl border transition-all overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800 border-white/5'}`}>
+                <div className="col-span-4 h-11 relative">
                     <input 
                       type="number" 
                       inputMode="numeric" 
@@ -296,39 +238,43 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                       disabled={set.completed} 
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => updateSet(idx, { reps: parseInt(e.target.value) || 0 })} 
-                      className="w-full bg-transparent text-center text-sm font-black text-white outline-none font-mono"
-                      placeholder="Reps"
+                      className="w-full h-full bg-white/5 border border-white/5 rounded-xl text-center text-sm font-bold text-white outline-none focus:border-emerald-500/50 transition-all font-mono"
+                      placeholder="0"
                     />
-                  </div>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-zinc-700 pointer-events-none">REPS</span>
                 </div>
 
-                {/* Completion Check */}
                 <div className="col-span-2 flex items-center justify-center">
                   <button 
                     onClick={() => updateSet(idx, { completed: !set.completed })} 
-                    className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all ${
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
                       set.completed 
-                      ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/40 scale-105' 
-                      : 'bg-zinc-800 border border-white/10 text-zinc-700'
+                      ? 'bg-emerald-500 text-bg shadow-[0_0_15px_rgba(16,185,129,0.3)]' 
+                      : 'bg-white/5 border border-white/5 text-zinc-800 hover:text-emerald-500'
                     }`}
                   >
-                    <Check size={22} strokeWidth={4} />
+                    <Check size={20} strokeWidth={4} />
                   </button>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="flex flex-col gap-3">
-             <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-2xl p-4 flex items-start gap-4">
-               <Info size={18} className="text-indigo-400 mt-0.5 shrink-0" />
-               <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest leading-relaxed">
-                 {exercise.notes || 'Foque no controle motor. Sinta o músculo trabalhar em cada fase.'}
-               </p>
-             </div>
+          <div className="flex flex-col gap-3 pt-2">
+             <p className="text-[10px] font-black italic text-zinc-500 leading-relaxed uppercase tracking-widest text-center opacity-60">
+                {exercise.notes || 'Mantenha cadência controlada e foco total na contração.'}
+             </p>
+             <a 
+               href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
+               target="_blank"
+               rel="noopener noreferrer"
+               className="text-[9px] font-black text-blue-500 hover:text-blue-400 transition-colors uppercase tracking-[0.2em] text-center"
+             >
+               Ver tutorial técnico
+             </a>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Video Modal */}
       {showVideo && (

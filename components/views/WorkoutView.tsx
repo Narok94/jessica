@@ -210,74 +210,53 @@ export const WorkoutView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-slide-up pb-64">
-      <header className="flex items-center justify-between sticky top-0 z-50 bg-zinc-950/80 backdrop-blur-lg py-4 border-b border-white/5 -mx-4 px-4">
-        <div className="flex items-center gap-3">
-          <button onClick={exitWorkout} className="w-10 h-10 flex items-center justify-center text-zinc-500 hover:text-white transition-all bg-zinc-900 rounded-xl border border-white/5 active:scale-95">
+      <header className="flex items-center justify-between sticky top-0 z-50 bg-bg/80 backdrop-blur-xl py-4 border-b border-white/5 -mx-4 px-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <button onClick={exitWorkout} className="w-10 h-10 flex items-center justify-center text-zinc-500 hover:text-white transition-all bg-white/5 rounded-xl border border-white/5 active:scale-95">
             <ChevronLeft size={20}/>
           </button>
-          <div>
-            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest leading-none mb-1">{selectedWorkout.title}</p>
+          <div className="min-w-0">
+            <h1 className="text-sm font-black text-white italic truncate leading-none mb-1 uppercase">{selectedWorkout.title}</h1>
             <div className="flex items-center gap-2">
-               <span className={`w-1.5 h-1.5 rounded-full ${isWorkoutActive ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-700'}`}></span>
-               <span className="text-xs font-black text-white italic uppercase tracking-tight">SESSÃO ATIVA</span>
+               <div className={`w-1.5 h-1.5 rounded-full ${isWorkoutActive ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-700'}`}></div>
+               <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest leading-none">
+                 {isWorkoutActive ? 'SESSÃO EM CURSO' : 'INICIAR SESSÃO'}
+               </span>
             </div>
           </div>
         </div>
 
-        {isWorkoutActive && (
+        {isWorkoutActive ? (
           <div className="flex items-center gap-4">
-            <div className="text-right hidden sm:block">
-              <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Volume (kg)</p>
-              <p className="text-sm font-black text-blue-500">{calculateVolume()}</p>
-            </div>
-            <div className="bg-zinc-900 border border-white/10 px-4 py-2 rounded-2xl flex items-center gap-3">
-              <Clock size={16} className="text-emerald-500" />
-              <span className="text-lg font-black text-white font-mono leading-none">{formatTime(elapsedTime)}</span>
-            </div>
+             <div className="bg-white/5 border border-white/10 px-4 py-2.5 rounded-2xl flex items-center gap-3">
+                <Clock size={14} className="text-emerald-500" />
+                <span className="text-base font-bold text-white font-mono leading-none tracking-tight">{formatTime(elapsedTime)}</span>
+             </div>
           </div>
+        ) : (
+          <button 
+            onClick={startWorkout}
+            className="px-6 py-2.5 bg-emerald-500 text-bg font-black text-[9px] uppercase tracking-[0.2em] rounded-xl active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+          >
+            START
+          </button>
         )}
       </header>
 
-      {!isWorkoutActive && (
-        <div className="glass-card p-10 rounded-[3rem] border border-emerald-500/20 bg-zinc-900/40 text-center space-y-8 animate-fade">
-          <div className="w-24 h-24 bg-emerald-500 rounded-[2.5rem] flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/30 transform rotate-12">
-            <Play size={44} className="text-zinc-950 ml-1.5" fill="currentColor" />
-          </div>
-          <div>
-            <h2 className="text-3xl font-black text-white uppercase tracking-tighter italic">BORA <span className="text-emerald-500">EVOLUIR?</span></h2>
-            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] mt-3">Clique abaixo para iniciar sua sessão.</p>
-          </div>
-          <button 
-            onClick={startWorkout}
-            className="w-full bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black py-6 rounded-[2rem] shadow-2xl shadow-emerald-500/20 uppercase tracking-[0.5em] active:scale-95 transition-all text-xs"
-          >
-            INICIAR TREINO
-          </button>
-        </div>
-      )}
-
       {isWorkoutActive && (
-        <div className="space-y-8">
-          <div className="bg-zinc-900/60 p-5 rounded-[2rem] border border-white/5 backdrop-blur-md">
-             <div className="flex items-center justify-between mb-3 px-1">
-                <div className="flex flex-col">
-                  <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">PROGRESSO TOTAL</span>
-                  <span className="text-[10px] font-black text-white uppercase tracking-tight mt-0.5">{completedSets} / {totalSets} SÉRIES</span>
-                </div>
-                <div className="flex items-center gap-2">
-                   <div className="text-right sm:hidden">
-                      <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">VOLUME</p>
-                      <p className="text-[10px] font-black text-blue-500">{calculateVolume()} kg</p>
-                   </div>
-                   <span className="text-xl font-black text-emerald-500 italic">{progressPercent}%</span>
-                </div>
+        <div className="space-y-8 animate-fade">
+          <div className="flex items-center justify-between px-2">
+             <div className="flex flex-col">
+                <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">PROGRESSO TOTAL</span>
+                <span className="text-[14px] font-black text-white uppercase tracking-tight mt-1">{completedSets} / {totalSets} SÉRIES</span>
              </div>
-             <div className="h-3 w-full bg-zinc-950 rounded-full overflow-hidden border border-white/5 p-0.5">
-                <div className="h-full bg-emerald-500 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all duration-700 ease-out" style={{ width: `${progressPercent}%` }}></div>
+             <div className="text-right">
+                <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">VOLUME TOTAL</span>
+                <span className="block text-[14px] font-black text-blue-500 uppercase tracking-tight mt-1">{calculateVolume()} KG</span>
              </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             {selectedWorkout.exercises.map(ex => (
               <ExerciseItem 
                 key={ex.id} 
@@ -290,22 +269,43 @@ export const WorkoutView: React.FC = () => {
           </div>
 
           <div className="pt-8 pb-32">
-            {completedSets > 0 && (
-               <button 
-                onClick={handleFinishWorkout} 
-                className="w-full font-black py-6 rounded-[2.5rem] shadow-2xl uppercase tracking-[0.5em] active:scale-95 flex items-center justify-center gap-4 text-xs transition-all bg-emerald-500 text-zinc-950 shadow-emerald-500/40 hover:bg-emerald-400 group"
-              >
-                <CheckCircle2 size={24} strokeWidth={4} className="group-hover:scale-125 transition-transform" /> FINALIZAR TREINO
-              </button>
-            )}
+            <button 
+              onClick={handleFinishWorkout} 
+              disabled={completedSets === 0}
+              className={`w-full font-black py-6 rounded-[2rem] shadow-xl uppercase tracking-[0.4em] active:scale-95 flex items-center justify-center gap-4 text-[10px] transition-all ${
+                completedSets > 0 
+                ? 'bg-emerald-500 text-bg shadow-emerald-500/20' 
+                : 'bg-white/5 text-zinc-700 border border-white/5 opacity-50 cursor-not-allowed'
+              }`}
+            >
+              <CheckCircle2 size={24} strokeWidth={4} /> FINALIZAR TREINO
+            </button>
             <button 
               onClick={cancelWorkout}
-              className="w-full mt-4 text-[9px] font-black text-zinc-600 hover:text-red-500 uppercase tracking-widest transition-colors py-2 active:scale-95"
+              className="w-full mt-4 text-[9px] font-black text-zinc-600 hover:text-red-500 uppercase tracking-[0.2em] transition-colors py-2 active:scale-95"
             >
-              DESCARTAR SESSÃO ATUAL
+              DESCARTAR SESSÃO
             </button>
           </div>
         </div>
+      )}
+
+      {!isWorkoutActive && (
+         <div className="glass-card p-12 rounded-[3rem] text-center space-y-8 animate-fade">
+            <div className="w-20 h-20 bg-emerald-500 rounded-[2rem] flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20 transform rotate-6">
+                <Play size={40} className="text-bg ml-1.5" fill="currentColor" />
+            </div>
+            <div>
+               <h2 className="text-3xl">Ready for<br/><span className="text-emerald-500">Impact?</span></h2>
+               <p className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.3em] mt-4 leading-relaxed max-w-[200px] mx-auto">Sua performance de hoje define seu resultado de amanhã.</p>
+            </div>
+            <button 
+               onClick={startWorkout}
+               className="w-full bg-emerald-500 text-bg py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.4em] shadow-xl shadow-emerald-500/20 active:scale-95 transition-all"
+            >
+               INICIAR SESSÃO
+            </button>
+         </div>
       )}
     </div>
   );
