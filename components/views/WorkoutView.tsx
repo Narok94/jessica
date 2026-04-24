@@ -210,101 +210,55 @@ export const WorkoutView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-slide-up pb-64">
-      <header className="flex items-center justify-between sticky top-0 z-50 bg-bg/80 backdrop-blur-xl py-4 border-b border-white/5 -mx-4 px-4">
+      <header className="flex items-center justify-between sticky top-0 z-50 bg-bg/80 backdrop-blur-xl py-4 border-b border-white/[0.08] -mx-4 px-4">
         <div className="flex items-center gap-3 min-w-0">
-          <button onClick={exitWorkout} className="w-10 h-10 flex items-center justify-center text-zinc-500 hover:text-white transition-all bg-white/5 rounded-xl border border-white/5 active:scale-95">
-            <ChevronLeft size={20}/>
+          <button onClick={exitWorkout} className="w-10 h-10 flex items-center justify-center text-zinc-600 hover:text-white transition-all bg-white/[0.02] rounded-xl border border-white/[0.08] active:scale-95">
+            <ChevronLeft size={18}/>
           </button>
           <div className="min-w-0">
-            <h1 className="text-sm font-black text-white italic truncate leading-none mb-1 uppercase">{selectedWorkout.title}</h1>
-            <div className="flex items-center gap-2">
-               <div className={`w-1.5 h-1.5 rounded-full ${isWorkoutActive ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-700'}`}></div>
-               <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest leading-none">
-                 {isWorkoutActive ? 'SESSÃO EM CURSO' : 'INICIAR SESSÃO'}
-               </span>
-            </div>
+            <h1 className="text-base font-black text-white italic truncate leading-none uppercase tracking-tighter">{selectedWorkout.title}</h1>
+            {isWorkoutActive && (
+              <span className="text-[10px] font-mono text-zinc-500 mt-1 block tracking-tight uppercase">SESSÃO EM CURSO</span>
+            )}
           </div>
         </div>
 
-        {isWorkoutActive ? (
-          <div className="flex items-center gap-4">
-             <div className="bg-white/5 border border-white/10 px-4 py-2.5 rounded-2xl flex items-center gap-3">
-                <Clock size={14} className="text-emerald-500" />
-                <span className="text-base font-bold text-white font-mono leading-none tracking-tight">{formatTime(elapsedTime)}</span>
-             </div>
-          </div>
-        ) : (
-          <button 
-            onClick={startWorkout}
-            className="px-6 py-2.5 bg-emerald-500 text-bg font-black text-[9px] uppercase tracking-[0.2em] rounded-xl active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-          >
-            START
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {isWorkoutActive ? (
+             <>
+               <div className="px-3 py-1.5 bg-white/[0.02] border border-white/[0.08] rounded-lg">
+                  <span className="text-xl font-bold text-white font-mono leading-none tracking-tight">{formatTime(elapsedTime)}</span>
+               </div>
+               <button 
+                 onClick={handleFinishWorkout}
+                 className="px-4 py-1.5 bg-emerald-500 text-bg font-black text-[10px] uppercase tracking-widest rounded-lg active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.15)]"
+               >
+                 FINISH
+               </button>
+             </>
+          ) : (
+            <button 
+              onClick={startWorkout}
+              className="px-6 py-2.5 bg-emerald-500 text-bg font-black text-[10px] uppercase tracking-widest rounded-lg active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.15)]"
+            >
+              START SESSION
+            </button>
+          )}
+        </div>
       </header>
 
-      {isWorkoutActive && (
-        <div className="space-y-8 animate-fade">
-          <div className="flex items-center justify-between px-2">
-             <div className="flex flex-col">
-                <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">PROGRESSO TOTAL</span>
-                <span className="text-[14px] font-black text-white uppercase tracking-tight mt-1">{completedSets} / {totalSets} SÉRIES</span>
-             </div>
-             <div className="text-right">
-                <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">VOLUME TOTAL</span>
-                <span className="block text-[14px] font-black text-blue-500 uppercase tracking-tight mt-1">{calculateVolume()} KG</span>
-             </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-            {selectedWorkout.exercises.map(ex => (
-              <ExerciseItem 
-                key={ex.id} 
-                exercise={ex} 
-                onSaveProgress={handleSaveProgress} 
-                savedWeight={user.weights?.[ex.id]} 
-                initialPerformance={currentSessionProgress[ex.id]}
-              />
-            ))}
-          </div>
-
-          <div className="pt-8 pb-32">
-            <button 
-              onClick={handleFinishWorkout} 
-              disabled={completedSets === 0}
-              className={`w-full font-black py-6 rounded-[2rem] shadow-xl uppercase tracking-[0.4em] active:scale-95 flex items-center justify-center gap-4 text-[10px] transition-all ${
-                completedSets > 0 
-                ? 'bg-emerald-500 text-bg shadow-emerald-500/20' 
-                : 'bg-white/5 text-zinc-700 border border-white/5 opacity-50 cursor-not-allowed'
-              }`}
-            >
-              <CheckCircle2 size={24} strokeWidth={4} /> FINALIZAR TREINO
-            </button>
-            <button 
-              onClick={cancelWorkout}
-              className="w-full mt-4 text-[9px] font-black text-zinc-600 hover:text-red-500 uppercase tracking-[0.2em] transition-colors py-2 active:scale-95"
-            >
-              DESCARTAR SESSÃO
-            </button>
-          </div>
-        </div>
-      )}
-
       {!isWorkoutActive && (
-         <div className="glass-card p-12 rounded-[3rem] text-center space-y-8 animate-fade">
-            <div className="w-20 h-20 bg-emerald-500 rounded-[2rem] flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20 transform rotate-6">
-                <Play size={40} className="text-bg ml-1.5" fill="currentColor" />
+         <div className="py-12 px-4 animate-fade">
+            <div className="glass-card p-10 rounded-[2rem] text-center border-white/[0.05]">
+               <h2 className="text-2xl font-black italic text-white uppercase tracking-tighter mb-2">Ready to Start?</h2>
+               <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-8">Treino {selectedWorkout.title} • {selectedWorkout.exercises.length} Exercícios</p>
+               <button 
+                  onClick={startWorkout}
+                  className="w-full bg-white text-bg py-5 rounded-xl font-black text-[11px] uppercase tracking-[0.4em] active:scale-95 transition-all"
+               >
+                  INICIAR TREINO
+               </button>
             </div>
-            <div>
-               <h2 className="text-3xl">Ready for<br/><span className="text-emerald-500">Impact?</span></h2>
-               <p className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.3em] mt-4 leading-relaxed max-w-[200px] mx-auto">Sua performance de hoje define seu resultado de amanhã.</p>
-            </div>
-            <button 
-               onClick={startWorkout}
-               className="w-full bg-emerald-500 text-bg py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.4em] shadow-xl shadow-emerald-500/20 active:scale-95 transition-all"
-            >
-               INICIAR SESSÃO
-            </button>
          </div>
       )}
     </div>

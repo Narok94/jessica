@@ -68,43 +68,40 @@ export const DashboardView: React.FC = () => {
   return (
     <div className="space-y-8 animate-slide-up pb-10 max-w-2xl mx-auto">
       {/* Minimalist Header */}
-      <header className="flex items-center justify-between py-4 px-2">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center bg-white/5 overflow-hidden">
+      <header className="flex items-center justify-between py-6 px-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full border border-white/[0.08] flex items-center justify-center bg-white/[0.02] overflow-hidden">
              {user.avatar ? (
-               <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+               <img src={user.avatar} alt={user.name} className="w-full h-full object-cover opacity-80" />
              ) : (
-               <UserIcon size={18} className="text-zinc-500" />
+               <UserIcon size={20} className="text-zinc-600" />
              )}
           </div>
           <div className="flex flex-col">
-            <h1 className="text-xl leading-none tracking-tight">{user.name.toUpperCase()}</h1>
-            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mt-0.5">
-              {initialWorkouts.length === 3 ? 'ABC' : 
-               initialWorkouts.length === 4 ? 'ABCD' : 
-               initialWorkouts.length === 5 ? 'ABCDE' : 'Personalizado'} Elite
-            </span>
+            <h1 className="text-2xl font-black italic tracking-tighter leading-none text-white">{user.name.toUpperCase()}</h1>
+            <div className="flex items-center gap-2 mt-1.5">
+               <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest leading-none">
+                 {initialWorkouts.length === 3 ? 'ABC' : 
+                  initialWorkouts.length === 4 ? 'ABCD' : 
+                  initialWorkouts.length === 5 ? 'ABCDE' : 'Personalizado'} Elite
+               </span>
+               {!isCheckedInToday && (
+                  <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest leading-none border-l border-white/10 pl-2">Pendente</span>
+               )}
+            </div>
           </div>
         </div>
-          <div className="flex items-center gap-4">
-             {!isCheckedInToday && (
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 rounded-full border border-orange-500/20">
-                  <div className="w-1 h-1 bg-orange-500 rounded-full animate-pulse"></div>
-                  <span className="text-[9px] font-black text-orange-500 uppercase tracking-widest">Aguardando Treino</span>
-                </div>
-             )}
-             <button onClick={() => logout()} className="p-2 text-zinc-500 hover:text-white transition-colors">
-              <LogOut size={20} />
-           </button>
-        </div>
+        <button onClick={() => logout()} className="text-[10px] font-black text-zinc-500 hover:text-white uppercase tracking-widest transition-colors py-2 px-4 border border-white/[0.05] rounded-full">
+           SAIR
+        </button>
       </header>
 
       {/* Main Focus Action: Check-in */}
       {!isCheckedInToday && (
-        <div className="animate-fade">
+        <div className="px-4 animate-fade">
           <button 
             onClick={handleManualCheckIn}
-            className="w-full py-6 rounded-[2rem] bg-gradient-to-r from-emerald-500 to-green-600 text-bg text-[11px] font-black uppercase tracking-[0.4em] shadow-[0_20px_50px_rgba(16,185,129,0.2)] transition-all active:scale-95 flex items-center justify-center gap-3 group"
+            className="w-full py-6 rounded-2xl bg-emerald-500 text-bg text-[11px] font-black uppercase tracking-[0.4em] shadow-[0_0_30px_rgba(16,185,129,0.15)] transition-all active:scale-[0.98] flex items-center justify-center gap-3 group"
           >
             MARCAR PRESENÇA <Check size={20} strokeWidth={4} />
           </button>

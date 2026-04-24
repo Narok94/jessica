@@ -8,7 +8,7 @@
 
   --color-bg: #080808;
   --color-ink: #ffffff;
-  --color-line: rgba(255, 255, 255, 0.1);
+  --color-line: rgba(255, 255, 255, 0.08);
 }
 
 @layer base {
@@ -29,6 +29,10 @@
 @layer components {
   .glass-card {
     @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] shadow-none;
+  }
+
+  .glass-card-hover {
+    @apply hover:bg-white/[0.05] hover:border-white/20 transition-all duration-300;
   }
 
   .input-field {
