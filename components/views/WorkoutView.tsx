@@ -1,5 +1,6 @@
 
 import React, { useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useStore } from '../../store';
 import { ChevronLeft, Clock, CheckCircle2, Play, LayoutDashboard, Quote } from 'lucide-react';
 import { ExerciseItem } from '../ExerciseItem';
@@ -30,16 +31,43 @@ export const WorkoutView: React.FC = () => {
   } = useStore();
 
   const timerIntervalRef = useRef<number | null>(null);
+  const wakeLockRef = useRef<any>(null);
+
+  const requestWakeLock = async () => {
+    if ('wakeLock' in navigator) {
+      try {
+        wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
+        console.log('Wake Lock isActive');
+      } catch (err: any) {
+        console.error(`${err.name}, ${err.message}`);
+      }
+    }
+  };
+
+  const releaseWakeLock = async () => {
+    if (wakeLockRef.current) {
+      try {
+        await wakeLockRef.current.release();
+        wakeLockRef.current = null;
+        console.log('Wake Lock was released');
+      } catch (err: any) {
+        console.error(`${err.name}, ${err.message}`);
+      }
+    }
+  };
 
   useEffect(() => {
     if (isWorkoutActive && workoutStartTime) {
+      requestWakeLock();
       timerIntervalRef.current = window.setInterval(() => {
         setElapsedTime(Math.floor((Date.now() - workoutStartTime) / 1000));
       }, 1000);
     } else {
+      releaseWakeLock();
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
     }
     return () => {
+      releaseWakeLock();
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
     };
   }, [isWorkoutActive, workoutStartTime, setElapsedTime]);
@@ -268,17 +296,37 @@ export const WorkoutView: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 gap-4 items-start pb-40">
-            {selectedWorkout.exercises.map(ex => (
-              <ExerciseItem 
-                key={ex.id} 
-                exercise={ex} 
-                onSaveProgress={handleSaveProgress} 
-                savedWeight={user.weights?.[ex.id]} 
-                initialPerformance={currentSessionProgress[ex.id]}
-              />
-            ))}
+            {selectedWorkout.exercises.map((ex, idx) => {
+              // Find previous performance for this exercise from user history
+              const lastWorkoutWithEx = user.history?.find(h => 
+                h.exercises.some(he => he.exerciseId === ex.id && he.performance.some(p => p.completed))
+              );
+              const lastPerf = lastWorkoutWithEx?.exercises.find(he => he.exerciseId === ex.id)?.performance.filter(p => p.completed);
+
+              return (
+                <motion.div
+                  key={ex.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 + (idx * 0.05) }}
+                >
+                  <ExerciseItem 
+                    exercise={ex} 
+                    onSaveProgress={handleSaveProgress} 
+                    savedWeight={user.weights?.[ex.id]} 
+                    initialPerformance={currentSessionProgress[ex.id]}
+                    lastPerformance={lastPerf}
+                  />
+                </motion.div>
+              );
+            })}
             
-            <div className="pt-10 flex flex-col gap-4">
+            <motion.div 
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               transition={{ delay: 0.5 }}
+               className="pt-10 flex flex-col gap-4"
+            >
               <button 
                 onClick={() => {
                   handleVibrate(30);
@@ -302,7 +350,7 @@ export const WorkoutView: React.FC = () => {
               >
                 CANCELAR TREINO
               </button>
-            </div>
+            </motion.div>
           </div>
         </div>
       )}

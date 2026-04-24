@@ -28,13 +28,15 @@ interface ExerciseItemProps {
   onSaveProgress: (exerciseId: string, performance: SetPerformance[]) => void;
   savedWeight?: number;
   initialPerformance?: SetPerformance[];
+  lastPerformance?: SetPerformance[];
 }
 
 export const ExerciseItem: React.FC<ExerciseItemProps> = ({ 
   exercise, 
   onSaveProgress, 
   savedWeight,
-  initialPerformance
+  initialPerformance,
+  lastPerformance
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [restTimeLeft, setRestTimeLeft] = useState<number | null>(null);
@@ -96,9 +98,9 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
     };
   }, [restTimeLeft]);
 
-  const startRestTimer = () => {
+  const startRestTimer = (seconds?: number) => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    setRestTimeLeft(exercise.rest);
+    setRestTimeLeft(seconds || exercise.rest);
   };
 
   const cancelRestTimer = () => {
@@ -129,8 +131,9 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
           setIsFinishing(false);
           setIsOpen(false);
         }, 1200);
-      } else if (index < performance.length - 1) {
-        startRestTimer();
+      } else {
+        // Auto-Rest Timer: 60 seconds
+        startRestTimer(60);
       }
     }
   };
@@ -218,12 +221,20 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                    <p className="text-lg font-black text-white font-mono leading-none">{restTimeLeft !== null ? `${restTimeLeft}s` : `${exercise.rest}s`}</p>
                 </div>
              </div>
-             <button onClick={restTimeLeft !== null ? cancelRestTimer : startRestTimer} className={`px-4 py-1.5 rounded-lg font-black text-[9px] uppercase tracking-widest transition-all ${restTimeLeft !== null ? 'bg-white/5 text-zinc-400' : 'bg-emerald-500 text-bg'}`}>
+             <button onClick={restTimeLeft !== null ? cancelRestTimer : () => startRestTimer()} className={`px-4 py-1.5 rounded-lg font-black text-[9px] uppercase tracking-widest transition-all ${restTimeLeft !== null ? 'bg-white/5 text-zinc-400' : 'bg-emerald-500 text-bg'}`}>
                 {restTimeLeft !== null ? 'STOP' : 'START TIMER'}
              </button>
           </div>
 
           <div className="space-y-2">
+            {lastPerformance && lastPerformance.length > 0 && (
+              <div className="flex items-center justify-between px-2 py-1 mb-2 bg-white/[0.01] rounded-lg border border-white/[0.03]">
+                <span className="text-[8px] font-black text-zinc-700 uppercase tracking-widest">Carga Anterior</span>
+                <span className="text-[9px] font-mono font-bold text-zinc-500">
+                  {lastPerformance.map(p => `${p.weight}kg x ${p.reps}`).join(' | ')}
+                </span>
+              </div>
+            )}
             {performance.map((set, idx) => (
               <div key={idx} className={`grid grid-cols-12 items-center gap-2 p-1.5 rounded-xl border transition-all duration-300 ${set.completed ? 'bg-emerald-500/[0.02] border-emerald-500/20' : 'bg-transparent border-white/[0.04]'}`}>
                 <div className="col-span-1 flex items-center justify-center font-mono text-[9px] font-black text-zinc-700">
