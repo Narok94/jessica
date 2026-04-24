@@ -12,6 +12,7 @@ import {
   Users
 } from 'lucide-react';
 import { useStore } from './store';
+import { useWorkoutPersistence } from './hooks/useWorkoutPersistence';
 import { AppTab, User } from './types';
 import { ToastProvider, useToast } from './components/ui/Toast';
 import { DashboardSkeleton } from './components/ui/Skeleton';
@@ -47,6 +48,8 @@ const AppContent: React.FC = () => {
     addToast,
     setAddToast
   } = useStore();
+
+  useWorkoutPersistence();
 
   const { addToast: toastFn } = useToast();
 
@@ -88,22 +91,6 @@ const AppContent: React.FC = () => {
     }
   }, [rememberMe]);
 
-  // Auto-save logic
-  useEffect(() => {
-    if (isWorkoutActive && user && selectedWorkout) {
-      const interval = setInterval(() => {
-        const sessionData = {
-          workoutId: selectedWorkout.id,
-          progress: currentSessionProgress,
-          startTime: workoutStartTime,
-          timestamp: Date.now()
-        };
-        localStorage.setItem(`tatugym_active_session_${user.username.toLowerCase()}`, JSON.stringify(sessionData));
-      }, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [isWorkoutActive, user, selectedWorkout, currentSessionProgress, workoutStartTime]);
-
   useEffect(() => {
     const checkAutoLogin = async () => {
       try {
@@ -134,23 +121,6 @@ const AppContent: React.FC = () => {
 
           setUser(finalUser);
           setIsLoggedIn(true);
-          
-          // Restore active session if exists and recent (within 5 mins)
-          const activeSession = localStorage.getItem(`tatugym_active_session_${finalUser.username.toLowerCase()}`);
-          if (activeSession) {
-            const session = JSON.parse(activeSession);
-            if (Date.now() - session.timestamp < 300000) {
-              const workout = allWorkouts[finalUser.username.toLowerCase() as keyof typeof allWorkouts]?.find(w => w.id === session.workoutId);
-              if (workout) {
-                setSelectedWorkout(workout);
-                setCurrentSessionProgress(session.progress);
-                setWorkoutStartTime(session.startTime);
-                setIsWorkoutActive(true);
-                setActiveTab(AppTab.WORKOUT);
-                if (addToast) addToast('Sessão de treino restaurada!', 'info');
-              }
-            }
-          }
         } else {
           console.log('[App] Nenhum usuário lembrado encontrado.');
         }

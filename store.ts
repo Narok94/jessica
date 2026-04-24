@@ -102,11 +102,16 @@ export const useStore = create<AppState>((set, get) => ({
   setAddToast: (fn) => set({ addToast: fn }),
 
   logout: async () => {
+    const { user } = get();
     try {
       await signOut(auth);
     } catch (e) {
       console.error('Error signing out:', e);
     }
+    if (user) {
+       localStorage.removeItem(`tatugym_active_session_${user.username.toLowerCase()}`);
+    }
+
     set({ 
       user: null, 
       isLoggedIn: false, 

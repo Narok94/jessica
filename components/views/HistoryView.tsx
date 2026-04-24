@@ -42,7 +42,7 @@ export const HistoryView: React.FC = () => {
           {user?.history.map((entry) => {
             const vol = entry.exercises.reduce((acc, ex) => acc + (ex.performance ? ex.performance.reduce((sa, p) => sa + (p.weight * p.reps), 0) : 0), 0);
             return (
-              <div key={entry.id} className="glass-card p-5 md:p-6 rounded-[2rem] space-y-4 border-l-4 border-l-emerald-500">
+              <div key={entry.id} className="glass-card glass-card-hover p-5 md:p-6 rounded-[2rem] space-y-4 border-l-4 border-l-emerald-500">
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="text-lg font-black text-white uppercase tracking-tight">{entry.workoutTitle}</h3>

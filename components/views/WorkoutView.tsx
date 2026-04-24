@@ -136,9 +136,21 @@ export const WorkoutView: React.FC = () => {
   };
 
   const exitWorkout = () => {
-    if(confirm('Sair do treino? Seu progresso atual está salvo e será mantido para quando você voltar.')) { 
       setSelectedWorkout(null);
       setShowSummary(false);
+      setActiveTab(AppTab.DASHBOARD);
+  };
+
+  const cancelWorkout = () => {
+    if(confirm('Tem certeza que deseja descarar este treino? Todo o progresso desta sessão será perdido.')) { 
+      if (user) {
+        localStorage.removeItem(`tatugym_active_session_${user.username.toLowerCase()}`);
+      }
+      setSelectedWorkout(null);
+      setCurrentSessionProgress({});
+      setWorkoutStartTime(null);
+      setElapsedTime(0);
+      setIsWorkoutActive(false);
       setActiveTab(AppTab.DASHBOARD);
     }
   };
@@ -157,14 +169,14 @@ export const WorkoutView: React.FC = () => {
          </div>
 
          <div className="grid grid-cols-2 gap-4">
-            <div className="glass-card p-6 rounded-[2rem] border border-emerald-500/10 bg-emerald-500/5">
+            <div className="glass-card glass-card-hover p-6 rounded-[2rem] border border-emerald-500/10 bg-emerald-500/5">
                <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1">Volume de Carga</p>
                <div className="flex items-end justify-center gap-1">
                   <span className="text-3xl font-black text-white">{lastWorkoutVolume}</span>
                   <span className="text-[10px] font-bold text-emerald-500 mb-1.5 uppercase">kg</span>
                </div>
             </div>
-            <div className="glass-card p-6 rounded-[2rem] border border-blue-500/10 bg-blue-500/5">
+            <div className="glass-card glass-card-hover p-6 rounded-[2rem] border border-blue-500/10 bg-blue-500/5">
                <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1">Duração</p>
                <div className="flex items-end justify-center gap-1">
                   <span className="text-2xl font-black text-white">{workoutDuration ? formatTime(workoutDuration) : '00:00'}</span>
@@ -199,9 +211,16 @@ export const WorkoutView: React.FC = () => {
   return (
     <div className="space-y-6 animate-slide-up pb-64">
       <header className="flex items-center justify-between">
-        <button onClick={exitWorkout} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-all text-[9px] font-black uppercase tracking-widest bg-zinc-900/60 px-4 py-2 rounded-xl border border-white/5 active:scale-95">
-          <ChevronLeft size={16}/> Voltar
-        </button>
+        <div className="flex gap-2">
+          <button onClick={exitWorkout} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-all text-[9px] font-black uppercase tracking-widest bg-zinc-900/60 px-4 py-2 rounded-xl border border-white/5 active:scale-95">
+            <ChevronLeft size={16}/> Sair
+          </button>
+          {isWorkoutActive && (
+            <button onClick={cancelWorkout} className="flex items-center gap-2 text-red-500/60 hover:text-red-500 transition-all text-[9px] font-black uppercase tracking-widest bg-red-500/5 px-4 py-2 rounded-xl border border-red-500/10 active:scale-95">
+              Cancelar
+            </button>
+          )}
+        </div>
         <div className="text-right">
            <div className="flex items-center gap-1.5 justify-end mb-0.5">
               <span className={`w-1.5 h-1.5 rounded-full ${isWorkoutActive ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-700'}`}></span>

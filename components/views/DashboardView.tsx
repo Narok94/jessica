@@ -274,7 +274,7 @@ export const DashboardView: React.FC = () => {
             const historyCount = getHistoryCount(workout.id);
             
             return (
-              <div key={workout.id} className="glass-card rounded-[2.5rem] overflow-hidden border border-white/5 hover:border-blue-500/30 transition-all group cursor-pointer" onClick={() => { setSelectedWorkout(workout); setActiveTab(AppTab.WORKOUT); }}>
+              <div key={workout.id} className="glass-card glass-card-hover rounded-[2.5rem] overflow-hidden border border-white/5 hover:border-blue-500/30 transition-all group cursor-pointer" onClick={() => { setSelectedWorkout(workout); setActiveTab(AppTab.WORKOUT); }}>
                 <div className="p-6 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-5">
                     <div className={`w-16 h-16 rounded-2xl bg-${workout.color}-500/10 flex items-center justify-center border border-${workout.color}-500/20 group-hover:scale-110 group-hover:bg-${workout.color}-500/20 transition-all duration-500`}>

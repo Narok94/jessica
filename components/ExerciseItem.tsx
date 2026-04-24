@@ -158,9 +158,9 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   };
 
   return (
-    <div className={`glass-card rounded-[2rem] border transition-all duration-500 mb-4 overflow-hidden relative ${
+    <div className={`glass-card glass-card-hover rounded-[2.5rem] border transition-all duration-500 mb-4 overflow-hidden relative ${
       isOpen 
-      ? 'border-emerald-500/40 bg-zinc-900/95 ring-1 ring-emerald-500/10' 
+      ? 'border-emerald-500/40 bg-zinc-900/90 ring-1 ring-emerald-500/10' 
       : 'border-white/5'
     } ${allSetsDone && !isOpen ? 'opacity-50 grayscale-[0.2] scale-[0.98]' : 'opacity-100 scale-100'} 
       ${isFinishing ? 'scale-[1.03] !border-emerald-400 !bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.3)] z-10' : ''}`}
