@@ -197,101 +197,82 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
         <div className="flex items-center gap-4 flex-1 min-w-0">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2.5 mb-1">
-               <h3 className={`text-lg font-black tracking-tight leading-none truncate transition-all duration-300 ${allSetsDone ? 'text-emerald-500 line-through' : 'text-white'}`}>
+               <h3 className={`text-lg font-black tracking-tight leading-none italic truncate transition-all duration-300 ${allSetsDone ? 'text-emerald-500' : 'text-white'}`}>
                 {exercise.name}
               </h3>
-              {allSetsDone && <CheckCircle2 size={20} className="text-emerald-500 shrink-0 animate-[bounce_0.6s_infinite]" />}
+              {allSetsDone && <CheckCircle2 size={18} className="text-emerald-500 shrink-0 fill-emerald-500/20" strokeWidth={3} />}
             </div>
-            <div className="flex items-center gap-3">
-              <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full border transition-colors ${allSetsDone ? 'bg-emerald-500/20 border-emerald-500/30' : 'bg-zinc-800/80 border-white/5'}`}>
-                  <span className={`text-[10px] font-black ${allSetsDone ? 'text-emerald-400' : 'text-emerald-500'}`}>{completedCount}</span>
-                  <span className="text-[9px] font-black text-zinc-500 uppercase">/ {exercise.sets} séries</span>
-              </div>
-              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-                {exercise.reps} reps
-              </p>
+            <div className="flex items-center gap-2">
+               <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full border transition-colors ${allSetsDone ? 'bg-emerald-500/20 border-emerald-500/30' : 'bg-zinc-800/80 border-white/5'}`}>
+                   <span className={`text-[10px] font-black ${allSetsDone ? 'text-emerald-400' : 'text-emerald-500'}`}>{completedCount}</span>
+                   <span className="text-[9px] font-black text-zinc-600 uppercase">/ {exercise.sets} séries</span>
+               </div>
+               <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest italic">
+                 {exercise.reps} reps
+               </p>
             </div>
           </div>
         </div>
         
-        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${isOpen ? 'bg-emerald-500 text-zinc-950 rotate-180 shadow-lg shadow-emerald-500/20' : 'bg-zinc-800/50 text-zinc-500'}`}>
-          <ChevronDown size={20} strokeWidth={3} />
+        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${isOpen ? 'bg-emerald-500 text-zinc-950 rotate-180' : 'bg-zinc-800/50 text-zinc-500'}`}>
+          <ChevronDown size={22} strokeWidth={4} />
         </div>
       </div>
 
       {isOpen && (
         <div className="px-5 pb-6 pt-2 animate-slide-up space-y-6">
-          {allSetsDone && (
-            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-3 flex items-center justify-center gap-2 animate-[pulse_2s_infinite]">
-              <Trophy size={16} className="text-emerald-500" />
-              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Parabéns! Exercício Finalizado</span>
-            </div>
-          )}
-
           <div className="flex flex-col gap-3">
-             <div className="bg-zinc-950/80 border border-white/10 rounded-[1.5rem] p-4 flex items-center justify-between shadow-xl">
-                <div className="flex items-center gap-4">
-                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${restTimeLeft !== null ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/30' : 'bg-zinc-900 text-zinc-600 border border-white/5'}`}>
-                      <Timer size={28} strokeWidth={2.5} />
-                   </div>
-                   <div>
-                      <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-0.5">Descanso</p>
-                      <p className="text-2xl font-black text-white leading-none">{restTimeLeft !== null ? `${restTimeLeft}s` : `${exercise.rest}s`}</p>
-                   </div>
+             <div className="bg-zinc-950/80 border border-white/10 rounded-[2rem] p-4 flex flex-col gap-3 shadow-xl">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                     <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${restTimeLeft !== null ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/30' : 'bg-zinc-900 text-zinc-600 border border-white/5'}`}>
+                        <Timer size={28} strokeWidth={2.5} />
+                     </div>
+                     <div>
+                        <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-0.5">Descanso</p>
+                        <p className="text-2xl font-black text-white font-mono leading-none">{restTimeLeft !== null ? `${restTimeLeft}s` : `${exercise.rest}s`}</p>
+                     </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                     {restTimeLeft !== null ? (
+                        <>
+                         <button onClick={cancelRestTimer} className="w-12 h-12 bg-zinc-900 text-zinc-400 rounded-2xl flex items-center justify-center border border-white/10 active:scale-90 transition-transform"><X size={22} /></button>
+                         <button onClick={startRestTimer} className="w-12 h-12 bg-emerald-500 text-zinc-950 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-90 transition-transform"><RotateCcw size={22} /></button>
+                        </>
+                     ) : (
+                       <button onClick={startRestTimer} className="flex items-center gap-3 px-6 py-4 bg-emerald-500 text-zinc-950 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-emerald-500/20">
+                         <Play size={16} fill="currentColor" /> Iniciar Timer
+                       </button>
+                     )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                   {restTimeLeft !== null ? (
-                      <>
-                       <button onClick={cancelRestTimer} className="w-12 h-12 bg-zinc-900 text-zinc-400 rounded-2xl flex items-center justify-center border border-white/10 active:scale-90 transition-transform hover:text-white hover:border-white/20"><X size={22} /></button>
-                       <button onClick={startRestTimer} className="w-12 h-12 bg-emerald-500 text-zinc-950 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-90 transition-transform hover:bg-emerald-400"><RotateCcw size={22} /></button>
-                      </>
-                   ) : (
-                     <button onClick={startRestTimer} className="flex items-center gap-3 px-6 py-4 bg-emerald-500 text-zinc-950 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-emerald-500/20 hover:bg-emerald-400">
-                       <Play size={16} fill="currentColor" /> Iniciar Timer
-                     </button>
-                   )}
-                </div>
+
+                <a 
+                  href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex items-center justify-center gap-3 py-3 rounded-xl bg-blue-500/5 border border-blue-500/20 text-[10px] font-black text-blue-400 uppercase tracking-[0.3em] hover:bg-blue-500/10 transition-all"
+                >
+                  <Search size={14} strokeWidth={3} />
+                  Ver execução no Google
+                </a>
              </div>
-             <a 
-               href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
-               target="_blank"
-               rel="noopener noreferrer"
-               onClick={(e) => e.stopPropagation()}
-               className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] hover:bg-blue-500/20 transition-all shadow-lg shadow-blue-500/5"
-             >
-               <Search size={14} strokeWidth={3} />
-               Ver execução no Google
-             </a>
           </div>
 
-          <div className="space-y-4">
-            <div className="hidden md:grid grid-cols-12 gap-3 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] px-3">
-              <div className="col-span-1 text-center">Set</div>
-              <div className="col-span-5 text-center">Peso (kg)</div>
-              <div className="col-span-5 text-center">Reps</div>
-              <div className="col-span-1 text-center">Ok</div>
-            </div>
-
+          <div className="space-y-3">
             {performance.map((set, idx) => (
-              <div key={idx} className={`grid grid-cols-12 items-center gap-2 md:gap-3 p-3 rounded-[1.8rem] border transition-all duration-300 ${set.completed ? 'bg-emerald-500/10 border-emerald-500/40 shadow-lg shadow-emerald-500/5' : 'bg-zinc-900/40 border-white/10 shadow-md'}`}>
+              <div key={idx} className={`grid grid-cols-12 items-center gap-2 p-3 rounded-[1.8rem] border transition-all duration-300 ${set.completed ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-zinc-900/60 border-white/10'}`}>
                 {/* Set Number */}
-                <div className="col-span-2 md:col-span-1 flex items-center justify-center">
-                  <div className={`w-9 h-9 flex items-center justify-center rounded-xl text-xs font-black border transition-all duration-300 ${set.completed ? 'bg-emerald-500 text-zinc-950 border-emerald-400 scale-110' : 'bg-zinc-800/80 text-zinc-500 border-white/5'}`}>
+                <div className="col-span-2 flex items-center justify-center">
+                  <div className={`w-9 h-9 flex items-center justify-center rounded-xl text-xs font-black transition-all ${set.completed ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/20' : 'bg-zinc-800 text-zinc-500'}`}>
                     {idx + 1}
                   </div>
                 </div>
 
-                {/* Weight Stepper */}
-                <div className="col-span-5 md:col-span-5 flex flex-col gap-1">
-                  <span className="md:hidden text-[7px] font-black text-zinc-600 uppercase tracking-widest text-center">Peso (kg)</span>
-                  <div className={`flex items-center rounded-2xl border transition-all duration-300 overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}>
-                    <button 
-                      disabled={set.completed} 
-                      onClick={() => adjustValue(idx, 'weight', -1)} 
-                      className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
-                    >
-                      <Minus size={16} strokeWidth={3} />
-                    </button>
+                {/* Weight Input */}
+                <div className="col-span-4 flex flex-col gap-1">
+                  <div className={`flex items-center rounded-2xl border transition-all overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800 border-white/5'}`}>
                     <input 
                       type="number" 
                       inputMode="decimal" 
@@ -299,46 +280,39 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                       disabled={set.completed} 
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => updateSet(idx, { weight: parseFloat(e.target.value) || 0 })} 
-                      className="w-10 md:w-12 bg-transparent text-center text-sm font-black text-white outline-none"
+                      className="w-full bg-transparent text-center text-sm font-black text-white outline-none font-mono"
+                      placeholder="Peso"
                     />
-                    <button 
-                      disabled={set.completed} 
-                      onClick={() => adjustValue(idx, 'weight', 1)} 
-                      className="flex-1 h-full flex items-center justify-center text-zinc-500 hover:text-white active:bg-white/5 disabled:opacity-30 transition-all"
-                    >
-                      <Plus size={16} strokeWidth={3} />
-                    </button>
                   </div>
                 </div>
 
-                {/* Reps Input (Simple numeric field as requested) */}
-                <div className="col-span-3 md:col-span-5 flex flex-col gap-1">
-                  <span className="md:hidden text-[7px] font-black text-zinc-600 uppercase tracking-widest text-center">Reps</span>
-                  <div className={`flex items-center rounded-2xl border transition-all duration-300 overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800/50 border-white/10'}`}>
+                {/* Reps Input */}
+                <div className="col-span-4 flex flex-col gap-1">
+                  <div className={`flex items-center rounded-2xl border transition-all overflow-hidden h-12 ${set.completed ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-800 border-white/5'}`}>
                     <input 
                       type="number" 
                       inputMode="numeric" 
-                      placeholder="0"
                       value={set.reps === 0 ? '' : set.reps} 
                       disabled={set.completed} 
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => updateSet(idx, { reps: parseInt(e.target.value) || 0 })} 
-                      className="w-full bg-transparent text-center text-sm font-black text-white outline-none px-2"
+                      className="w-full bg-transparent text-center text-sm font-black text-white outline-none font-mono"
+                      placeholder="Reps"
                     />
                   </div>
                 </div>
 
                 {/* Completion Check */}
-                <div className="col-span-2 md:col-span-1 flex items-center justify-center">
+                <div className="col-span-2 flex items-center justify-center">
                   <button 
                     onClick={() => updateSet(idx, { completed: !set.completed })} 
-                    className={`w-10 h-10 md:w-11 md:h-11 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                    className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all ${
                       set.completed 
-                      ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/30 scale-105' 
-                      : 'bg-zinc-800 border border-white/10 text-zinc-700 hover:border-emerald-500/50 hover:text-emerald-500/50'
+                      ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/40 scale-105' 
+                      : 'bg-zinc-800 border border-white/10 text-zinc-700'
                     }`}
                   >
-                    <Check size={20} strokeWidth={4} />
+                    <Check size={22} strokeWidth={4} />
                   </button>
                 </div>
               </div>
@@ -346,32 +320,12 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
           </div>
 
           <div className="flex flex-col gap-3">
-            {exercise.videoUrl && (
-              <button 
-                onClick={() => setShowVideo(true)}
-                className="w-full bg-zinc-900 border border-white/5 hover:border-emerald-500/30 rounded-2xl p-4 flex items-center justify-between group transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-emerald-500/10 text-emerald-500 rounded-xl flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-zinc-950 transition-all">
-                    <PlayCircle size={20} />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[10px] font-black text-white uppercase tracking-widest">Tutorial em Vídeo</p>
-                    <p className="text-[8px] font-bold text-zinc-500 uppercase">Assista a execução correta</p>
-                  </div>
-                </div>
-                <ExternalLink size={14} className="text-zinc-700 group-hover:text-emerald-500 transition-colors" />
-              </button>
-            )}
-
-            <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-2xl p-4 flex items-start gap-3">
-              <Info size={16} className="text-indigo-400 mt-0.5 shrink-0" />
-              <div className="flex-1">
-                <p className="text-[11px] font-medium text-zinc-400 leading-relaxed">
-                  {exercise.notes || 'Foque no controle motor. Sinta o músculo trabalhar em cada fase.'}
-                </p>
-              </div>
-            </div>
+             <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-2xl p-4 flex items-start gap-4">
+               <Info size={18} className="text-indigo-400 mt-0.5 shrink-0" />
+               <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest leading-relaxed">
+                 {exercise.notes || 'Foque no controle motor. Sinta o músculo trabalhar em cada fase.'}
+               </p>
+             </div>
           </div>
         </div>
       )}

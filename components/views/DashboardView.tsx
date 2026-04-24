@@ -98,46 +98,44 @@ export const DashboardView: React.FC = () => {
       </div>
 
       {/* Weekly Consistency (Check-in) - TOP POSITION */}
-      <div className="glass-card p-6 rounded-[2.5rem] border border-white/10 shadow-2xl relative overflow-hidden group bg-gradient-to-br from-zinc-900/40 to-black/40">
-        <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 blur-[80px] rounded-full -mr-24 -mt-24 group-hover:bg-emerald-500/10 transition-all duration-700"></div>
+      <div className="glass-card p-6 rounded-[2.5rem] border border-white/10 shadow-2xl relative overflow-hidden group bg-zinc-900/40">
         <div className="relative z-10 space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] flex items-center gap-2">
-                <Calendar size={14} className="text-emerald-500" /> Consistência Semanal
+                <Calendar size={14} className="text-blue-500" /> CALENDÁRIO SEMANAL
               </h3>
-              <p className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Mantenha o ritmo para melhores resultados</p>
             </div>
             {isCheckedInToday ? (
               <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Check-in OK</span>
+                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">PRESENÇA CONFIRMADA</span>
               </div>
             ) : (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-500/10 border border-orange-500/20 rounded-full">
-                <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse"></div>
-                <span className="text-[9px] font-black text-orange-500 uppercase tracking-widest">Pendente</span>
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-800 border border-white/5 rounded-full">
+                <div className="w-1.5 h-1.5 bg-zinc-600 rounded-full"></div>
+                <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">PENDENTE</span>
               </div>
             )}
           </div>
           
           <div className="flex justify-between items-center gap-2">
             {weekActivity.map((day, i) => (
-              <div key={i} className="flex flex-col items-center gap-3 flex-1">
+              <div key={i} className="flex flex-col items-center gap-2 flex-1">
+                <span className={`text-[10px] font-black ${day.today ? 'text-blue-500' : 'text-zinc-600'}`}>{day.label}</span>
                 <button 
                   onClick={() => day.today && !day.active ? handleManualCheckIn() : null}
                   disabled={!day.today || day.active}
-                  className={`w-full aspect-[4/5] rounded-2xl flex flex-col items-center justify-center transition-all duration-500 border ${
+                  className={`w-full aspect-square rounded-2xl flex flex-col items-center justify-center transition-all duration-500 border ${
                     day.active 
                     ? 'bg-emerald-500 border-emerald-400 text-zinc-950 shadow-lg shadow-emerald-500/40 scale-105' 
                     : day.today 
-                      ? 'bg-zinc-900/80 border-emerald-500/50 text-white shadow-lg shadow-emerald-500/10' 
-                      : 'bg-zinc-900/40 border-white/5 text-zinc-600'
+                      ? 'bg-zinc-800 border-blue-500/50 text-white shadow-lg shadow-blue-500/10' 
+                      : 'bg-zinc-900/60 border-white/5 text-zinc-700'
                   }`}
                 >
-                  <span className="text-[10px] font-black">{day.label}</span>
-                  {day.today && !day.active && <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-2 animate-pulse"></div>}
-                  {day.active && <Check size={14} className="mt-1" strokeWidth={4} />}
+                  {day.active && <Check size={16} strokeWidth={4} />}
+                  {!day.active && day.today && <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>}
                 </button>
               </div>
             ))}
@@ -146,62 +144,50 @@ export const DashboardView: React.FC = () => {
           {!isCheckedInToday && (
             <button 
               onClick={handleManualCheckIn}
-              className="w-full py-5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase tracking-[0.3em] shadow-xl shadow-emerald-600/30 transition-all active:scale-95 flex items-center justify-center gap-3 group"
+              className="w-full py-5 rounded-[1.8rem] bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-[10px] font-black uppercase tracking-[0.4em] shadow-2xl shadow-emerald-500/40 transition-all active:scale-95 flex items-center justify-center gap-3 group animate-bounce-subtle"
             >
-              MARCAR PRESENÇA HOJE <Check size={18} strokeWidth={3} className="group-hover:scale-125 transition-transform" />
+              MARCAR PRESENÇA <Check size={20} strokeWidth={4} />
             </button>
           )}
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Grid - Symmetric and Compact */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="glass-card rounded-[2.5rem] p-6 border border-white/10 bg-gradient-to-br from-zinc-900/50 to-zinc-950 relative overflow-hidden">
-          <div className="absolute -right-4 -bottom-4 opacity-5">
-            <Zap size={80} className="text-blue-500" />
+        <div className="glass-card rounded-[2rem] p-5 border border-white/5 bg-zinc-900/20">
+          <div className="flex items-center gap-3 mb-4">
+             <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+               <ClipboardList size={20} className="text-blue-500" />
+             </div>
+             <h3 className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Plano Atual</h3>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-              <ClipboardList size={28} className="text-blue-500" />
-            </div>
-            <div>
-              <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Plano Atual</h3>
-              <p className="text-sm font-black text-white uppercase tracking-tight mt-0.5">ABCD Elite</p>
-            </div>
+          <p className="text-base font-black text-white uppercase tracking-tight">ABCD Elite</p>
+          <div className="mt-4 flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-zinc-600">
+            <span>Volume</span>
+            <span className="text-blue-500">65%</span>
           </div>
-          <div className="mt-6 space-y-3">
-            <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-zinc-500">
-              <span>Progresso</span>
-              <span className="text-blue-500">65%</span>
-            </div>
-            <div className="h-1.5 bg-zinc-800/50 rounded-full overflow-hidden">
-              <div className="h-full bg-blue-600 rounded-full w-[65%] shadow-[0_0_15px_rgba(37,99,235,0.4)]"></div>
-            </div>
+          <div className="mt-1.5 h-1 bg-zinc-800/50 rounded-full overflow-hidden">
+            <div className="h-full bg-blue-500 rounded-full w-[65%]"></div>
           </div>
         </div>
 
-        <div className="glass-card rounded-[2.5rem] p-6 border border-white/10 bg-gradient-to-br from-zinc-900/50 to-zinc-950 relative overflow-hidden">
-          <div className="absolute -right-4 -bottom-4 opacity-5">
-            <Award size={80} className="text-purple-500" />
+        <div className="glass-card rounded-[2rem] p-5 border border-white/5 bg-zinc-900/20">
+          <div className="flex items-center gap-3 mb-4">
+             <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
+               <TrendingUp size={20} className="text-purple-500" />
+             </div>
+             <h3 className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Total Treinos</h3>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
-              <TrendingUp size={28} className="text-purple-500" />
-            </div>
-            <div>
-              <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Total Treinos</h3>
-              <p className="text-sm font-black text-white uppercase tracking-tight mt-0.5">{user.totalWorkouts || 0} Sessões</p>
-            </div>
-          </div>
-          <div className="mt-6 flex items-center gap-3">
-            <div className="flex -space-x-2">
+          <p className="text-base font-black text-white uppercase tracking-tight">{user.totalWorkouts || 0} Sessões</p>
+          <div className="mt-4 flex items-center gap-2">
+            <div className="flex -space-x-1.5">
               {[1,2,3].map(i => (
-                <div key={i} className="w-7 h-7 rounded-full border-2 border-zinc-950 bg-zinc-800 flex items-center justify-center">
-                  <UserIcon size={12} className="text-zinc-500" />
+                <div key={i} className="w-5 h-5 rounded-full border border-zinc-950 bg-zinc-800 flex items-center justify-center">
+                  <UserIcon size={10} className="text-zinc-600" />
                 </div>
               ))}
             </div>
-            <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">+12 AMIGOS</span>
+            <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Ranking #3</span>
           </div>
         </div>
       </div>
