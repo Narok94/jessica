@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { Exercise, SetPerformance } from '../types';
 import { 
@@ -105,6 +106,12 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
     setRestTimeLeft(null);
   };
 
+  const handleVibrate = (ms = 10) => {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(ms);
+    }
+  };
+
   const updateSet = (index: number, updates: Partial<SetPerformance>) => {
     const newPerf = [...performance];
     newPerf[index] = { ...newPerf[index], ...updates };
@@ -112,7 +119,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
     onSaveProgress(exercise.id, newPerf);
     
     if (updates.completed) {
-      if (window.navigator.vibrate) window.navigator.vibrate(20);
+      handleVibrate(15);
       
       const allDone = newPerf.every(p => p.completed);
       if (allDone) {
@@ -182,11 +189,18 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
         </div>
         
         <div className="flex items-center gap-3">
-           {allSetsDone && !isOpen && (
-             <div className="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center text-bg">
-                <Check size={16} strokeWidth={4} />
-             </div>
-           )}
+           <AnimatePresence>
+             {allSetsDone && !isOpen && (
+               <motion.div 
+                 initial={{ scale: 0, rotate: -20 }}
+                 animate={{ scale: 1, rotate: 0 }}
+                 exit={{ scale: 0 }}
+                 className="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center text-bg shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+               >
+                  <Check size={16} strokeWidth={4} />
+               </motion.div>
+             )}
+           </AnimatePresence>
            <div className={`w-7 h-7 rounded-full border border-white/[0.08] flex items-center justify-center transition-all ${isOpen ? 'rotate-180 bg-white/5 text-white' : 'text-zinc-700'}`}>
              <ChevronDown size={14} strokeWidth={3} />
            </div>
@@ -245,7 +259,8 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                 </div>
 
                 <div className="col-span-3 flex items-center justify-end pr-2">
-                  <button 
+                  <motion.button 
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => updateSet(idx, { completed: !set.completed })} 
                     className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
                       set.completed 
@@ -254,7 +269,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                     }`}
                   >
                     <Check size={18} strokeWidth={4} />
-                  </button>
+                  </motion.button>
                 </div>
               </div>
             ))}

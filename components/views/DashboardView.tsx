@@ -65,6 +65,17 @@ export const DashboardView: React.FC = () => {
     };
   });
 
+  const handleVibrate = () => {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(10);
+    }
+  };
+
+  const onCheckIn = () => {
+    handleVibrate();
+    handleManualCheckIn();
+  };
+
   return (
     <div className="space-y-8 animate-slide-up pb-10 max-w-2xl mx-auto">
       {/* Minimalist Header */}
@@ -100,7 +111,7 @@ export const DashboardView: React.FC = () => {
       {!isCheckedInToday && (
         <div className="px-4 animate-fade">
           <button 
-            onClick={handleManualCheckIn}
+            onClick={onCheckIn}
             className="w-full py-6 rounded-2xl bg-emerald-500 text-bg text-[11px] font-black uppercase tracking-[0.4em] shadow-[0_0_30px_rgba(16,185,129,0.15)] transition-all active:scale-[0.98] flex items-center justify-center gap-3 group"
           >
             MARCAR PRESENÇA <Check size={20} strokeWidth={4} />
@@ -251,8 +262,23 @@ export const DashboardView: React.FC = () => {
             const lastDate = getLastCompletedDate(workout.id);
             const historyCount = getHistoryCount(workout.id);
             
+            const colorGlowMap: Record<string, string> = {
+              blue: 'hover:shadow-[0_0_40px_rgba(59,130,246,0.15)] hover:border-blue-500/30',
+              orange: 'hover:shadow-[0_0_40px_rgba(249,115,22,0.15)] hover:border-orange-500/30',
+              green: 'hover:shadow-[0_0_40_rgba(16,185,129,0.15)] hover:border-emerald-500/30',
+              emerald: 'hover:shadow-[0_0_40px_rgba(16,185,129,0.15)] hover:border-emerald-500/30'
+            };
+
             return (
-              <div key={workout.id} className="glass-card glass-card-hover rounded-[2.5rem] overflow-hidden border border-white/5 hover:border-blue-500/30 transition-all group cursor-pointer" onClick={() => { setSelectedWorkout(workout); setActiveTab(AppTab.WORKOUT); }}>
+              <div 
+                key={workout.id} 
+                className={`glass-card rounded-[2.5rem] overflow-hidden border border-white/5 transition-all duration-500 group cursor-pointer ${colorGlowMap[workout.color] || 'hover:shadow-[0_0_40px_rgba(255,255,255,0.05)]'}`} 
+                onClick={() => { 
+                  handleVibrate();
+                  setSelectedWorkout(workout); 
+                  setActiveTab(AppTab.WORKOUT); 
+                }}
+              >
                 <div className="p-6 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-5">
                     <div className={`w-16 h-16 rounded-2xl bg-${workout.color}-500/10 flex items-center justify-center border border-${workout.color}-500/20 group-hover:scale-110 group-hover:bg-${workout.color}-500/20 transition-all duration-500`}>

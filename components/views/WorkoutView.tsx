@@ -56,7 +56,14 @@ export const WorkoutView: React.FC = () => {
       .join(":");
   };
 
+  const handleVibrate = (ms = 10) => {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(ms);
+    }
+  };
+
   const startWorkout = () => {
+    handleVibrate(20);
     setIsWorkoutActive(true);
     setWorkoutStartTime(Date.now());
     setElapsedTime(0);
@@ -233,7 +240,7 @@ export const WorkoutView: React.FC = () => {
                  onClick={handleFinishWorkout}
                  className="px-4 py-1.5 bg-emerald-500 text-bg font-black text-[10px] uppercase tracking-widest rounded-lg active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.15)]"
                >
-                 FINISH
+                 FINALIZAR
                </button>
              </>
           ) : (
@@ -241,16 +248,69 @@ export const WorkoutView: React.FC = () => {
               onClick={startWorkout}
               className="px-6 py-2.5 bg-emerald-500 text-bg font-black text-[10px] uppercase tracking-widest rounded-lg active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.15)]"
             >
-              START SESSION
+              INICIAR TREINO
             </button>
           )}
         </div>
       </header>
 
+      {isWorkoutActive && (
+        <div className="space-y-8 animate-fade px-4">
+          <div className="flex items-center justify-between">
+             <div className="flex flex-col">
+                <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">PROGRESSO TOTAL</span>
+                <span className="text-xl font-black text-white leading-none mt-1">{completedSets} / {totalSets}</span>
+             </div>
+             <div className="text-right">
+                <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">VOLUME TOTAL</span>
+                <span className="block text-xl font-black text-emerald-500 leading-none mt-1">{calculateVolume()} KG</span>
+             </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 items-start pb-40">
+            {selectedWorkout.exercises.map(ex => (
+              <ExerciseItem 
+                key={ex.id} 
+                exercise={ex} 
+                onSaveProgress={handleSaveProgress} 
+                savedWeight={user.weights?.[ex.id]} 
+                initialPerformance={currentSessionProgress[ex.id]}
+              />
+            ))}
+            
+            <div className="pt-10 flex flex-col gap-4">
+              <button 
+                onClick={() => {
+                  handleVibrate(30);
+                  handleFinishWorkout();
+                }}
+                disabled={completedSets === 0}
+                className={`w-full py-5 rounded-xl font-black text-[11px] uppercase tracking-[0.4em] transition-all flex items-center justify-center gap-3 ${
+                  completedSets > 0 
+                  ? 'bg-emerald-500 text-bg shadow-[0_0_20px_rgba(16,185,129,0.15)]' 
+                  : 'bg-white/[0.03] border border-white/[0.08] text-zinc-700 cursor-not-allowed'
+                }`}
+              >
+                FINALIZAR SESSÃO
+              </button>
+              <button 
+                onClick={() => {
+                   handleVibrate(10);
+                   cancelWorkout();
+                }}
+                className="w-full py-3 text-[10px] font-black text-zinc-600 hover:text-white uppercase tracking-widest transition-colors flex items-center justify-center gap-2"
+              >
+                CANCELAR TREINO
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {!isWorkoutActive && (
          <div className="py-12 px-4 animate-fade">
             <div className="glass-card p-10 rounded-[2rem] text-center border-white/[0.05]">
-               <h2 className="text-2xl font-black italic text-white uppercase tracking-tighter mb-2">Ready to Start?</h2>
+               <h2 className="text-2xl font-black italic text-white uppercase tracking-tighter mb-2">Pronto para começar?</h2>
                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-8">Treino {selectedWorkout.title} • {selectedWorkout.exercises.length} Exercícios</p>
                <button 
                   onClick={startWorkout}
