@@ -82,7 +82,6 @@ export enum AppTab {
   DASHBOARD = 'dashboard',
   WORKOUT = 'workout',
   HISTORY = 'history',
-  AI_ASSISTANT = 'ai',
   PROFILE = 'profile',
   ADMIN = 'admin',
   TEACHER = 'teacher'

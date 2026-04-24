@@ -4,7 +4,6 @@ import {
   Dumbbell, 
   LayoutDashboard, 
   History as HistoryIcon, 
-  Bot, 
   User as UserIcon,
   Lock,
   Check,
@@ -24,7 +23,6 @@ import { signInAnonymously } from 'firebase/auth';
 import { DashboardView } from './components/views/DashboardView';
 import { WorkoutView } from './components/views/WorkoutView';
 import { HistoryView } from './components/views/HistoryView';
-import { AIAssistantView } from './components/views/AIAssistantView';
 import { ProfileView } from './components/views/ProfileView';
 import { TeacherView } from './components/views/TeacherView';
 
@@ -169,6 +167,14 @@ const AppContent: React.FC = () => {
           if (addToast) addToast('Senha incorreta para Flavia.', 'error');
           return;
         }
+        if (lowerUser === 'henrique' && password !== '9860') {
+          if (addToast) addToast('Senha incorreta para Henrique.', 'error');
+          return;
+        }
+        if (lowerUser === 'jessica' && password !== '9860') {
+          if (addToast) addToast('Senha incorreta para Jéssica.', 'error');
+          return;
+        }
         if (lowerUser === 'professor' && password !== 'admin') {
           if (addToast) addToast('Senha incorreta para Professor.', 'error');
           return;
@@ -300,7 +306,7 @@ const AppContent: React.FC = () => {
                 className="text-zinc-400 font-bold uppercase tracking-[0.3em] text-xs leading-relaxed opacity-80"
               >
                 A plataforma definitiva para quem busca o próximo nível. <br />
-                Treinos personalizados, acompanhamento em tempo real e IA.
+                Treinos personalizados e acompanhamento em tempo real.
               </motion.p>
             </div>
           </div>
@@ -453,7 +459,6 @@ const AppContent: React.FC = () => {
     switch (activeTab) {
       case AppTab.DASHBOARD: return <DashboardView />;
       case AppTab.HISTORY: return <HistoryView />;
-      case AppTab.AI_ASSISTANT: return <AIAssistantView />;
       case AppTab.PROFILE: return <ProfileView />;
       case AppTab.TEACHER: return <TeacherView />;
       default: return <DashboardView />;
@@ -474,7 +479,6 @@ const AppContent: React.FC = () => {
               ...(user?.role === 'teacher' ? [{ id: AppTab.TEACHER, icon: Users, label: 'Alunos' }] : []),
               { id: AppTab.DASHBOARD, icon: LayoutDashboard, label: 'Home' },
               { id: AppTab.HISTORY, icon: HistoryIcon, label: 'Histórico' },
-              { id: AppTab.AI_ASSISTANT, icon: Bot, label: 'AI' },
               { id: AppTab.PROFILE, icon: UserIcon, label: 'Perfil' }
             ].map((item) => (
               <button

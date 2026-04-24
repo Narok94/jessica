@@ -78,18 +78,22 @@ export const DashboardView: React.FC = () => {
              )}
           </div>
           <div className="flex flex-col">
-            <h1 className="text-xl leading-none tracking-tight">JÉSSICA</h1>
-            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mt-0.5">ABCD Elite</span>
+            <h1 className="text-xl leading-none tracking-tight">{user.name.toUpperCase()}</h1>
+            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mt-0.5">
+              {initialWorkouts.length === 3 ? 'ABC' : 
+               initialWorkouts.length === 4 ? 'ABCD' : 
+               initialWorkouts.length === 5 ? 'ABCDE' : 'Personalizado'} Elite
+            </span>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-           {!isCheckedInToday && (
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/5">
-                <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
-                <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">PENDENTE</span>
-              </div>
-           )}
-           <button onClick={() => logout()} className="p-2 text-zinc-500 hover:text-white transition-colors">
+          <div className="flex items-center gap-4">
+             {!isCheckedInToday && (
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 rounded-full border border-orange-500/20">
+                  <div className="w-1 h-1 bg-orange-500 rounded-full animate-pulse"></div>
+                  <span className="text-[9px] font-black text-orange-500 uppercase tracking-widest">Aguardando Treino</span>
+                </div>
+             )}
+             <button onClick={() => logout()} className="p-2 text-zinc-500 hover:text-white transition-colors">
               <LogOut size={20} />
            </button>
         </div>
@@ -148,7 +152,11 @@ export const DashboardView: React.FC = () => {
              </div>
              <h3 className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Plano Atual</h3>
           </div>
-          <p className="text-base font-black text-white uppercase tracking-tight">ABCD Elite</p>
+          <p className="text-base font-black text-white uppercase tracking-tight">
+            {initialWorkouts.length === 3 ? 'ABC' : 
+             initialWorkouts.length === 4 ? 'ABCD' : 
+             initialWorkouts.length === 5 ? 'ABCDE' : 'Personalizado'} Elite
+          </p>
           <div className="mt-4 flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-zinc-600">
             <span>Volume</span>
             <span className="text-blue-500">65%</span>
