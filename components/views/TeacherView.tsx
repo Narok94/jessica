@@ -245,33 +245,33 @@ export const TeacherView: React.FC = () => {
 
     return (
       <div className="space-y-6 animate-slide-up pb-20">
-        <header className="flex items-center gap-4 text-ink">
+        <header className="flex items-center gap-4">
           <button 
             onClick={() => setSelectedStudent(null)}
-            className="w-10 h-10 rounded-xl glass-card flex items-center justify-center text-secondary hover:text-ink transition-colors"
+            className="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
           >
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h2 className="text-2xl font-black text-ink uppercase tracking-tighter italic leading-none">
+            <h2 className="text-2xl font-black text-white uppercase tracking-tighter italic leading-none">
               {studentProfile?.name || selectedStudent}
             </h2>
-            <p className="text-secondary text-[10px] font-black uppercase tracking-[0.3em] mt-1">Gerenciar treinos do aluno</p>
+            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] mt-1">Gerenciar treinos do aluno</p>
           </div>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="glass-card p-4 rounded-3xl">
-            <p className="text-[10px] font-black text-secondary uppercase tracking-widest mb-1">Treinos Concluídos</p>
-            <p className="text-2xl font-black text-ink">{studentProfile?.totalWorkouts || 0}</p>
+          <div className="glass-card p-4 rounded-3xl border border-white/5 bg-zinc-900/20">
+            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Treinos Concluídos</p>
+            <p className="text-2xl font-black text-white">{studentProfile?.totalWorkouts || 0}</p>
           </div>
-          <div className="glass-card p-4 rounded-3xl">
-            <p className="text-[10px] font-black text-secondary uppercase tracking-widest mb-1">Sequência Atual</p>
+          <div className="glass-card p-4 rounded-3xl border border-white/5 bg-zinc-900/20">
+            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Sequência Atual</p>
             <p className="text-2xl font-black text-orange-500">{studentProfile?.streak || 0} dias</p>
           </div>
-          <div className="glass-card p-4 rounded-3xl">
-            <p className="text-[10px] font-black text-secondary uppercase tracking-widest mb-1">Último Acesso</p>
-            <p className="text-sm font-black text-ink uppercase">
+          <div className="glass-card p-4 rounded-3xl border border-white/5 bg-zinc-900/20">
+            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Último Acesso</p>
+            <p className="text-sm font-black text-white uppercase">
               {studentProfile?.checkIns?.length ? new Date(studentProfile.checkIns[studentProfile.checkIns.length - 1]).toLocaleDateString('pt-BR') : 'Nunca'}
             </p>
           </div>
@@ -279,25 +279,25 @@ export const TeacherView: React.FC = () => {
 
         {/* Configured Exercises Summary */}
         <div className="space-y-4">
-          <h3 className="text-sm font-black text-ink uppercase tracking-widest">Exercícios Configurados</h3>
+          <h3 className="text-sm font-black text-white uppercase tracking-widest">Exercícios Configurados</h3>
           <div className="flex flex-wrap gap-2">
             {Array.from(new Set(studentWorkouts.flatMap(w => w.exercises.map(e => e.name)))).map(exName => (
-              <span key={exName} className="px-3 py-1.5 glass-card rounded-full text-[10px] font-bold text-secondary uppercase tracking-tight">
+              <span key={exName} className="px-3 py-1.5 bg-zinc-900 border border-white/5 rounded-full text-[10px] font-bold text-zinc-400 uppercase tracking-tight">
                 {exName}
               </span>
             ))}
             {studentWorkouts.length === 0 && (
-              <p className="text-secondary text-[10px] font-black uppercase tracking-widest">Nenhum exercício configurado.</p>
+              <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest">Nenhum exercício configurado.</p>
             )}
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-black text-ink uppercase tracking-widest">Planilhas de Treino</h3>
+            <h3 className="text-sm font-black text-white uppercase tracking-widest">Planilhas de Treino</h3>
             <button 
               onClick={() => setIsAddingWorkout(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-accent rounded-xl text-[10px] font-black text-white uppercase tracking-widest hover:brightness-110 shadow-lg transition-all"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 rounded-xl text-[10px] font-black text-white uppercase tracking-widest hover:bg-blue-500 transition-all"
             >
               <Plus size={14} /> Novo Treino
             </button>
@@ -305,27 +305,27 @@ export const TeacherView: React.FC = () => {
 
           <div className="grid grid-cols-1 gap-4">
             {studentWorkouts.map((workout, idx) => (
-              <div key={workout.id} className="glass-card rounded-3xl overflow-hidden group">
+              <div key={workout.id} className="glass-card rounded-3xl border border-white/5 overflow-hidden group">
                 <div className="p-5 flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className={`w-12 h-12 rounded-xl bg-${workout.color}-500/10 flex items-center justify-center border border-${workout.color}-500/20`}>
                       <Dumbbell size={24} className={`text-${workout.color}-500`} />
                     </div>
                     <div>
-                      <h4 className="font-black text-ink uppercase tracking-tight italic">Treino {String.fromCharCode(65 + idx)}: {workout.title}</h4>
-                      <p className="text-[10px] font-bold text-secondary uppercase tracking-widest">{workout.exercises.length} exercícios</p>
+                      <h4 className="font-black text-white uppercase tracking-tight italic">Treino {String.fromCharCode(65 + idx)}: {workout.title}</h4>
+                      <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{workout.exercises.length} exercícios</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => setEditingWorkout(workout)}
-                      className="p-3 rounded-xl glass-card text-secondary hover:text-accent transition-colors"
+                      className="p-3 rounded-xl bg-zinc-900 text-zinc-400 hover:text-blue-500 transition-colors"
                     >
                       <Edit2 size={18} />
                     </button>
                     <button 
                       onClick={() => handleDeleteWorkout(workout.id)}
-                      className="p-3 rounded-xl glass-card text-secondary hover:text-rose-500 transition-colors"
+                      className="p-3 rounded-xl bg-zinc-900 text-zinc-400 hover:text-rose-500 transition-colors"
                     >
                       <Trash2 size={18} />
                     </button>
@@ -335,8 +335,8 @@ export const TeacherView: React.FC = () => {
             ))}
 
             {studentWorkouts.length === 0 && (
-              <div className="p-12 text-center border-2 border-dashed border-line rounded-3xl">
-                <p className="text-secondary text-[10px] font-black uppercase tracking-widest">Nenhum treino atribuído.</p>
+              <div className="p-12 text-center border-2 border-dashed border-white/5 rounded-3xl">
+                <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest">Nenhum treino atribuído.</p>
               </div>
             )}
           </div>
@@ -345,14 +345,14 @@ export const TeacherView: React.FC = () => {
         {/* Workout Editor Modal */}
         {(isAddingWorkout || editingWorkout) && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <div className="bg-bg w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-[2.5rem] border border-line flex flex-col shadow-2xl transition-colors duration-400">
-              <div className="p-6 border-b border-line flex items-center justify-between">
-                <h3 className="text-xl font-black text-ink uppercase tracking-tighter italic">
+            <div className="bg-zinc-950 w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-[2.5rem] border border-white/10 flex flex-col shadow-2xl">
+              <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">
                   {editingWorkout ? 'Editar Treino' : 'Novo Treino'}
                 </h3>
                 <button 
                   onClick={() => { setIsAddingWorkout(false); setEditingWorkout(null); }}
-                  className="p-2 text-secondary hover:text-ink"
+                  className="p-2 text-zinc-500 hover:text-white"
                 >
                   <X size={24} />
                 </button>
@@ -361,24 +361,24 @@ export const TeacherView: React.FC = () => {
               <div className="flex-1 overflow-y-auto p-6 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-secondary uppercase tracking-widest ml-1">Título</label>
+                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Título</label>
                     <input 
                       type="text"
                       value={editingWorkout ? editingWorkout.title : newWorkoutData.title}
                       onChange={(e) => editingWorkout ? setEditingWorkout({...editingWorkout, title: e.target.value}) : setNewWorkoutData({...newWorkoutData, title: e.target.value})}
-                      className="w-full glass-card rounded-2xl p-4 text-ink font-bold outline-none focus:border-accent"
+                      className="w-full bg-zinc-900 border border-white/5 rounded-2xl p-4 text-white font-bold outline-none focus:border-blue-500/50"
                       placeholder="Ex: Peito e Tríceps"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-secondary uppercase tracking-widest ml-1">Cor</label>
+                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Cor</label>
                     <div className="flex gap-2">
                       {['blue', 'emerald', 'purple', 'orange', 'rose'].map(color => (
                         <button
                           key={color}
                           onClick={() => editingWorkout ? setEditingWorkout({...editingWorkout, color}) : setNewWorkoutData({...newWorkoutData, color})}
                           className={`w-10 h-10 rounded-xl bg-${color}-500 transition-all ${
-                            (editingWorkout ? editingWorkout.color : newWorkoutData.color) === color ? 'ring-4 ring-ink/20 scale-110' : 'opacity-40 hover:opacity-100'
+                            (editingWorkout ? editingWorkout.color : newWorkoutData.color) === color ? 'ring-4 ring-white/20 scale-110' : 'opacity-40 hover:opacity-100'
                           }`}
                         />
                       ))}
@@ -388,10 +388,10 @@ export const TeacherView: React.FC = () => {
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-[10px] font-black text-secondary uppercase tracking-widest">Exercícios</h4>
+                    <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Exercícios</h4>
                     <button 
                       onClick={() => setIsExercisePickerOpen(true)}
-                      className="text-[10px] font-black text-accent uppercase tracking-widest flex items-center gap-1"
+                      className="text-[10px] font-black text-blue-500 uppercase tracking-widest flex items-center gap-1"
                     >
                       <Plus size={14} /> Adicionar
                     </button>
@@ -399,30 +399,30 @@ export const TeacherView: React.FC = () => {
 
                   <div className="space-y-3">
                     {(editingWorkout ? editingWorkout.exercises : newWorkoutData.exercises || []).map((ex, idx) => (
-                      <div key={ex.id} className="glass-card p-4 rounded-2xl border border-line flex items-center justify-between gap-4">
+                      <div key={ex.id} className="bg-zinc-900/50 p-4 rounded-2xl border border-white/5 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4 flex-1">
-                        <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-line text-secondary">
-                          <Dumbbell size={24}/>
+                        <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center border border-white/5">
+                          <Dumbbell size={24} className="text-zinc-600" />
                         </div>
                           <div className="flex-1">
-                            <p className="text-xs font-black text-ink uppercase tracking-tight">{ex.name}</p>
+                            <p className="text-xs font-black text-white uppercase tracking-tight">{ex.name}</p>
                             <div className="flex gap-3 mt-1">
                               <div className="flex items-center gap-1">
-                                <span className="text-[8px] font-black text-secondary uppercase">Séries:</span>
+                                <span className="text-[8px] font-black text-zinc-500 uppercase">Séries:</span>
                                 <input 
                                   type="number"
                                   value={ex.sets}
                                   onChange={(e) => {
-                                    const val = parseInt(e.target.value) || 0;
+                                    const val = parseInt(e.target.value);
                                     const updateEx = (exercises: Exercise[]) => exercises.map(item => item.id === ex.id ? {...item, sets: val} : item);
                                     if (editingWorkout) setEditingWorkout({...editingWorkout, exercises: updateEx(editingWorkout.exercises)});
                                     else setNewWorkoutData({...newWorkoutData, exercises: updateEx(newWorkoutData.exercises || [])});
                                   }}
-                                  className="w-8 bg-transparent text-[10px] font-black text-accent outline-none"
+                                  className="w-8 bg-transparent text-[10px] font-black text-blue-500 outline-none"
                                 />
                               </div>
                               <div className="flex items-center gap-1">
-                                <span className="text-[8px] font-black text-secondary uppercase">Reps:</span>
+                                <span className="text-[8px] font-black text-zinc-500 uppercase">Reps:</span>
                                 <input 
                                   type="text"
                                   value={ex.reps}
@@ -432,7 +432,7 @@ export const TeacherView: React.FC = () => {
                                     if (editingWorkout) setEditingWorkout({...editingWorkout, exercises: updateEx(editingWorkout.exercises)});
                                     else setNewWorkoutData({...newWorkoutData, exercises: updateEx(newWorkoutData.exercises || [])});
                                   }}
-                                  className="w-12 bg-transparent text-[10px] font-black text-accent outline-none"
+                                  className="w-12 bg-transparent text-[10px] font-black text-blue-500 outline-none"
                                 />
                               </div>
                             </div>
@@ -440,7 +440,7 @@ export const TeacherView: React.FC = () => {
                         </div>
                         <button 
                           onClick={() => removeExerciseFromWorkout(ex.id)}
-                          className="p-2 text-secondary hover:text-rose-500 transition-colors"
+                          className="p-2 text-zinc-600 hover:text-rose-500 transition-colors"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -450,10 +450,10 @@ export const TeacherView: React.FC = () => {
                 </div>
               </div>
 
-              <div className="p-6 border-t border-line bg-white/5">
+              <div className="p-6 border-t border-white/5 bg-zinc-900/20">
                 <button 
                   onClick={editingWorkout ? handleUpdateWorkout : handleAddWorkout}
-                  className="w-full py-4 bg-accent rounded-2xl text-white font-black uppercase tracking-[0.3em] shadow-xl flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-blue-600 rounded-2xl text-white font-black uppercase tracking-[0.3em] shadow-xl shadow-blue-600/20 flex items-center justify-center gap-2"
                 >
                   <Save size={18} /> {editingWorkout ? 'Salvar Alterações' : 'Criar Treino'}
                 </button>
@@ -465,19 +465,19 @@ export const TeacherView: React.FC = () => {
         {/* Exercise Picker Modal */}
         {isExercisePickerOpen && (
           <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-            <div className="bg-bg w-full max-w-lg max-h-[80vh] overflow-hidden rounded-[2.5rem] border border-line flex flex-col shadow-2xl transition-colors duration-400">
-              <div className="p-6 border-b border-line">
+            <div className="bg-zinc-950 w-full max-w-lg max-h-[80vh] overflow-hidden rounded-[2.5rem] border border-white/10 flex flex-col">
+              <div className="p-6 border-b border-white/5">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-black text-ink uppercase tracking-tighter italic">Escolher Exercício</h3>
-                  <button onClick={() => setIsExercisePickerOpen(false)} className="text-secondary hover:text-ink"><X size={24} /></button>
+                  <h3 className="text-lg font-black text-white uppercase tracking-tighter italic">Escolher Exercício</h3>
+                  <button onClick={() => setIsExercisePickerOpen(false)} className="text-zinc-500 hover:text-white"><X size={24} /></button>
                 </div>
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary" size={18} />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600" size={18} />
                   <input 
                     type="text"
                     value={exerciseSearch}
                     onChange={(e) => setExerciseSearch(e.target.value)}
-                    className="w-full glass-card rounded-xl p-3 pl-12 text-sm text-ink outline-none focus:border-accent"
+                    className="w-full bg-zinc-900 border border-white/5 rounded-xl p-3 pl-12 text-sm text-white outline-none focus:border-blue-500/50"
                     placeholder="Buscar exercício..."
                   />
                 </div>
@@ -489,14 +489,14 @@ export const TeacherView: React.FC = () => {
                     onClick={() => addExerciseToWorkout(ex)}
                     className="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-white/5 transition-colors text-left group"
                   >
-                    <div className="w-12 h-12 rounded-xl glass-card flex items-center justify-center">
-                      <Dumbbell size={24} className="text-secondary/50 group-hover:text-accent transition-colors" />
+                    <div className="w-12 h-12 rounded-xl bg-zinc-900 flex items-center justify-center border border-white/5">
+                      <Dumbbell size={24} className="text-zinc-700" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-xs font-black text-ink uppercase tracking-tight group-hover:text-accent transition-colors">{ex.name}</p>
-                      <p className="text-[9px] font-bold text-secondary uppercase tracking-widest">{ex.muscleGroup}</p>
+                      <p className="text-xs font-black text-white uppercase tracking-tight group-hover:text-blue-400 transition-colors">{ex.name}</p>
+                      <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{ex.muscleGroup}</p>
                     </div>
-                    <PlusCircle size={20} className="text-secondary/30 group-hover:text-accent transition-colors" />
+                    <PlusCircle size={20} className="text-zinc-700 group-hover:text-blue-500 transition-colors" />
                   </button>
                 ))}
               </div>
@@ -511,21 +511,21 @@ export const TeacherView: React.FC = () => {
     <div className="space-y-8 animate-slide-up pb-20">
       <header className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-black text-ink uppercase tracking-tighter italic leading-none">
-            ÁREA DO <span className="text-accent">PROFESSOR</span>
+          <h2 className="text-3xl font-black text-white uppercase tracking-tighter italic leading-none">
+            ÁREA DO <span className="text-blue-500">PROFESSOR</span>
           </h2>
-          <p className="text-secondary text-[10px] font-black uppercase tracking-[0.3em] mt-2">Gestão de alunos e treinos</p>
+          <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Gestão de alunos e treinos</p>
         </div>
-        <div className="flex glass-card p-1 rounded-2xl border border-line">
+        <div className="flex bg-zinc-900/40 p-1 rounded-2xl border border-white/5">
           <button 
             onClick={() => setActiveSubTab('students')}
-            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeSubTab === 'students' ? 'bg-accent text-white shadow-lg' : 'text-secondary hover:text-ink'}`}
+            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeSubTab === 'students' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-zinc-500 hover:text-zinc-300'}`}
           >
             Alunos
           </button>
           <button 
             onClick={() => setActiveSubTab('database')}
-            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeSubTab === 'database' ? 'bg-accent text-white shadow-lg' : 'text-secondary hover:text-ink'}`}
+            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeSubTab === 'database' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-zinc-500 hover:text-zinc-300'}`}
           >
             Base
           </button>
@@ -536,18 +536,18 @@ export const TeacherView: React.FC = () => {
         <div className="space-y-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary" size={20} />
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600" size={20} />
               <input 
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full glass-card rounded-2xl p-5 pl-14 text-ink font-bold outline-none focus:border-accent backdrop-blur-sm"
+                className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl p-5 pl-14 text-white font-bold outline-none focus:border-blue-500/50 backdrop-blur-sm"
                 placeholder="BUSCAR ALUNO..."
               />
             </div>
             <button 
               onClick={() => setIsAddingStudent(true)}
-              className="bg-accent hover:brightness-110 text-white px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl flex items-center justify-center gap-3 transition-all"
+              className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-600/20 flex items-center justify-center gap-3 transition-all"
             >
               <Plus size={20} /> NOVO ALUNO
             </button>
@@ -557,19 +557,19 @@ export const TeacherView: React.FC = () => {
             {filteredStudents.map((student) => (
               <div 
                 key={student.username}
-                className="glass-card rounded-[2.5rem] hover:border-accent/30 transition-all group overflow-hidden"
+                className="glass-card rounded-[2.5rem] border border-white/5 hover:border-blue-500/30 transition-all group overflow-hidden"
               >
                 <div className="p-6 flex items-center justify-between">
                   <div className="flex items-center gap-5">
-                    <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center border border-line group-hover:scale-110 transition-transform duration-500">
-                      <UserIcon size={32} className="text-secondary group-hover:text-accent transition-colors" />
+                    <div className="w-16 h-16 rounded-2xl bg-zinc-900 flex items-center justify-center border border-white/5 group-hover:scale-110 transition-transform duration-500">
+                      <UserIcon size={32} className="text-zinc-700 group-hover:text-blue-500 transition-colors" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-black text-ink uppercase tracking-tight italic">{student.name}</h3>
+                      <h3 className="text-xl font-black text-white uppercase tracking-tight italic">{student.name}</h3>
                       <div className="flex items-center gap-3 mt-1">
-                        <span className="text-[9px] font-black text-secondary uppercase tracking-widest">@{student.username}</span>
-                        <div className="w-1 h-1 bg-line rounded-full"></div>
-                        <span className="text-[9px] font-black text-accent uppercase tracking-widest">{allWorkouts[student.username.toLowerCase()]?.length || 0} TREINOS</span>
+                        <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">@{student.username}</span>
+                        <div className="w-1 h-1 bg-zinc-800 rounded-full"></div>
+                        <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">{allWorkouts[student.username.toLowerCase()]?.length || 0} TREINOS</span>
                       </div>
                     </div>
                   </div>
@@ -577,13 +577,13 @@ export const TeacherView: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <button 
                       onClick={() => setSelectedStudent(student.username)}
-                      className="glass-card hover:bg-accent text-secondary hover:text-white w-12 h-12 rounded-2xl flex items-center justify-center transition-all"
+                      className="bg-zinc-900/50 hover:bg-blue-600 text-zinc-600 hover:text-white w-12 h-12 rounded-2xl flex items-center justify-center transition-all border border-white/5"
                     >
                       <ChevronRight size={24} />
                     </button>
                     <button 
                       onClick={() => handleDeleteStudent(student.username)}
-                      className="glass-card hover:bg-rose-500/10 text-secondary hover:text-rose-500 w-12 h-12 rounded-2xl flex items-center justify-center transition-all"
+                      className="bg-zinc-900/50 hover:bg-rose-500/20 text-zinc-600 hover:text-rose-500 w-12 h-12 rounded-2xl flex items-center justify-center transition-all border border-white/5"
                     >
                       <Trash2 size={20} />
                     </button>
@@ -593,9 +593,9 @@ export const TeacherView: React.FC = () => {
             ))}
 
             {filteredStudents.length === 0 && (
-              <div className="p-20 text-center border-2 border-dashed border-line rounded-[3rem]">
-                <Users size={48} className="text-secondary/50 mx-auto mb-4" />
-                <p className="text-secondary text-xs font-black uppercase tracking-[0.2em]">Nenhum aluno encontrado.</p>
+              <div className="p-20 text-center border-2 border-dashed border-white/5 rounded-[3rem]">
+                <Users size={48} className="text-zinc-800 mx-auto mb-4" />
+                <p className="text-zinc-600 text-xs font-black uppercase tracking-[0.2em]">Nenhum aluno encontrado.</p>
               </div>
             )}
           </div>
@@ -603,12 +603,12 @@ export const TeacherView: React.FC = () => {
       ) : (
         <div className="space-y-6">
           <div className="relative">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary" size={20} />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600" size={20} />
             <input 
               type="text"
               value={exerciseSearch}
               onChange={(e) => setExerciseSearch(e.target.value)}
-              className="w-full glass-card rounded-2xl p-5 pl-14 text-ink font-bold outline-none focus:border-accent backdrop-blur-sm"
+              className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl p-5 pl-14 text-white font-bold outline-none focus:border-blue-500/50 backdrop-blur-sm"
               placeholder="BUSCAR NA BASE DE EXERCÍCIOS..."
             />
           </div>
@@ -616,25 +616,25 @@ export const TeacherView: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredExercises.map((ex, i) => {
               return (
-                <div key={i} className="glass-card p-4 rounded-3xl flex items-center gap-4">
-                  <div className="w-20 h-20 rounded-2xl bg-white/5 border border-line flex items-center justify-center">
-                    <Dumbbell size={40} className="text-secondary/30" />
+                <div key={i} className="glass-card p-4 rounded-3xl border border-white/5 flex items-center gap-4 bg-zinc-900/20">
+                  <div className="w-20 h-20 rounded-2xl bg-zinc-950 border border-white/5 flex items-center justify-center">
+                    <Dumbbell size={40} className="text-zinc-800" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-black text-ink uppercase tracking-tight italic">{ex.name}</h4>
-                    <p className="text-[10px] font-black text-accent uppercase tracking-widest mt-1">{ex.muscleGroup}</p>
+                    <h4 className="font-black text-white uppercase tracking-tight italic">{ex.name}</h4>
+                    <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mt-1">{ex.muscleGroup}</p>
                     <div className="flex gap-3 mt-2">
                       <div className="flex flex-col">
-                        <span className="text-[7px] font-black text-secondary uppercase">Séries</span>
-                        <span className="text-[10px] font-bold text-secondary">{ex.defaultSets}</span>
+                        <span className="text-[7px] font-black text-zinc-600 uppercase">Séries</span>
+                        <span className="text-[10px] font-bold text-zinc-400">{ex.defaultSets}</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[7px] font-black text-secondary uppercase">Reps</span>
-                        <span className="text-[10px] font-bold text-secondary">{ex.defaultReps}</span>
+                        <span className="text-[7px] font-black text-zinc-600 uppercase">Reps</span>
+                        <span className="text-[10px] font-bold text-zinc-400">{ex.defaultReps}</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[7px] font-black text-secondary uppercase">Descanso</span>
-                        <span className="text-[10px] font-bold text-secondary">{ex.defaultRest}s</span>
+                        <span className="text-[7px] font-black text-zinc-600 uppercase">Descanso</span>
+                        <span className="text-[10px] font-bold text-zinc-400">{ex.defaultRest}s</span>
                       </div>
                     </div>
                   </div>
@@ -651,16 +651,16 @@ export const TeacherView: React.FC = () => {
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-bg w-full max-w-md rounded-[2.5rem] border border-line p-8 space-y-8 shadow-2xl transition-colors duration-400"
+            className="bg-zinc-950 w-full max-w-md rounded-[2.5rem] border border-white/10 p-8 space-y-8 shadow-2xl"
           >
             <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-black text-ink uppercase tracking-tighter italic">Novo Aluno</h3>
-              <button onClick={() => setIsAddingStudent(false)} className="text-secondary hover:text-ink"><X size={24} /></button>
+              <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">Novo Aluno</h3>
+              <button onClick={() => setIsAddingStudent(false)} className="text-zinc-500 hover:text-white"><X size={24} /></button>
             </div>
 
             <form onSubmit={handleAddStudent} className="space-y-5">
               <div className="space-y-2">
-                <label htmlFor="student-name" className="text-[10px] font-black text-secondary uppercase tracking-widest ml-1">Nome Completo</label>
+                <label htmlFor="student-name" className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Nome Completo</label>
                 <input 
                   id="student-name"
                   name="name"
@@ -669,12 +669,12 @@ export const TeacherView: React.FC = () => {
                   required
                   value={newStudentData.name}
                   onChange={(e) => setNewStudentData({...newStudentData, name: e.target.value})}
-                  className="w-full glass-card rounded-2xl p-4 text-ink font-bold outline-none focus:border-accent"
+                  className="w-full bg-zinc-900 border border-white/5 rounded-2xl p-4 text-white font-bold outline-none focus:border-blue-500/50"
                   placeholder="Ex: João Silva"
                 />
               </div>
               <div className="space-y-2">
-                <label htmlFor="student-username" className="text-[10px] font-black text-secondary uppercase tracking-widest ml-1">Usuário (Login)</label>
+                <label htmlFor="student-username" className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Usuário (Login)</label>
                 <input 
                   id="student-username"
                   name="username"
@@ -683,12 +683,12 @@ export const TeacherView: React.FC = () => {
                   required
                   value={newStudentData.username}
                   onChange={(e) => setNewStudentData({...newStudentData, username: e.target.value})}
-                  className="w-full glass-card rounded-2xl p-4 text-ink font-bold outline-none focus:border-accent"
+                  className="w-full bg-zinc-900 border border-white/5 rounded-2xl p-4 text-white font-bold outline-none focus:border-blue-500/50"
                   placeholder="Ex: joaosilva"
                 />
               </div>
               <div className="space-y-2">
-                <label htmlFor="student-password" className="text-[10px] font-black text-secondary uppercase tracking-widest ml-1">Senha</label>
+                <label htmlFor="student-password" className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Senha</label>
                 <input 
                   id="student-password"
                   name="password"
@@ -697,24 +697,24 @@ export const TeacherView: React.FC = () => {
                   required
                   value={newStudentData.password}
                   onChange={(e) => setNewStudentData({...newStudentData, password: e.target.value})}
-                  className="w-full glass-card rounded-2xl p-4 text-ink font-bold outline-none focus:border-accent"
+                  className="w-full bg-zinc-900 border border-white/5 rounded-2xl p-4 text-white font-bold outline-none focus:border-blue-500/50"
                   placeholder="••••••••"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-secondary uppercase tracking-widest ml-1">Idade (Opcional)</label>
+                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Idade (Opcional)</label>
                 <input 
                   type="number"
                   value={newStudentData.age}
                   onChange={(e) => setNewStudentData({...newStudentData, age: e.target.value})}
-                  className="w-full glass-card rounded-2xl p-4 text-ink font-bold outline-none focus:border-accent"
+                  className="w-full bg-zinc-900 border border-white/5 rounded-2xl p-4 text-white font-bold outline-none focus:border-blue-500/50"
                   placeholder="Ex: 25"
                 />
               </div>
 
               <button 
                 type="submit"
-                className="w-full py-5 bg-accent hover:brightness-110 text-white font-black uppercase tracking-[0.4em] rounded-2xl shadow-xl transition-all mt-4"
+                className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-[0.4em] rounded-2xl shadow-xl shadow-blue-600/20 transition-all mt-4"
               >
                 CADASTRAR ALUNO
               </button>

@@ -22,7 +22,6 @@ interface AppState {
   isChatLoading: boolean;
   selectedStudent: string | null;
   allWorkouts: Record<string, WorkoutRoutine[]>;
-  theme: 'light' | 'dark';
 
   // Actions
   setUser: (user: User | null) => void;
@@ -40,7 +39,6 @@ interface AppState {
   setWorkoutDuration: (duration: number | null) => void;
   setChatMessages: (messages: { role: 'user' | 'model', text: string }[]) => void;
   setIsChatLoading: (isLoading: boolean) => void;
-  toggleTheme: () => void;
   updateUserProfile: (newData: Partial<User>) => void;
   checkAchievements: () => void;
   handleManualCheckIn: () => void;
@@ -50,18 +48,7 @@ interface AppState {
   logout: () => void;
 }
 
-export const useStore = create<AppState>((set, get) => {
-  // Theme initialization
-  const savedTheme = localStorage.getItem('tatugym_theme') as 'light' | 'dark' | null;
-  const initialTheme = savedTheme || 'dark';
-  
-  // Apply theme class on load
-  if (typeof document !== 'undefined') {
-    if (initialTheme === 'light') document.body.classList.add('light');
-    else document.body.classList.remove('light');
-  }
-
-  return {
+export const useStore = create<AppState>((set, get) => ({
   user: null,
   isLoggedIn: false,
   activeTab: AppTab.DASHBOARD,
@@ -76,7 +63,6 @@ export const useStore = create<AppState>((set, get) => {
   chatMessages: [],
   isChatLoading: false,
   selectedStudent: null,
-  theme: initialTheme,
   allWorkouts: (() => {
     const saved = localStorage.getItem('tatugym_all_workouts');
     if (saved) {
@@ -114,17 +100,6 @@ export const useStore = create<AppState>((set, get) => {
   setChatMessages: (chatMessages) => set({ chatMessages }),
   setIsChatLoading: (isChatLoading) => set({ isChatLoading }),
   setAddToast: (fn) => set({ addToast: fn }),
-
-  toggleTheme: () => {
-    const newTheme = get().theme === 'dark' ? 'light' : 'dark';
-    if (newTheme === 'light') {
-      document.body.classList.add('light');
-    } else {
-      document.body.classList.remove('light');
-    }
-    localStorage.setItem('tatugym_theme', newTheme);
-    set({ theme: newTheme });
-  },
 
   logout: async () => {
     const { user } = get();
@@ -227,5 +202,4 @@ export const useStore = create<AppState>((set, get) => {
       localStorage.setItem(`tatugym_user_profile_${user.username.toLowerCase()}`, JSON.stringify({ ...user, badges: newBadges }));
     }
   }
-};
-});
+}));

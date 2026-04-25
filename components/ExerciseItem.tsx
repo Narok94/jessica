@@ -168,71 +168,80 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   };
 
   return (
-    <div className={`glass-card rounded-2xl transition-all duration-500 overflow-hidden relative ${
+    <div className={`glass-card rounded-[2rem] border transition-all duration-500 overflow-hidden relative ${
       isOpen 
-      ? 'shadow-2xl' 
-      : 'border-line/50'
-    } ${allSetsDone && !isOpen ? 'opacity-40 translate-x-2' : 'opacity-100'}`}>
+      ? 'bg-slate-50 border-indigo-200 shadow-xl shadow-indigo-950/5' 
+      : 'border-slate-100 shadow-sm'
+    } ${allSetsDone && !isOpen ? 'opacity-50 grayscale-[0.5]' : 'opacity-100'}`}>
       
       <div 
         onClick={() => setIsOpen(!isOpen)}
-        className="p-4 flex items-center justify-between cursor-pointer group"
+        className="p-5 flex items-center justify-between cursor-pointer group"
       >
-        <div className="flex items-center gap-4 flex-1 min-w-0">
+        <div className="flex items-center gap-5 flex-1 min-w-0">
           <div className="flex-1 min-w-0">
-            <h3 className={`text-lg font-black italic tracking-tighter leading-none truncate transition-colors duration-300 ${allSetsDone ? 'text-accent' : 'text-ink'}`}>
+            <h3 className={`text-xl font-black italic tracking-tighter leading-none truncate transition-colors duration-500 ${allSetsDone ? 'text-emerald-500' : 'text-slate-900 group-hover:text-indigo-600'}`}>
               {exercise.name.toUpperCase()}
             </h3>
-            <div className="flex items-center gap-2 mt-2">
-               <span className="text-[9px] font-black text-secondary uppercase tracking-widest">{exercise.sets} SETS</span>
-               <div className="w-1 h-1 rounded-full bg-line"></div>
-               <span className="text-[9px] font-black text-secondary uppercase tracking-widest">{exercise.reps} REPS</span>
-               {allSetsDone && (
-                 <span className="text-[8px] font-black text-accent uppercase tracking-widest ml-auto flex items-center gap-1"><Check size={8} strokeWidth={4}/> CONCLUÍDO</span>
-               )}
+            <div className="flex items-center gap-3 mt-2.5">
+               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{exercise.sets} SÉRIES</span>
+               <div className="w-1.5 h-1.5 rounded-full bg-slate-200"></div>
+               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{exercise.reps} REPS</span>
             </div>
           </div>
         </div>
         
-        <div className="flex items-center gap-3">
-           <div className={`w-7 h-7 rounded-full border border-line flex items-center justify-center transition-all ${isOpen ? 'rotate-180 bg-accent text-white border-accent' : 'text-secondary'}`}>
-             <ChevronDown size={14} strokeWidth={3} />
+        <div className="flex items-center gap-4">
+           <AnimatePresence>
+             {allSetsDone && !isOpen && (
+               <motion.div 
+                 initial={{ scale: 0, rotate: -20 }}
+                 animate={{ scale: 1, rotate: 0 }}
+                 exit={{ scale: 0 }}
+                 className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-100"
+               >
+                  <Check size={20} strokeWidth={4} />
+               </motion.div>
+             )}
+           </AnimatePresence>
+           <div className={`w-10 h-10 rounded-2xl border border-slate-100 flex items-center justify-center transition-all duration-500 ${isOpen ? 'rotate-180 bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-300 group-hover:text-slate-600 group-hover:border-slate-300 shadow-sm bg-white'}`}>
+             <ChevronDown size={20} strokeWidth={3} />
            </div>
         </div>
       </div>
-      <div className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[1000px] opacity-100 border-t border-line' : 'max-h-0 opacity-0 pointer-events-none overflow-hidden'}`}>
-        <div className="px-4 pb-6 pt-5 space-y-6">
-          <div className="flex items-center justify-between bg-white/[0.01] p-3 rounded-xl border border-line">
-             <div className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${restTimeLeft !== null ? 'bg-highlight text-white' : 'bg-white/5 text-secondary'}`}>
-                   <Timer size={18} strokeWidth={2.5} />
+      <div className={`transition-all duration-700 ease-in-out ${isOpen ? 'max-h-[1000px] opacity-100 border-t border-slate-100' : 'max-h-0 opacity-0 pointer-events-none overflow-hidden'}`}>
+        <div className="px-5 pb-8 pt-6 space-y-8">
+          <div className="flex items-center justify-between bg-slate-50 p-4 rounded-[1.5rem] border border-slate-100 shadow-inner">
+             <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 ${restTimeLeft !== null ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'bg-white text-slate-300 border border-slate-100 shadow-sm'}`}>
+                   <Timer size={24} strokeWidth={2.5} />
                 </div>
                 <div>
-                   <p className="text-[8px] font-black text-secondary uppercase tracking-widest leading-none mb-1">Descanso</p>
-                   <p className="text-lg font-black text-ink font-mono leading-none">{restTimeLeft !== null ? `${restTimeLeft}s` : `${exercise.rest}s`}</p>
+                   <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Descanso</p>
+                   <p className={`text-2xl font-black font-mono leading-none tracking-tighter ${restTimeLeft !== null ? 'text-indigo-600' : 'text-slate-900'}`}>{restTimeLeft !== null ? `${restTimeLeft}s` : `${exercise.rest}s`}</p>
                 </div>
              </div>
-             <button onClick={restTimeLeft !== null ? cancelRestTimer : () => startRestTimer()} className={`px-4 py-1.5 rounded-lg font-black text-[9px] uppercase tracking-widest transition-all ${restTimeLeft !== null ? 'bg-white/5 text-secondary' : 'bg-highlight text-white shadow-lg shadow-highlight/20'}`}>
-                {restTimeLeft !== null ? 'PARAR' : 'INICIAR'}
+             <button onClick={restTimeLeft !== null ? cancelRestTimer : () => startRestTimer()} className={`px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-md active:scale-95 ${restTimeLeft !== null ? 'bg-white text-slate-400 border border-slate-200' : 'bg-indigo-600 text-white shadow-indigo-100'}`}>
+                {restTimeLeft !== null ? 'PARAR' : 'DESCANSO'}
              </button>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             {lastPerformance && lastPerformance.length > 0 && (
-              <div className="flex items-center justify-between px-3 py-1.5 mb-3 bg-accent/5 rounded-lg border border-accent/10">
-                <span className="text-[8px] font-black text-accent uppercase tracking-widest">Carga Anterior</span>
-                <span className="text-[9px] font-mono font-bold text-accent italic">
+              <div className="flex items-center justify-between px-3 py-2 mb-4 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
+                <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Carga Anterior</span>
+                <span className="text-[10px] font-black text-indigo-600 tracking-tighter">
                   {lastPerformance.map(p => `${p.weight}kg x ${p.reps}`).join(' | ')}
                 </span>
               </div>
             )}
             {performance.map((set, idx) => (
-              <div key={idx} className={`grid grid-cols-12 items-center gap-2 p-1.5 rounded-xl border transition-all duration-300 ${set.completed ? 'bg-accent/5 border-accent/30' : 'bg-transparent border-line'}`}>
-                <div className="col-span-1 flex items-center justify-center font-mono text-[9px] font-black text-secondary">
+              <div key={idx} className={`grid grid-cols-12 items-center gap-3 p-2 rounded-[1.5rem] border transition-all duration-500 ${set.completed ? 'bg-emerald-50 border-emerald-100' : 'bg-white border-slate-100 shadow-sm'}`}>
+                <div className="col-span-1 flex items-center justify-center font-black text-[11px] text-slate-300">
                   {idx + 1}
                 </div>
                 
-                <div className="col-span-4 h-10 relative">
+                <div className="col-span-4 h-12 relative group/input">
                    <input 
                       type="number" 
                       inputMode="decimal"
@@ -240,13 +249,13 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                       disabled={set.completed} 
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => updateSet(idx, { weight: parseFloat(e.target.value) || 0 })} 
-                      className="w-full h-full bg-white/5 border border-line rounded-lg text-center text-sm font-bold text-ink outline-none focus:border-accent transition-all font-mono"
+                      className="w-full h-full bg-slate-50 border border-slate-100 rounded-xl text-center text-base font-black text-slate-900 outline-none focus:border-indigo-400 focus:bg-white focus:shadow-lg focus:shadow-indigo-950/5 transition-all font-mono"
                       placeholder="0"
                     />
-                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[8px] font-black text-secondary pointer-events-none">KG</span>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-300 pointer-events-none group-focus-within/input:text-indigo-400">KG</span>
                 </div>
 
-                <div className="col-span-4 h-10 relative">
+                <div className="col-span-4 h-12 relative group/input">
                     <input 
                       type="number" 
                       inputMode="decimal" 
@@ -254,40 +263,43 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                       disabled={set.completed} 
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => updateSet(idx, { reps: parseInt(e.target.value) || 0 })} 
-                      className="w-full h-full bg-white/5 border border-line rounded-lg text-center text-sm font-bold text-ink outline-none focus:border-accent transition-all font-mono"
+                      className="w-full h-full bg-slate-50 border border-slate-100 rounded-xl text-center text-base font-black text-slate-900 outline-none focus:border-indigo-400 focus:bg-white focus:shadow-lg focus:shadow-indigo-950/5 transition-all font-mono"
                       placeholder="0"
                     />
-                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[8px] font-black text-secondary pointer-events-none">REPS</span>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-300 pointer-events-none group-focus-within/input:text-indigo-400">REPS</span>
                 </div>
 
-                <div className="col-span-3 flex items-center justify-end pr-2">
+                <div className="col-span-3 flex items-center justify-end pr-1">
                   <motion.button 
                     whileTap={{ scale: 0.9 }}
                     onClick={() => updateSet(idx, { completed: !set.completed })} 
-                    className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
+                    className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-md ${
                       set.completed 
-                      ? 'bg-accent text-white shadow-lg' 
-                      : 'bg-white/5 border border-line text-secondary hover:text-ink'
+                      ? 'bg-emerald-500 text-white shadow-emerald-100' 
+                      : 'bg-white border border-slate-100 text-slate-300 hover:text-indigo-600 hover:border-indigo-200'
                     }`}
                   >
-                    <Check size={18} strokeWidth={4} />
+                    <Check size={24} strokeWidth={4} />
                   </motion.button>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="flex flex-col gap-3 pt-2">
-             <p className="text-[10px] font-black italic text-secondary leading-relaxed uppercase tracking-widest text-center opacity-60">
-                {exercise.notes || 'Mantenha cadência controlada e foco total na contração.'}
-             </p>
+          <div className="flex flex-col gap-4 pt-4">
+             <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+                <p className="text-[11px] font-black italic text-slate-400 leading-relaxed uppercase tracking-widest mb-1 opacity-80">NOTA DO COACH</p>
+                <p className="text-[13px] font-bold text-slate-600 tracking-tight leading-relaxed">
+                   {exercise.notes || 'Mantenha a cadência controlada (2s descida, 1s subida) e foco total na amplitude.'}
+                </p>
+             </div>
              <a 
                href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
                target="_blank"
                rel="noopener noreferrer"
-               className="text-[9px] font-black text-accent hover:brightness-110 transition-all uppercase tracking-[0.2em] text-center"
+               className="text-[10px] font-black text-indigo-600 hover:text-indigo-500 transition-colors uppercase tracking-[0.3em] flex items-center justify-center gap-2 group"
              >
-               Ver tutorial técnico
+               GUIA TÉCNICO <ArrowUpRight size={14} className="group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
              </a>
           </div>
         </div>
@@ -297,13 +309,13 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
       {showVideo && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 animate-fade">
           <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={() => setShowVideo(false)}></div>
-          <div className="relative w-full max-w-4xl bg-bg rounded-[2.5rem] border border-line overflow-hidden shadow-2xl animate-slide-up transition-colors duration-400">
-            <div className="flex items-center justify-between p-6 border-b border-line">
+          <div className="relative w-full max-w-4xl glass-card rounded-[2.5rem] border border-white/10 overflow-hidden shadow-2xl animate-slide-up">
+            <div className="flex items-center justify-between p-6 border-b border-white/5">
                <div>
-                 <h2 className="text-xl font-black text-ink uppercase tracking-tight">{exercise.name}</h2>
-                 <p className="text-[10px] font-black text-accent uppercase tracking-widest">Guia de Execução</p>
+                 <h2 className="text-xl font-black text-white uppercase tracking-tight">{exercise.name}</h2>
+                 <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Guia de Execução</p>
                </div>
-               <button onClick={() => setShowVideo(false)} className="w-10 h-10 glass-card text-secondary rounded-full flex items-center justify-center hover:text-ink transition-colors">
+               <button onClick={() => setShowVideo(false)} className="w-10 h-10 bg-zinc-900 text-zinc-400 rounded-full flex items-center justify-center hover:text-white transition-colors">
                  <X size={20} />
                </button>
             </div>
@@ -317,11 +329,11 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                   allowFullScreen
                 ></iframe>
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-white/5 p-8 text-center">
-                  <Search size={48} className="text-secondary/50" />
+                <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-zinc-900 p-8 text-center">
+                  <Search size={48} className="text-zinc-700" />
                   <div>
-                    <p className="text-ink font-black uppercase tracking-widest mb-2">Vídeo não disponível</p>
-                    <p className="text-secondary text-xs font-medium max-w-xs mx-auto">
+                    <p className="text-white font-black uppercase tracking-widest mb-2">Vídeo não disponível</p>
+                    <p className="text-zinc-500 text-xs font-medium max-w-xs mx-auto">
                       Não encontramos um vídeo direto para este exercício, mas você pode buscar no Google.
                     </p>
                   </div>
@@ -329,15 +341,15 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                     href={`https://www.google.com/search?q=gif+execução+exercicio+${encodeURIComponent(exercise.name)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-8 py-4 bg-accent text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-lg shadow-accent/20"
+                    className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20"
                   >
                     Buscar no Google
                   </a>
                 </div>
               )}
             </div>
-            <div className="p-6 bg-white/5">
-               <p className="text-secondary text-sm font-medium leading-relaxed italic">
+            <div className="p-6 bg-zinc-900/50">
+               <p className="text-zinc-400 text-sm font-medium leading-relaxed italic">
                  {exercise.notes || 'Siga as orientações do vídeo para garantir a melhor técnica e evitar lesões.'}
                </p>
             </div>
