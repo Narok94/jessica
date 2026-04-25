@@ -267,28 +267,31 @@ export const WorkoutView: React.FC = () => {
       // Add Workout Title
       ctx.font = '900 80px Inter';
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(selectedWorkout.title.toUpperCase(), 60, targetHeight - 320);
+      ctx.fillText(selectedWorkout.title.toUpperCase(), 60, targetHeight - 400);
 
-      // Stats Section
-      // Volume
-      ctx.font = 'bold 30px Inter';
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.fillText('VOLUME TOTAL', 600, targetHeight - 320);
-      ctx.font = '900 60px Inter';
-      ctx.fillStyle = '#00FF95';
-      ctx.fillText(`${lastWorkoutVolume} KG`, 600, targetHeight - 260);
+      // Infer Focus from exercises or title
+      const focusText = selectedWorkout.title.toLowerCase().includes('superior') ? 'SUPERIORES' :
+                        selectedWorkout.title.toLowerCase().includes('inferior') || selectedWorkout.title.toLowerCase().includes('perna') ? 'INFERIORES' :
+                        selectedWorkout.title.toLowerCase().includes('cardio') || selectedWorkout.title.toLowerCase().includes('aeró') ? 'AERÓBICO' :
+                        selectedWorkout.title.toLowerCase().includes('abd') ? 'ABDÔMEN' : 'COMPLETO';
+
+      ctx.font = 'black 50px Inter';
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.fillText(focusText, 60, targetHeight - 330);
+
+      // stats section removed volume
 
       // Duration
       ctx.font = 'bold 30px Inter';
       ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.fillText('DURAÇÃO', 600, targetHeight - 180);
-      ctx.font = '900 60px Inter';
+      ctx.fillText('DURAÇÃO TOTAL', 60, targetHeight - 250);
+      ctx.font = '900 80px Inter';
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(workoutDuration ? formatTime(workoutDuration) : '00:00', 600, targetHeight - 120);
+      ctx.fillText(workoutDuration ? formatTime(workoutDuration) : '00:00', 60, targetHeight - 170);
 
       // Blue accent line
       ctx.fillStyle = '#2979FF';
-      ctx.fillRect(60, targetHeight - 360, 100, 8);
+      ctx.fillRect(60, targetHeight - 450, 100, 10);
 
       // Trigger download
       const link = document.createElement('a');
@@ -303,22 +306,22 @@ export const WorkoutView: React.FC = () => {
   if (showSummary) {
     return (
       <div className="max-w-xl mx-auto space-y-8 animate-slide-up py-6 text-center pb-24">
-         <div className="space-y-4">
-            <div className="mx-auto w-24 h-24 bg-emerald-500 rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-emerald-500/30 transform rotate-12 animate-fade">
-              <CheckCircle2 size={48} className="text-zinc-950" strokeWidth={3} />
+          <div className="space-y-4">
+            <div className="mx-auto w-24 h-24 bg-accent rounded-[2.5rem] flex items-center justify-center shadow-2xl transform rotate-12 animate-fade">
+              <CheckCircle2 size={48} className="text-white" strokeWidth={3} />
             </div>
             <div>
-              <h1 className="text-4xl font-black text-white uppercase tracking-tighter italic leading-none">Treino <span className="text-emerald-500">Concluído!</span></h1>
-              <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] mt-3">Sessão finalizada com sucesso.</p>
+              <h1 className="text-4xl font-black text-ink uppercase tracking-tighter italic leading-none">Treino <span className="text-accent">Concluído!</span></h1>
+              <p className="text-secondary text-[10px] font-black uppercase tracking-[0.3em] mt-3">Sessão finalizada com sucesso.</p>
             </div>
-         </div>
+          </div>
 
          {/* Victory Photo Section */}
          <div className="space-y-4">
             <div className="flex items-center justify-between px-2">
-               <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Victory Photo</span>
+               <span className="text-[10px] font-black text-secondary uppercase tracking-widest">Victory Photo</span>
                {capturedImage && (
-                 <button onClick={() => setCapturedImage(null)} className="text-zinc-600 hover:text-red-500 transition-colors">
+                 <button onClick={() => setCapturedImage(null)} className="text-secondary hover:text-red-500 transition-colors">
                     <Trash2 size={16} />
                  </button>
                )}
@@ -327,25 +330,46 @@ export const WorkoutView: React.FC = () => {
             {!capturedImage ? (
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full aspect-[4/5] glass-card rounded-[2.5rem] border-dashed border-white/10 flex flex-col items-center justify-center gap-4 hover:bg-white/[0.05] transition-all group"
+                className="w-full aspect-[4/5] glass-card rounded-[2.5rem] border-dashed border-line flex flex-col items-center justify-center gap-4 group transition-all"
               >
-                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-500/10 transition-all">
-                  <Camera size={32} className="text-zinc-600 group-hover:text-blue-500" />
+                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-accent/10 transition-all">
+                  <Camera size={32} className="text-secondary group-hover:text-accent" />
                 </div>
-                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest group-hover:text-zinc-400">Registrar Evolução</p>
+                <p className="text-[10px] font-black text-secondary uppercase tracking-widest group-hover:text-ink">Registrar Evolução</p>
               </button>
             ) : (
-              <div className="relative group rounded-[2.5rem] overflow-hidden border border-white/[0.08]">
+              <div className="relative group rounded-[2.5rem] overflow-hidden border border-line">
                 <img src={capturedImage} alt="Victory" className="w-full aspect-[4/5] object-cover" />
-                <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/90 to-transparent">
-                  <div className="flex items-end justify-between gap-4">
-                    <div className="text-left">
-                      <p className="text-blue-500 font-black italic text-lg leading-none uppercase">TATU GYM</p>
-                      <p className="text-white font-black text-2xl tracking-tighter uppercase mt-1 italic">{selectedWorkout.title}</p>
+                <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/95 via-black/80 to-transparent text-white">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                      <div className="text-left">
+                        <p className="text-accent font-black italic text-xs leading-none uppercase tracking-widest mb-1">TATU GYM PRO</p>
+                        <p className="text-white font-black text-xl tracking-tighter uppercase italic leading-none">{selectedWorkout.title}</p>
+                        <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.2em] mt-2">
+                          {selectedWorkout.title.toLowerCase().includes('superior') ? 'SUPERIORES' :
+                           selectedWorkout.title.toLowerCase().includes('inferior') || selectedWorkout.title.toLowerCase().includes('perna') ? 'INFERIORES' :
+                           selectedWorkout.title.toLowerCase().includes('cardio') || selectedWorkout.title.toLowerCase().includes('aeró') ? 'AERÓBICO' :
+                           selectedWorkout.title.toLowerCase().includes('abd') ? 'ABDÔMEN' : 'COMPLETO'}
+                        </p>
+                      </div>
+                      <div className="w-px h-8 bg-white/10"></div>
+                      <div className="text-right">
+                        <p className="text-[8px] font-black text-zinc-400 uppercase tracking-widest mb-1">DURAÇÃO</p>
+                        <p className="text-xl font-black text-white leading-none font-mono tracking-tighter">
+                          {workoutDuration ? formatTime(workoutDuration) : '00:00'}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex flex-col items-end">
-                      <p className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">VOLUME</p>
-                      <p className="text-xl font-black text-white leading-none">{lastWorkoutVolume}kg</p>
+                    
+                    <div className="flex items-center justify-between">
+                       <div className="flex items-center gap-2">
+                          <Clock size={14} className="text-accent" />
+                          <span className="text-[10px] font-black text-white uppercase tracking-widest">TREINO CONCLUÍDO</span>
+                       </div>
+                       <div className="px-2 py-1 bg-accent rounded text-[8px] font-black text-white uppercase tracking-widest italic">
+                          VICTORY
+                       </div>
                     </div>
                   </div>
                 </div>
@@ -353,13 +377,30 @@ export const WorkoutView: React.FC = () => {
                    <button 
                      onClick={downloadSummaryImage}
                      disabled={isGeneratingImage}
-                     className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg active:scale-95 transition-all"
+                     className="w-14 h-14 rounded-full bg-accent text-white flex items-center justify-center shadow-lg active:scale-95 transition-all"
                    >
                      {isGeneratingImage ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <Download size={24} />}
                    </button>
                 </div>
               </div>
             )}
+
+            {capturedImage && (
+              <motion.button 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={downloadSummaryImage}
+                disabled={isGeneratingImage}
+                className="w-full py-4 bg-accent/10 border border-accent/20 text-accent font-black text-[11px] uppercase tracking-[0.3em] rounded-2xl flex items-center justify-center gap-3 active:scale-95 transition-all"
+              >
+                {isGeneratingImage ? (
+                  <>GERANDO... <div className="w-4 h-4 border-2 border-accent/20 border-t-accent rounded-full animate-spin"></div></>
+                ) : (
+                  <>BAIXAR FOTO DE VITÓRIA <Download size={18} /></>
+                )}
+              </motion.button>
+            )}
+
             <input 
               type="file" 
               ref={fileInputRef} 
@@ -371,27 +412,20 @@ export const WorkoutView: React.FC = () => {
             <canvas ref={canvasRef} className="hidden" />
          </div>
 
-         <div className="grid grid-cols-2 gap-4">
-            <div className="glass-card glass-card-hover p-6 rounded-[2rem] border border-emerald-500/10 bg-emerald-500/5">
-               <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1">Volume de Carga</p>
-               <div className="flex items-end justify-center gap-1">
-                  <span className="text-3xl font-black text-white">{lastWorkoutVolume}</span>
-                  <span className="text-[10px] font-bold text-emerald-500 mb-1.5 uppercase">kg</span>
-               </div>
-            </div>
-            <div className="glass-card glass-card-hover p-6 rounded-[2rem] border border-blue-500/10 bg-blue-500/5">
-               <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1">Duração</p>
-               <div className="flex items-end justify-center gap-1">
-                  <span className="text-2xl font-black text-white">{workoutDuration ? formatTime(workoutDuration) : '00:00'}</span>
-                  <Clock size={16} className="text-blue-500 mb-1.5" />
+         <div className="grid grid-cols-1 gap-4">
+            <div className="glass-card p-8 rounded-[2.5rem] bg-accent/5">
+               <p className="text-[10px] font-black text-secondary uppercase tracking-[0.3em] mb-2">Duração da Sessão</p>
+               <div className="flex items-center justify-center gap-3">
+                  <span className="text-4xl font-black text-ink italic tracking-tighter">{workoutDuration ? formatTime(workoutDuration) : '00:00'}</span>
+                  <Clock size={24} className="text-accent" />
                </div>
             </div>
          </div>
 
          <div className="glass-card p-8 rounded-[2.5rem] space-y-4 relative overflow-hidden">
-            <Quote className="absolute -top-4 -left-4 text-white/5 w-24 h-24" />
+            <Quote className="absolute -top-4 -left-4 text-accent/5 w-24 h-24" />
             <div className="relative z-10">
-               <p className="text-zinc-300 font-bold italic text-lg leading-relaxed">
+               <p className="text-ink font-bold italic text-lg leading-relaxed">
                  "A constância é a mãe da evolução. Parabéns por hoje."
                </p>
             </div>
@@ -399,7 +433,7 @@ export const WorkoutView: React.FC = () => {
 
          <button 
            onClick={closeSummary} 
-           className="w-full bg-white text-zinc-950 font-black py-5 rounded-[1.8rem] shadow-xl uppercase tracking-[0.4em] active:scale-95 text-[10px] transition-all flex items-center justify-center gap-3"
+           className="w-full bg-accent text-white font-black py-5 rounded-[1.8rem] shadow-xl uppercase tracking-[0.4em] active:scale-95 text-[10px] transition-all flex items-center justify-center gap-3"
          >
            <LayoutDashboard size={18} /> Voltar para o Dashboard
          </button>
@@ -413,15 +447,15 @@ export const WorkoutView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-slide-up pb-64">
-      <header className="flex items-center justify-between sticky top-0 z-50 bg-bg/80 backdrop-blur-xl py-4 border-b border-white/[0.08] -mx-4 px-4">
+      <header className="flex items-center justify-between sticky top-0 z-50 bg-bg/80 backdrop-blur-xl py-4 border-b border-line -mx-4 px-4">
         <div className="flex items-center gap-3 min-w-0">
-          <button onClick={exitWorkout} className="w-10 h-10 flex items-center justify-center text-zinc-600 hover:text-white transition-all bg-white/[0.02] rounded-xl border border-white/[0.08] active:scale-95">
+          <button onClick={exitWorkout} className="w-10 h-10 flex items-center justify-center text-secondary hover:text-ink transition-all glass-card rounded-xl active:scale-95">
             <ChevronLeft size={18}/>
           </button>
           <div className="min-w-0">
-            <h1 className="text-base font-black text-white italic truncate leading-none uppercase tracking-tighter">{selectedWorkout.title}</h1>
+            <h1 className="text-base font-black text-ink italic truncate leading-none uppercase tracking-tighter">{selectedWorkout.title}</h1>
             {isWorkoutActive && (
-              <span className="text-[10px] font-mono text-zinc-500 mt-1 block tracking-tight uppercase">SESSÃO EM CURSO</span>
+              <span className="text-[10px] font-mono text-secondary mt-1 block tracking-tight uppercase">SESSÃO EM CURSO</span>
             )}
           </div>
         </div>
@@ -429,12 +463,12 @@ export const WorkoutView: React.FC = () => {
         <div className="flex items-center gap-3">
           {isWorkoutActive ? (
              <>
-               <div className="px-3 py-1.5 bg-white/[0.02] border border-white/[0.08] rounded-lg">
-                  <span className="text-xl font-bold text-white font-mono leading-none tracking-tight">{formatTime(elapsedTime)}</span>
+               <div className="px-3 py-1.5 glass-card rounded-lg">
+                  <span className="text-xl font-bold text-ink font-mono leading-none tracking-tight">{formatTime(elapsedTime)}</span>
                </div>
                <button 
                  onClick={handleFinishWorkout}
-                 className="px-4 py-1.5 bg-emerald-500 text-bg font-black text-[10px] uppercase tracking-widest rounded-lg active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.15)]"
+                 className="px-4 py-1.5 bg-accent text-white font-black text-[10px] uppercase tracking-widest rounded-lg active:scale-95 transition-all shadow-lg"
                >
                  FINALIZAR
                </button>
@@ -442,7 +476,7 @@ export const WorkoutView: React.FC = () => {
           ) : (
             <button 
               onClick={startWorkout}
-              className="px-6 py-2.5 bg-emerald-500 text-bg font-black text-[10px] uppercase tracking-widest rounded-lg active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.15)]"
+              className="px-6 py-2.5 bg-accent text-white font-black text-[10px] uppercase tracking-widest rounded-lg active:scale-95 transition-all shadow-lg"
             >
               INICIAR TREINO
             </button>
@@ -454,12 +488,12 @@ export const WorkoutView: React.FC = () => {
         <div className="space-y-8 animate-fade px-4">
           <div className="flex items-center justify-between">
              <div className="flex flex-col">
-                <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">PROGRESSO TOTAL</span>
-                <span className="text-xl font-black text-white leading-none mt-1">{completedSets} / {totalSets}</span>
+                <span className="text-[9px] font-black text-secondary uppercase tracking-widest">PROGRESSO TOTAL</span>
+                <span className="text-xl font-black text-ink leading-none mt-1">{completedSets} / {totalSets}</span>
              </div>
              <div className="text-right">
-                <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">VOLUME TOTAL</span>
-                <span className="block text-xl font-black text-emerald-500 leading-none mt-1">{calculateVolume()} KG</span>
+                <span className="text-[9px] font-black text-secondary uppercase tracking-widest">DURAÇÃO</span>
+                <span className="block text-xl font-black text-accent leading-none mt-1">{formatTime(elapsedTime)}</span>
              </div>
           </div>
 
@@ -525,12 +559,12 @@ export const WorkoutView: React.FC = () => {
 
       {!isWorkoutActive && (
          <div className="py-12 px-4 animate-fade">
-            <div className="glass-card p-10 rounded-[2rem] text-center border-white/[0.05]">
-               <h2 className="text-2xl font-black italic text-white uppercase tracking-tighter mb-2">Pronto para começar?</h2>
-               <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-8">Treino {selectedWorkout.title} • {selectedWorkout.exercises.length} Exercícios</p>
+            <div className="glass-card p-10 rounded-[2rem] text-center">
+               <h2 className="text-2xl font-black italic text-ink uppercase tracking-tighter mb-2">Pronto para começar?</h2>
+               <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-8">Treino {selectedWorkout.title} • {selectedWorkout.exercises.length} Exercícios</p>
                <button 
                   onClick={startWorkout}
-                  className="w-full bg-white text-bg py-5 rounded-xl font-black text-[11px] uppercase tracking-[0.4em] active:scale-95 transition-all"
+                  className="w-full bg-accent text-white py-5 rounded-xl font-black text-[11px] uppercase tracking-[0.4em] active:scale-95 transition-all shadow-lg"
                >
                   INICIAR TREINO
                </button>

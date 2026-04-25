@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { useStore } from '../../store';
-import { UserCircle2, ShieldCheck, TrendingUp, Trophy, Award, Rocket, Flame, LogOut } from 'lucide-react';
+import { UserCircle2, ShieldCheck, TrendingUp, Trophy, Award, Rocket, Flame, LogOut, Sun, Moon } from 'lucide-react';
 
 export const ProfileView: React.FC = () => {
-  const { user, logout } = useStore();
+  const { user, logout, theme, toggleTheme } = useStore();
 
   if (!user) return null;
 
@@ -21,64 +21,72 @@ export const ProfileView: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-slide-up pb-10">
-       <header className="flex items-center justify-between">
+       <header className="flex items-center justify-between px-2">
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter italic uppercase leading-none">Meu <span className="text-blue-500">Perfil</span></h1>
-            <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] mt-1 text-[9px]">Configurações e conquistas.</p>
+            <h1 className="text-2xl md:text-3xl font-black text-ink tracking-tighter italic uppercase leading-none">Meu <span className="text-accent">Perfil</span></h1>
+            <p className="text-secondary font-bold uppercase tracking-[0.2em] mt-1 text-[9px]">Configurações e conquistas.</p>
           </div>
-          <button onClick={handleLogout} className="w-10 h-10 bg-zinc-900 rounded-2xl flex items-center justify-center text-rose-500 border border-white/5 hover:bg-rose-500/10 transition-all">
-            <LogOut size={20} />
-          </button>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={toggleTheme} 
+              className="w-10 h-10 glass-card rounded-2xl flex items-center justify-center text-accent hover:scale-110 active:scale-95 transition-all"
+            >
+              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            <button onClick={handleLogout} className="w-10 h-10 glass-card rounded-2xl flex items-center justify-center text-rose-500 hover:bg-rose-500/10 transition-all">
+              <LogOut size={20} />
+            </button>
+          </div>
        </header>
 
-       <div className="glass-card p-8 rounded-[2.5rem] border border-white/10 flex flex-col items-center text-center space-y-4">
-          <div className="w-24 h-24 rounded-[2.5rem] bg-blue-500/20 flex items-center justify-center border-2 border-blue-500/50 shadow-2xl shadow-blue-500/20">
-            <UserCircle2 size={56} className="text-blue-500" />
+       <div className="glass-card p-8 rounded-[2.5rem] flex flex-col items-center text-center space-y-4">
+          <div className="w-24 h-24 rounded-[2.5rem] bg-accent/10 flex items-center justify-center border-2 border-accent/50 shadow-2xl shadow-accent/20">
+            <UserCircle2 size={56} className="text-accent" />
           </div>
           <div>
-            <h2 className="text-2xl font-black text-white uppercase tracking-tight">{user.name}</h2>
+            <h2 className="text-2xl font-black text-ink uppercase tracking-tight">{user.name}</h2>
             <div className="flex items-center gap-2 justify-center mt-1">
                <ShieldCheck size={14} className="text-emerald-500" />
-               <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Membro Pro</span>
+               <span className="text-[10px] font-black text-secondary uppercase tracking-widest">Membro Pro</span>
             </div>
           </div>
        </div>
 
        {/* Medals Section */}
        <div className="space-y-4">
-          <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em] flex items-center gap-2 px-2">
+          <h3 className="text-[10px] font-black text-secondary uppercase tracking-[0.3em] flex items-center gap-2 px-2">
             <Award size={14} className="text-emerald-500" /> Minhas Medalhas
           </h3>
           <div className="grid grid-cols-2 gap-4">
             {user.badges && user.badges.length > 0 ? (
               user.badges.map(badge => (
-                <div key={badge.id} className="glass-card p-6 rounded-[2rem] border border-white/5 flex flex-col items-center text-center space-y-3 bg-white/5">
-                  <div className="w-12 h-12 bg-zinc-900 rounded-2xl flex items-center justify-center shadow-lg">
+                <div key={badge.id} className="glass-card p-6 rounded-[2rem] flex flex-col items-center text-center space-y-3">
+                  <div className="w-12 h-12 bg-bg/50 rounded-2xl flex items-center justify-center shadow-lg border border-line">
                     {badgeIcons[badge.icon] || <Award size={24} className="text-emerald-500" />}
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-white uppercase tracking-tight">{badge.name}</p>
-                    <p className="text-[8px] font-bold text-zinc-500 uppercase mt-1 leading-tight">{badge.description}</p>
+                    <p className="text-[10px] font-black text-ink uppercase tracking-tight">{badge.name}</p>
+                    <p className="text-[8px] font-bold text-secondary uppercase mt-1 leading-tight">{badge.description}</p>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="col-span-2 glass-card p-8 rounded-[2rem] border border-dashed border-white/10 text-center">
-                <p className="text-zinc-600 text-[9px] font-black uppercase tracking-widest">Nenhuma medalha conquistada ainda. Continue treinando!</p>
+              <div className="col-span-2 glass-card p-8 rounded-[2rem] border-dashed border-line text-center">
+                <p className="text-secondary text-[9px] font-black uppercase tracking-widest">Nenhuma medalha conquistada ainda. Continue treinando!</p>
               </div>
             )}
           </div>
        </div>
 
        <div className="grid grid-cols-2 gap-4">
-          <div className="glass-card p-6 rounded-[2rem] border border-white/5 space-y-1">
-             <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Total de Treinos</p>
-             <p className="text-2xl font-black text-white">{user.totalWorkouts || 0}</p>
+          <div className="glass-card p-6 rounded-[2rem] space-y-1">
+             <p className="text-[8px] font-black text-secondary uppercase tracking-widest">Total de Treinos</p>
+             <p className="text-2xl font-black text-ink">{user.totalWorkouts || 0}</p>
           </div>
-          <div className="glass-card p-6 rounded-[2rem] border border-white/5 space-y-1">
-             <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Sequência Atual</p>
+          <div className="glass-card p-6 rounded-[2rem] space-y-1">
+             <p className="text-[8px] font-black text-secondary uppercase tracking-widest">Sequência Atual</p>
              <div className="flex items-center gap-2">
-                <p className="text-2xl font-black text-white">{user.streak || 0}</p>
+                <p className="text-2xl font-black text-ink">{user.streak || 0}</p>
                 <Flame size={20} className="text-orange-500" />
              </div>
           </div>

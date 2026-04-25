@@ -256,58 +256,60 @@ const AppContent: React.FC = () => {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 font-sans selection:bg-blue-500/30 relative overflow-hidden">
-        {/* Cobalt Blue Radial Gradient Background */}
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_left,_rgba(29,78,216,0.15),_transparent_40%)] pointer-events-none"></div>
-        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_bottom_right,_rgba(29,78,216,0.05),_transparent_40%)] pointer-events-none"></div>
+      <div className="min-h-screen bg-bg text-ink flex flex-col items-center justify-center p-6 font-sans selection:bg-accent/30 relative overflow-hidden transition-colors duration-400">
+        {/* Animated Mesh Background (CSS variable based) */}
+        <div className="bg-mesh absolute inset-0 opacity-40 pointer-events-none"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_left,_var(--accent-color)_5%,_transparent_40%)] opacity-20 pointer-events-none"></div>
+        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_bottom_right,_var(--highlight-color)_5%,_transparent_40%)] opacity-20 pointer-events-none"></div>
 
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
           className="w-full max-w-md space-y-12 relative z-10"
         >
-          <div className="flex flex-col items-center gap-4 text-center">
+          <div className="flex flex-col items-center gap-6 text-center">
              <motion.div 
                whileHover={{ rotate: 5, scale: 1.05 }}
-               className="p-6 bg-white/[0.03] border border-white/[0.08] rounded-[2.5rem] backdrop-blur-xl"
+               className="p-8 glass-card rounded-[3rem] shadow-2xl relative"
              >
-                <Dumbbell size={48} className="text-blue-500" strokeWidth={2.5} />
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-highlight rounded-full animate-pulse shadow-[0_0_15px_var(--highlight-color)]"></div>
+                <Dumbbell size={64} className="text-accent" strokeWidth={2.5} />
              </motion.div>
-             <div className="space-y-1">
-                <h1 className="text-5xl font-black text-white tracking-tighter italic uppercase">
-                  TATU <span className="text-blue-600">GYM</span>
+             <div className="space-y-2">
+                <h1 className="text-5xl font-black text-ink tracking-tighter italic uppercase leading-none">
+                  TATU <span className="text-accent">GYM</span>
                 </h1>
-                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.4em]">Elite Performance</p>
+                <p className="text-[10px] font-black text-secondary uppercase tracking-[0.4em]">Elite Performance System</p>
              </div>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="space-y-2">
-                <label className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Usuário</label>
-                <div className="relative">
-                  <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-700" size={18} />
+                <label className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] ml-1">Usuário</label>
+                <div className="relative group">
+                  <UserIcon className="absolute left-6 top-1/2 -translate-y-1/2 text-secondary group-focus-within:text-accent transition-colors" size={20} />
                   <input 
                     type="text" 
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full bg-white/[0.03] border border-white/[0.08] rounded-2xl p-5 pl-14 text-white font-bold outline-none focus:border-blue-500/30 focus:bg-white/[0.05] transition-all placeholder:text-zinc-800 backdrop-blur-md"
-                    placeholder="Nome de usuário"
+                    className="w-full glass-card rounded-2xl p-5 pl-16 text-ink font-bold outline-none focus:border-accent group-hover:bg-white/5 transition-all placeholder:text-secondary/30"
+                    placeholder="Seu usuário"
                     required
                   />
                 </div>
               </div>
               
               <div className="space-y-2">
-                <label className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Senha</label>
-                <div className="relative">
-                  <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-700" size={18} />
+                <label className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] ml-1">Senha</label>
+                <div className="relative group">
+                  <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-secondary group-focus-within:text-accent transition-colors" size={20} />
                   <input 
                     type="password" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-white/[0.03] border border-white/[0.08] rounded-2xl p-5 pl-14 text-white font-bold outline-none focus:border-blue-500/30 focus:bg-white/[0.05] transition-all placeholder:text-zinc-800 backdrop-blur-md"
+                    className="w-full glass-card rounded-2xl p-5 pl-16 text-ink font-bold outline-none focus:border-accent group-hover:bg-white/5 transition-all placeholder:text-secondary/30"
                     placeholder="••••••••"
                     required
                   />
@@ -315,45 +317,45 @@ const AppContent: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between px-1">
+            <div className="flex items-center justify-between px-2">
               <label className="flex items-center gap-3 cursor-pointer group">
                 <div 
-                  className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-all duration-300 ${rememberMe ? 'bg-blue-600 border-blue-600' : 'border-white/[0.1] bg-white/[0.02]'}`}
+                  className={`w-6 h-6 rounded-xl border-2 flex items-center justify-center transition-all duration-300 ${rememberMe ? 'bg-accent border-accent shadow-lg shadow-accent/20' : 'border-line bg-white/5'}`}
                   onClick={(e) => {
                     e.preventDefault();
                     handleVibrate();
                     setRememberMe(!rememberMe);
                   }}
                 >
-                  {rememberMe && <Check size={12} className="text-white" strokeWidth={4} />}
+                  {rememberMe && <Check size={14} className="text-white" strokeWidth={4} />}
                 </div>
-                <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Lembrar</span>
+                <span className="text-[11px] font-black text-secondary uppercase tracking-widest">Lembrar acesso</span>
               </label>
               <button 
                 type="button" 
                 onClick={handleVibrate}
-                className="text-[10px] font-black text-zinc-700 uppercase tracking-widest hover:text-blue-500 transition-colors"
+                className="text-[10px] font-black text-secondary uppercase tracking-widest hover:text-accent transition-colors"
               >
-                Esqueci a senha
+                Esqueci
               </button>
             </div>
 
             <motion.button 
-              whileHover={{ scale: 1.01 }}
+              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className={`w-full py-6 rounded-2xl font-black text-xs uppercase tracking-[0.5em] transition-all flex items-center justify-center gap-4 border ${
+              className={`w-full py-6 rounded-2xl font-black text-sm uppercase tracking-[0.5em] transition-all flex items-center justify-center gap-4 border shadow-xl ${
                 (username || password) 
-                ? 'border-blue-500 text-blue-500 bg-blue-500/5 shadow-[0_0_40px_rgba(59,130,246,0.1)]' 
-                : 'border-white/[0.08] text-zinc-700'
+                ? 'bg-accent text-white border-accent shadow-accent/20' 
+                : 'bg-white/5 border-line text-secondary'
               }`}
             >
-              ENTRAR <ArrowRight size={18} />
+              ENTRAR <ArrowRight size={20} strokeWidth={3} />
             </motion.button>
           </form>
 
           <div className="pt-8 text-center">
-             <p className="text-zinc-800 text-[9px] font-black uppercase tracking-[0.3em] leading-relaxed">
-               © 2026 TATU GYM PRO • HIGH PERFORMANCE ONLY
+             <p className="text-secondary text-[10px] font-black uppercase tracking-[0.3em] leading-relaxed opacity-50">
+               © 2026 TATU GYM PRO • HIGH TECH FITNESS
              </p>
           </div>
         </motion.div>
@@ -374,7 +376,7 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 pb-32">
+    <div className="min-h-screen bg-bg text-ink pb-32 transition-colors duration-400">
       <div className="max-w-4xl mx-auto p-6">
         {renderView()}
       </div>
@@ -382,7 +384,7 @@ const AppContent: React.FC = () => {
       {/* Navigation Bar */}
       {!selectedWorkout && (
         <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50">
-          <div className="glass-card rounded-[2.5rem] p-2 flex items-center justify-between border border-white/10 shadow-2xl shadow-black/50">
+          <div className="glass-card rounded-[2.5rem] p-2 flex items-center justify-between shadow-2xl">
             {[
               ...(user?.role === 'teacher' ? [{ id: AppTab.TEACHER, icon: Users, label: 'Alunos' }] : []),
               { id: AppTab.DASHBOARD, icon: LayoutDashboard, label: 'Home' },
@@ -397,8 +399,8 @@ const AppContent: React.FC = () => {
                 }}
                 className={`flex flex-col items-center justify-center w-16 h-16 rounded-[2rem] transition-all duration-300 ${
                   activeTab === item.id 
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 scale-110' 
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  ? 'bg-accent text-white shadow-lg scale-110' 
+                  : 'text-secondary hover:text-ink'
                 }`}
               >
                 <item.icon size={22} strokeWidth={activeTab === item.id ? 3 : 2} />
