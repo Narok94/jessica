@@ -61,7 +61,7 @@ export const ProfileView: React.FC = () => {
             {user.badges && user.badges.length > 0 ? (
               user.badges.map(badge => (
                 <div key={badge.id} className="glass-card p-6 rounded-[2rem] flex flex-col items-center text-center space-y-3">
-                  <div className="w-12 h-12 bg-bg/50 rounded-2xl flex items-center justify-center shadow-lg border border-line">
+                  <div className="w-12 h-12 bg-ink/[0.03] rounded-2xl flex items-center justify-center shadow-lg border border-line">
                     {badgeIcons[badge.icon] || <Award size={24} className="text-emerald-500" />}
                   </div>
                   <div>

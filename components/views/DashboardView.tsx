@@ -81,7 +81,7 @@ export const DashboardView: React.FC = () => {
       {/* Minimalist Header */}
       <header className="flex items-center justify-between py-6 px-4">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full border border-line flex items-center justify-center bg-white/5 overflow-hidden">
+          <div className="w-12 h-12 rounded-full border border-line flex items-center justify-center bg-ink/[0.03] overflow-hidden">
              {user.avatar ? (
                <img src={user.avatar} alt={user.name} className="w-full h-full object-cover opacity-80" />
              ) : (
@@ -169,7 +169,7 @@ export const DashboardView: React.FC = () => {
             <span>Progresso</span>
             <span className="text-accent">65%</span>
           </div>
-          <div className="mt-1.5 h-1 bg-white/10 rounded-full overflow-hidden">
+          <div className="mt-1.5 h-1 bg-ink/[0.05] rounded-full overflow-hidden">
             <div className="h-full bg-accent rounded-full w-[65%]"></div>
           </div>
         </div>
@@ -281,7 +281,7 @@ export const DashboardView: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <h3 className="text-lg font-black text-ink uppercase tracking-tight italic">Treino {String.fromCharCode(65 + index)}</h3>
                         {historyCount > 0 && (
-                          <span className="bg-bg/50 text-secondary text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest border border-line">
+                          <span className="bg-ink/[0.03] text-secondary text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest border border-line">
                             {historyCount}x
                           </span>
                         )}

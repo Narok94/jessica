@@ -253,9 +253,9 @@ export const WorkoutView: React.FC = () => {
 
       // Add "TATU GYM" Branding
       ctx.font = 'black 60px Inter';
-      ctx.fillStyle = '#2979FF';
+      ctx.fillStyle = '#4f46e5';
       ctx.textAlign = 'left';
-      ctx.shadowColor = 'rgba(41, 121, 255, 0.5)';
+      ctx.shadowColor = 'rgba(79, 70, 229, 0.5)';
       ctx.shadowBlur = 20;
       ctx.fillText('TATU GYM', 60, targetHeight - 200);
       ctx.shadowBlur = 0;
@@ -290,7 +290,7 @@ export const WorkoutView: React.FC = () => {
       ctx.fillText(workoutDuration ? formatTime(workoutDuration) : '00:00', 60, targetHeight - 170);
 
       // Blue accent line
-      ctx.fillStyle = '#2979FF';
+      ctx.fillStyle = '#4f46e5';
       ctx.fillRect(60, targetHeight - 450, 100, 10);
 
       // Trigger download
@@ -332,7 +332,7 @@ export const WorkoutView: React.FC = () => {
                 onClick={() => fileInputRef.current?.click()}
                 className="w-full aspect-[4/5] glass-card rounded-[2.5rem] border-dashed border-line flex flex-col items-center justify-center gap-4 group transition-all"
               >
-                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-accent/10 transition-all">
+                <div className="w-16 h-16 rounded-full bg-ink/[0.03] flex items-center justify-center group-hover:scale-110 group-hover:bg-accent/10 transition-all">
                   <Camera size={32} className="text-secondary group-hover:text-accent" />
                 </div>
                 <p className="text-[10px] font-black text-secondary uppercase tracking-widest group-hover:text-ink">Registrar Evolução</p>
@@ -537,8 +537,8 @@ export const WorkoutView: React.FC = () => {
                 disabled={completedSets === 0}
                 className={`w-full py-5 rounded-xl font-black text-[11px] uppercase tracking-[0.4em] transition-all flex items-center justify-center gap-3 ${
                   completedSets > 0 
-                  ? 'bg-emerald-500 text-bg shadow-[0_0_20px_rgba(16,185,129,0.15)]' 
-                  : 'bg-white/[0.03] border border-white/[0.08] text-zinc-700 cursor-not-allowed'
+                  ? 'bg-accent text-white shadow-xl' 
+                  : 'bg-ink/[0.03] border border-line text-secondary cursor-not-allowed'
                 }`}
               >
                 FINALIZAR SESSÃO

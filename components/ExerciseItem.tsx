@@ -202,9 +202,9 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
       </div>
       <div className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[1000px] opacity-100 border-t border-line' : 'max-h-0 opacity-0 pointer-events-none overflow-hidden'}`}>
         <div className="px-4 pb-6 pt-5 space-y-6">
-          <div className="flex items-center justify-between bg-white/[0.01] p-3 rounded-xl border border-line">
+          <div className="flex items-center justify-between bg-ink/[0.02] p-3 rounded-xl border border-line">
              <div className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${restTimeLeft !== null ? 'bg-highlight text-white' : 'bg-white/5 text-secondary'}`}>
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${restTimeLeft !== null ? 'bg-highlight text-white' : 'bg-ink/[0.03] text-secondary'}`}>
                    <Timer size={18} strokeWidth={2.5} />
                 </div>
                 <div>
@@ -212,7 +212,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                    <p className="text-lg font-black text-ink font-mono leading-none">{restTimeLeft !== null ? `${restTimeLeft}s` : `${exercise.rest}s`}</p>
                 </div>
              </div>
-             <button onClick={restTimeLeft !== null ? cancelRestTimer : () => startRestTimer()} className={`px-4 py-1.5 rounded-lg font-black text-[9px] uppercase tracking-widest transition-all ${restTimeLeft !== null ? 'bg-white/5 text-secondary' : 'bg-highlight text-white shadow-lg shadow-highlight/20'}`}>
+             <button onClick={restTimeLeft !== null ? cancelRestTimer : () => startRestTimer()} className={`px-4 py-1.5 rounded-lg font-black text-[9px] uppercase tracking-widest transition-all ${restTimeLeft !== null ? 'bg-ink/[0.03] text-secondary' : 'bg-highlight text-white shadow-lg'}`}>
                 {restTimeLeft !== null ? 'PARAR' : 'INICIAR'}
              </button>
           </div>
@@ -240,7 +240,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                       disabled={set.completed} 
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => updateSet(idx, { weight: parseFloat(e.target.value) || 0 })} 
-                      className="w-full h-full bg-white/5 border border-line rounded-lg text-center text-sm font-bold text-ink outline-none focus:border-accent transition-all font-mono"
+                      className="w-full h-full bg-ink/[0.03] border border-line rounded-lg text-center text-sm font-bold text-ink outline-none focus:border-accent transition-all font-mono"
                       placeholder="0"
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[8px] font-black text-secondary pointer-events-none">KG</span>
@@ -254,7 +254,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                       disabled={set.completed} 
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => updateSet(idx, { reps: parseInt(e.target.value) || 0 })} 
-                      className="w-full h-full bg-white/5 border border-line rounded-lg text-center text-sm font-bold text-ink outline-none focus:border-accent transition-all font-mono"
+                      className="w-full h-full bg-ink/[0.03] border border-line rounded-lg text-center text-sm font-bold text-ink outline-none focus:border-accent transition-all font-mono"
                       placeholder="0"
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[8px] font-black text-secondary pointer-events-none">REPS</span>
@@ -267,7 +267,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                     className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
                       set.completed 
                       ? 'bg-accent text-white shadow-lg' 
-                      : 'bg-white/5 border border-line text-secondary hover:text-ink'
+                      : 'bg-ink/[0.03] border border-line text-secondary hover:text-ink'
                     }`}
                   >
                     <Check size={18} strokeWidth={4} />
@@ -317,7 +317,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                   allowFullScreen
                 ></iframe>
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-white/5 p-8 text-center">
+                <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-ink/[0.03] p-8 text-center">
                   <Search size={48} className="text-secondary/50" />
                   <div>
                     <p className="text-ink font-black uppercase tracking-widest mb-2">Vídeo não disponível</p>

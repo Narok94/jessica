@@ -34,7 +34,7 @@ export const HistoryView: React.FC = () => {
       
       {user?.history.length === 0 ? (
         <div className="glass-card p-12 rounded-[2.5rem] text-center border-dashed">
-           <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-secondary mx-auto mb-4"><History size={32} /></div>
+           <div className="w-16 h-16 bg-ink/[0.03] rounded-2xl flex items-center justify-center text-secondary mx-auto mb-4"><History size={32} /></div>
            <p className="text-secondary text-[9px] font-black uppercase tracking-[0.2em]">Sua história começa agora.</p>
         </div>
       ) : (
@@ -71,7 +71,7 @@ export const HistoryView: React.FC = () => {
                       <p className="text-[8px] font-black text-secondary uppercase tracking-widest truncate">{ex.name}</p>
                       <div className="flex flex-wrap gap-1">
                         {ex.performance && ex.performance.slice(0, 2).map((s, si) => (
-                          <div key={si} className="text-[7px] font-bold bg-white/5 text-ink px-1.5 py-0.5 rounded-md border border-line">
+                          <div key={si} className="text-[7px] font-bold bg-ink/[0.03] text-ink px-1.5 py-0.5 rounded-md border border-line">
                              {s.weight}kg x {s.reps}
                           </div>
                         ))}
