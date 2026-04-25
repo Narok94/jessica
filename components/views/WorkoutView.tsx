@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useStore } from '../../store';
-import { ChevronLeft, Clock, CheckCircle2, Play, LayoutDashboard, Quote } from 'lucide-react';
+import { ChevronLeft, Clock, CheckCircle2, Play, LayoutDashboard, Quote, Camera, Download, Trash2, Share2, Dumbbell } from 'lucide-react';
 import { ExerciseItem } from '../ExerciseItem';
 import { SetPerformance, WorkoutHistoryEntry, AppTab } from '../../types';
 
@@ -30,6 +30,10 @@ export const WorkoutView: React.FC = () => {
     workoutStartTime
   } = useStore();
 
+  const [capturedImage, setCapturedImage] = React.useState<string | null>(null);
+  const [isGeneratingImage, setIsGeneratingImage] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const timerIntervalRef = useRef<number | null>(null);
   const wakeLockRef = useRef<any>(null);
 
@@ -160,6 +164,7 @@ export const WorkoutView: React.FC = () => {
   };
 
   const closeSummary = () => {
+    setCapturedImage(null);
     setShowSummary(false);
     setSelectedWorkout(null);
     setCurrentSessionProgress({});
@@ -190,9 +195,114 @@ export const WorkoutView: React.FC = () => {
     }
   };
 
+  const handleImageCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCapturedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const downloadSummaryImage = () => {
+    if (!canvasRef.current || !capturedImage) return;
+    setIsGeneratingImage(true);
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = capturedImage;
+
+    img.onload = () => {
+      // Set canvas size to match image or a standard social media size
+      const targetWidth = 1080;
+      const targetHeight = 1350; // 4:5 aspect ratio
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+
+      // Draw background image (proportional crop)
+      const imgAspect = img.width / img.height;
+      const targetAspect = targetWidth / targetHeight;
+      let drawW, drawH, drawX, drawY;
+
+      if (imgAspect > targetAspect) {
+        drawH = targetHeight;
+        drawW = targetHeight * imgAspect;
+        drawX = (targetWidth - drawW) / 2;
+        drawY = 0;
+      } else {
+        drawW = targetWidth;
+        drawH = targetWidth / imgAspect;
+        drawX = 0;
+        drawY = (targetHeight - drawH) / 2;
+      }
+
+      ctx.drawImage(img, drawX, drawY, drawW, drawH);
+
+      // Dark Overlay at bottom for better readability
+      const gradient = ctx.createLinearGradient(0, targetHeight * 0.6, 0, targetHeight);
+      gradient.addColorStop(0, 'rgba(0,0,0,0)');
+      gradient.addColorStop(1, 'rgba(0,0,0,0.9)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, targetHeight * 0.6, targetWidth, targetHeight * 0.4);
+
+      // Add "TATU GYM" Branding
+      ctx.font = 'black 60px Inter';
+      ctx.fillStyle = '#2979FF';
+      ctx.textAlign = 'left';
+      ctx.shadowColor = 'rgba(41, 121, 255, 0.5)';
+      ctx.shadowBlur = 20;
+      ctx.fillText('TATU GYM', 60, targetHeight - 200);
+      ctx.shadowBlur = 0;
+
+      ctx.font = 'italic 40px Inter';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('PRO PERFORMANCE', 60, targetHeight - 150);
+
+      // Add Workout Title
+      ctx.font = '900 80px Inter';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(selectedWorkout.title.toUpperCase(), 60, targetHeight - 320);
+
+      // Stats Section
+      // Volume
+      ctx.font = 'bold 30px Inter';
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.fillText('VOLUME TOTAL', 600, targetHeight - 320);
+      ctx.font = '900 60px Inter';
+      ctx.fillStyle = '#00FF95';
+      ctx.fillText(`${lastWorkoutVolume} KG`, 600, targetHeight - 260);
+
+      // Duration
+      ctx.font = 'bold 30px Inter';
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.fillText('DURAÇÃO', 600, targetHeight - 180);
+      ctx.font = '900 60px Inter';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(workoutDuration ? formatTime(workoutDuration) : '00:00', 600, targetHeight - 120);
+
+      // Blue accent line
+      ctx.fillStyle = '#2979FF';
+      ctx.fillRect(60, targetHeight - 360, 100, 8);
+
+      // Trigger download
+      const link = document.createElement('a');
+      link.download = `tatu-gym-victory-${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      setIsGeneratingImage(false);
+      handleVibrate(30);
+    };
+  };
+
   if (showSummary) {
     return (
-      <div className="max-w-xl mx-auto space-y-8 animate-slide-up py-6 text-center">
+      <div className="max-w-xl mx-auto space-y-8 animate-slide-up py-6 text-center pb-24">
          <div className="space-y-4">
             <div className="mx-auto w-24 h-24 bg-emerald-500 rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-emerald-500/30 transform rotate-12 animate-fade">
               <CheckCircle2 size={48} className="text-zinc-950" strokeWidth={3} />
@@ -201,6 +311,64 @@ export const WorkoutView: React.FC = () => {
               <h1 className="text-4xl font-black text-white uppercase tracking-tighter italic leading-none">Treino <span className="text-emerald-500">Concluído!</span></h1>
               <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] mt-3">Sessão finalizada com sucesso.</p>
             </div>
+         </div>
+
+         {/* Victory Photo Section */}
+         <div className="space-y-4">
+            <div className="flex items-center justify-between px-2">
+               <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Victory Photo</span>
+               {capturedImage && (
+                 <button onClick={() => setCapturedImage(null)} className="text-zinc-600 hover:text-red-500 transition-colors">
+                    <Trash2 size={16} />
+                 </button>
+               )}
+            </div>
+            
+            {!capturedImage ? (
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full aspect-[4/5] glass-card rounded-[2.5rem] border-dashed border-white/10 flex flex-col items-center justify-center gap-4 hover:bg-white/[0.05] transition-all group"
+              >
+                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-500/10 transition-all">
+                  <Camera size={32} className="text-zinc-600 group-hover:text-blue-500" />
+                </div>
+                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest group-hover:text-zinc-400">Registrar Evolução</p>
+              </button>
+            ) : (
+              <div className="relative group rounded-[2.5rem] overflow-hidden border border-white/[0.08]">
+                <img src={capturedImage} alt="Victory" className="w-full aspect-[4/5] object-cover" />
+                <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/90 to-transparent">
+                  <div className="flex items-end justify-between gap-4">
+                    <div className="text-left">
+                      <p className="text-blue-500 font-black italic text-lg leading-none uppercase">TATU GYM</p>
+                      <p className="text-white font-black text-2xl tracking-tighter uppercase mt-1 italic">{selectedWorkout.title}</p>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <p className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">VOLUME</p>
+                      <p className="text-xl font-black text-white leading-none">{lastWorkoutVolume}kg</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-sm">
+                   <button 
+                     onClick={downloadSummaryImage}
+                     disabled={isGeneratingImage}
+                     className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg active:scale-95 transition-all"
+                   >
+                     {isGeneratingImage ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <Download size={24} />}
+                   </button>
+                </div>
+              </div>
+            )}
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleImageCapture} 
+              accept="image/*" 
+              capture="environment" 
+              className="hidden" 
+            />
+            <canvas ref={canvasRef} className="hidden" />
          </div>
 
          <div className="grid grid-cols-2 gap-4">
