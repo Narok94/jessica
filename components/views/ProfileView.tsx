@@ -2,6 +2,7 @@
 import React from 'react';
 import { useStore } from '../../store';
 import { UserCircle2, ShieldCheck, TrendingUp, Trophy, Award, Rocket, Flame, LogOut, Sun, Moon } from 'lucide-react';
+import { motion } from 'motion/react';
 
 export const ProfileView: React.FC = () => {
   const { user, logout, theme, toggleTheme } = useStore();
@@ -57,10 +58,24 @@ export const ProfileView: React.FC = () => {
           <h3 className="text-[10px] font-black text-secondary uppercase tracking-[0.3em] flex items-center gap-2 px-2">
             <Award size={14} className="text-emerald-500" /> Minhas Medalhas
           </h3>
-          <div className="grid grid-cols-2 gap-4">
+          <motion.div 
+            className="grid grid-cols-2 gap-4"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: { transition: { staggerChildren: 0.1 } }
+            }}
+          >
             {user.badges && user.badges.length > 0 ? (
               user.badges.map(badge => (
-                <div key={badge.id} className="glass-card p-6 rounded-[2rem] flex flex-col items-center text-center space-y-3">
+                <motion.div 
+                  key={badge.id} 
+                  variants={{
+                    hidden: { scale: 0.8, opacity: 0 },
+                    visible: { scale: 1, opacity: 1 }
+                  }}
+                  className="glass-card p-6 rounded-[2rem] flex flex-col items-center text-center space-y-3"
+                >
                   <div className="w-12 h-12 bg-ink/[0.03] rounded-2xl flex items-center justify-center shadow-lg border border-line">
                     {badgeIcons[badge.icon] || <Award size={24} className="text-emerald-500" />}
                   </div>
@@ -68,14 +83,14 @@ export const ProfileView: React.FC = () => {
                     <p className="text-[10px] font-black text-ink uppercase tracking-tight">{badge.name}</p>
                     <p className="text-[8px] font-bold text-secondary uppercase mt-1 leading-tight">{badge.description}</p>
                   </div>
-                </div>
+                </motion.div>
               ))
             ) : (
               <div className="col-span-2 glass-card p-8 rounded-[2rem] border-dashed border-line text-center">
                 <p className="text-secondary text-[9px] font-black uppercase tracking-widest">Nenhuma medalha conquistada ainda. Continue treinando!</p>
               </div>
             )}
-          </div>
+          </motion.div>
        </div>
 
        <div className="grid grid-cols-2 gap-4">

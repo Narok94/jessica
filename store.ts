@@ -95,7 +95,32 @@ export const useStore = create<AppState>((set, get) => {
   })(),
   addToast: undefined,
 
-  setUser: (user) => set({ user }),
+  setUser: (user) => {
+    set({ user });
+    if (user) {
+      const username = user.username.toLowerCase();
+      let preferredTheme: 'light' | 'dark' = 'dark';
+      
+      if (username === 'jessica' || username === 'flavia') {
+        preferredTheme = 'light';
+      } else if (username === 'henrique') {
+        preferredTheme = 'dark';
+      } else {
+        // Fallback to current theme or dark
+        preferredTheme = get().theme;
+      }
+
+      if (typeof document !== 'undefined') {
+        if (preferredTheme === 'light') {
+          document.body.classList.add('light');
+        } else {
+          document.body.classList.remove('light');
+        }
+        localStorage.setItem('tatugym_theme', preferredTheme);
+      }
+      set({ theme: preferredTheme });
+    }
+  },
   setIsLoggedIn: (isLoggedIn) => set({ isLoggedIn }),
   setActiveTab: (activeTab) => set({ activeTab }),
   setSelectedWorkout: (selectedWorkout) => set({ selectedWorkout }),

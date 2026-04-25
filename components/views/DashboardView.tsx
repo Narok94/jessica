@@ -15,6 +15,7 @@ import {
   Award,
   LogOut
 } from 'lucide-react';
+import { motion } from 'motion/react';
 import { AppTab } from '../../types';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
@@ -109,14 +110,20 @@ export const DashboardView: React.FC = () => {
 
       {/* Main Focus Action: Check-in */}
       {!isCheckedInToday && (
-        <div className="px-4 animate-fade">
+        <motion.div 
+          className="px-4"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
           <button 
             onClick={onCheckIn}
-            className="w-full py-6 rounded-2xl bg-highlight text-white text-[11px] font-black uppercase tracking-[0.4em] shadow-[0_0_30px_rgba(236,72,153,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3 group"
+            className="relative w-full py-6 rounded-2xl bg-highlight text-white text-[11px] font-black uppercase tracking-[0.4em] shadow-[0_15px_35px_rgba(var(--color-highlight-rgb,236,72,153),0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3 group overflow-hidden"
           >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none"></div>
             MARCAR PRESENÇA <Check size={20} strokeWidth={4} />
           </button>
-        </div>
+        </motion.div>
       )}
 
       {/* Simplified Weekly Consistency */}
@@ -257,14 +264,25 @@ export const DashboardView: React.FC = () => {
           <button className="text-[9px] font-black text-accent uppercase tracking-widest hover:brightness-110 transition-all">Ver Todos</button>
         </div>
         
-        <div className="grid grid-cols-1 gap-4">
+        <motion.div 
+          className="grid grid-cols-1 gap-4"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            visible: { transition: { staggerChildren: 0.1 } }
+          }}
+        >
           {initialWorkouts.map((workout, index) => {
             const lastDate = getLastCompletedDate(workout.id);
             const historyCount = getHistoryCount(workout.id);
             
             return (
-              <div 
+              <motion.div 
                 key={workout.id} 
+                variants={{
+                  hidden: { y: 20, opacity: 0 },
+                  visible: { y: 0, opacity: 1 }
+                }}
                 className="glass-card glass-card-hover overflow-hidden transition-all duration-500 group cursor-pointer" 
                 onClick={() => { 
                   handleVibrate();
@@ -299,10 +317,10 @@ export const DashboardView: React.FC = () => {
                     <ArrowRight size={20} />
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

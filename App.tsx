@@ -36,6 +36,7 @@ const AppContent: React.FC = () => {
     currentSessionProgress,
     workoutStartTime,
     allWorkouts,
+    theme,
     setUser, 
     setIsLoggedIn, 
     setActiveTab, 
@@ -54,6 +55,11 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     setAddToast(toastFn);
   }, [toastFn, setAddToast]);
+
+  useEffect(() => {
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(theme);
+  }, [theme]);
 
   // Safety sync for already logged-in users to ensure security rules work
   useEffect(() => {
@@ -256,7 +262,7 @@ const AppContent: React.FC = () => {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-bg text-ink flex flex-col items-center justify-center p-6 font-sans selection:bg-accent/30 relative overflow-hidden transition-colors duration-400">
+      <div className={`min-h-screen ${theme} bg-bg text-ink flex flex-col items-center justify-center p-6 font-sans selection:bg-accent/30 relative overflow-hidden transition-colors duration-400`}>
         {/* Animated Mesh Background (CSS variable based) */}
         <div className="bg-mesh absolute inset-0 opacity-40 pointer-events-none"></div>
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_left,_var(--accent-color)_5%,_transparent_40%)] opacity-20 pointer-events-none"></div>
@@ -376,7 +382,7 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-bg text-ink pb-32 transition-colors duration-400">
+    <div className={`min-h-screen ${theme} bg-bg text-ink pb-32 transition-colors duration-400`}>
       <div className="max-w-4xl mx-auto p-6">
         {renderView()}
       </div>
@@ -397,12 +403,19 @@ const AppContent: React.FC = () => {
                   handleVibrate();
                   setActiveTab(item.id);
                 }}
-                className={`flex flex-col items-center justify-center w-16 h-16 rounded-[2rem] transition-all duration-300 ${
+                className={`relative flex flex-col items-center justify-center w-16 h-16 rounded-[2rem] transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
                   activeTab === item.id 
-                  ? 'bg-accent text-white shadow-lg scale-110' 
+                  ? 'bg-accent text-white shadow-[0_10px_25px_rgba(var(--color-accent-rgb),0.3)] scale-110' 
                   : 'text-secondary hover:text-ink'
                 }`}
               >
+                {activeTab === item.id && (
+                  <motion.div 
+                    layoutId="active-pill"
+                    className="absolute inset-0 bg-accent rounded-[2rem] -z-10 shadow-lg shadow-accent/20"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
                 <item.icon size={22} strokeWidth={activeTab === item.id ? 3 : 2} />
                 <span className="text-[8px] font-black uppercase tracking-widest mt-1">{item.label}</span>
               </button>
