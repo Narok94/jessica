@@ -129,7 +129,7 @@ export const DashboardView: React.FC = () => {
       {/* Simplified Weekly Consistency */}
       <div className="glass-card p-5">
         <div className="flex items-center justify-between mb-4">
-           <h3 className="text-[9px] font-black text-secondary uppercase tracking-[0.2em]">Calendário Semanal</h3>
+           <h3 className="text-[9px] font-black text-secondary uppercase tracking-[0.2em]">Frequência Semanal</h3>
            {isCheckedInToday && (
              <span className="text-[9px] font-black text-highlight uppercase tracking-widest flex items-center gap-1.5">
                <Check size={10} strokeWidth={4}/> Confirmada
@@ -165,7 +165,7 @@ export const DashboardView: React.FC = () => {
              <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center border border-accent/20">
                <ClipboardList size={20} className="text-accent" />
              </div>
-             <h3 className="text-[9px] font-black text-secondary uppercase tracking-widest">Plano Atual</h3>
+             <h3 className="text-[9px] font-black text-secondary uppercase tracking-widest">Programa Atual</h3>
           </div>
           <p className="text-base font-black text-ink uppercase tracking-tight">
             {initialWorkouts.length === 3 ? 'ABC' : 
@@ -186,7 +186,7 @@ export const DashboardView: React.FC = () => {
              <div className="w-10 h-10 rounded-xl bg-highlight/10 flex items-center justify-center border border-highlight/20">
                <TrendingUp size={20} className="text-highlight" />
              </div>
-             <h3 className="text-[9px] font-black text-secondary uppercase tracking-widest">Total Treinos</h3>
+             <h3 className="text-[9px] font-black text-secondary uppercase tracking-widest">Atividade Total</h3>
           </div>
           <p className="text-base font-black text-ink uppercase tracking-tight">{user.totalWorkouts || 0} Sessões</p>
           <div className="mt-4 flex items-center gap-2">
@@ -260,8 +260,8 @@ export const DashboardView: React.FC = () => {
       {/* Workout Cards List */}
       <div className="space-y-6">
         <div className="flex items-center justify-between px-2">
-          <h3 className="text-[10px] font-black text-secondary uppercase tracking-[0.3em]">Meus Treinos</h3>
-          <button className="text-[9px] font-black text-accent uppercase tracking-widest hover:brightness-110 transition-all">Ver Todos</button>
+          <h3 className="text-[10px] font-black text-secondary uppercase tracking-[0.3em]">Cronograma de Treinos</h3>
+          <button className="text-[9px] font-black text-accent uppercase tracking-widest hover:brightness-110 transition-all">Expandir</button>
         </div>
         
         <motion.div 

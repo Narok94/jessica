@@ -245,53 +245,58 @@ export const WorkoutView: React.FC = () => {
       ctx.drawImage(img, drawX, drawY, drawW, drawH);
 
       // Dark Overlay at bottom for better readability
-      const gradient = ctx.createLinearGradient(0, targetHeight * 0.6, 0, targetHeight);
+      const gradient = ctx.createLinearGradient(0, targetHeight * 0.4, 0, targetHeight);
       gradient.addColorStop(0, 'rgba(0,0,0,0)');
+      gradient.addColorStop(0.7, 'rgba(0,0,0,0.6)');
       gradient.addColorStop(1, 'rgba(0,0,0,0.9)');
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, targetHeight * 0.6, targetWidth, targetHeight * 0.4);
+      ctx.fillRect(0, targetHeight * 0.4, targetWidth, targetHeight * 0.6);
 
-      // Add "TATU GYM" Branding
-      ctx.font = 'black 60px Inter';
-      ctx.fillStyle = '#4f46e5';
+      // Add "TATU GYM" Branding (TOP LEFT)
+      ctx.font = '900 40px sans-serif';
+      ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'left';
-      ctx.shadowColor = 'rgba(79, 70, 229, 0.5)';
-      ctx.shadowBlur = 20;
-      ctx.fillText('TATU GYM', 60, targetHeight - 200);
-      ctx.shadowBlur = 0;
+      ctx.fillText('TATU GYM', 60, 100);
+      
+      // PINK Accent Spot
+      ctx.fillStyle = '#EC4899';
+      ctx.fillRect(60, 115, 60, 8);
 
-      ctx.font = 'italic 40px Inter';
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText('PRO PERFORMANCE', 60, targetHeight - 150);
-
-      // Add Workout Title
-      ctx.font = '900 80px Inter';
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText(selectedWorkout.title.toUpperCase(), 60, targetHeight - 400);
-
-      // Infer Focus from exercises or title
+      // Infer Focus
       const focusText = selectedWorkout.title.toLowerCase().includes('superior') ? 'SUPERIORES' :
                         selectedWorkout.title.toLowerCase().includes('inferior') || selectedWorkout.title.toLowerCase().includes('perna') ? 'INFERIORES' :
                         selectedWorkout.title.toLowerCase().includes('cardio') || selectedWorkout.title.toLowerCase().includes('aeró') ? 'AERÓBICO' :
                         selectedWorkout.title.toLowerCase().includes('abd') ? 'ABDÔMEN' : 'COMPLETO';
 
-      ctx.font = 'black 50px Inter';
-      ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      ctx.fillText(focusText, 60, targetHeight - 330);
+      // Focus Tag (BOTTOM)
+      ctx.font = '900 24px sans-serif';
+      ctx.fillStyle = '#EC4899';
+      ctx.fillText(focusText, 60, targetHeight - 480);
 
-      // stats section removed volume
-
-      // Duration
-      ctx.font = 'bold 30px Inter';
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.fillText('DURAÇÃO TOTAL', 60, targetHeight - 250);
-      ctx.font = '900 80px Inter';
+      // Add Workout Title
+      ctx.font = 'italic 900 90px sans-serif';
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(workoutDuration ? formatTime(workoutDuration) : '00:00', 60, targetHeight - 170);
+      ctx.fillText(selectedWorkout.title.toUpperCase(), 60, targetHeight - 380);
 
-      // Blue accent line
-      ctx.fillStyle = '#4f46e5';
-      ctx.fillRect(60, targetHeight - 450, 100, 10);
+      // Stats Label
+      ctx.font = '900 24px sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.fillText('DURAÇÃO TOTAL', 60, targetHeight - 270);
+
+      // Elapsed Time
+      ctx.font = '900 120px sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(workoutDuration ? formatTime(workoutDuration) : '00:00', 60, targetHeight - 150);
+
+      // PRO PERFORMANCE branding (BOTTOM RIGHT)
+      ctx.save();
+      ctx.translate(targetWidth - 60, targetHeight - 150);
+      ctx.rotate(-Math.PI / 2);
+      ctx.font = '900 20px sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.textAlign = 'right';
+      ctx.fillText('PRO PERFORMANCE', 0, 0);
+      ctx.restore();
 
       // Trigger download
       const link = document.createElement('a');
@@ -311,8 +316,8 @@ export const WorkoutView: React.FC = () => {
               <CheckCircle2 size={48} className="text-white" strokeWidth={3} />
             </div>
             <div>
-              <h1 className="text-4xl font-black text-ink uppercase tracking-tighter italic leading-none">Treino <span className="text-accent">Concluído!</span></h1>
-              <p className="text-secondary text-[10px] font-black uppercase tracking-[0.3em] mt-3">Sessão finalizada com sucesso.</p>
+              <h1 className="text-4xl font-black text-ink uppercase tracking-tighter italic leading-none">Missão <span className="text-accent">Cumprida!</span></h1>
+              <p className="text-secondary text-[10px] font-black uppercase tracking-[0.3em] mt-3">Seu desempenho foi registrado com sucesso.</p>
             </div>
           </div>
 
@@ -335,44 +340,48 @@ export const WorkoutView: React.FC = () => {
                 <div className="w-16 h-16 rounded-full bg-ink/[0.03] flex items-center justify-center group-hover:scale-110 group-hover:bg-accent/10 transition-all">
                   <Camera size={32} className="text-secondary group-hover:text-accent" />
                 </div>
-                <p className="text-[10px] font-black text-secondary uppercase tracking-widest group-hover:text-ink">Registrar Evolução</p>
+                <p className="text-[10px] font-black text-secondary uppercase tracking-widest group-hover:text-ink">Registrar Vitória</p>
               </button>
             ) : (
               <div className="relative group rounded-[2.5rem] overflow-hidden border border-line">
                 <img src={capturedImage} alt="Victory" className="w-full aspect-[4/5] object-cover" />
-                <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/95 via-black/80 to-transparent text-white">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                
+                {/* HUD Preview */}
+                <div className="absolute inset-0 p-8 flex flex-col justify-between pointer-events-none">
+                  {/* Top Branding */}
+                  <div className="text-left">
+                    <p className="text-white font-black text-xl tracking-tighter uppercase leading-none">TATU GYM</p>
+                    <div className="w-10 h-1 bg-accent mt-2"></div>
+                  </div>
+
+                  {/* Bottom Stats */}
+                  <div className="space-y-6">
+                    <div>
+                      <p className="text-accent font-black text-xs uppercase tracking-widest mb-1">
+                        {selectedWorkout.title.toLowerCase().includes('superior') ? 'SUPERIORES' :
+                         selectedWorkout.title.toLowerCase().includes('inferior') || selectedWorkout.title.toLowerCase().includes('perna') ? 'INFERIORES' :
+                         selectedWorkout.title.toLowerCase().includes('cardio') || selectedWorkout.title.toLowerCase().includes('aeró') ? 'AERÓBICO' :
+                         selectedWorkout.title.toLowerCase().includes('abd') ? 'ABDÔMEN' : 'COMPLETO'}
+                      </p>
+                      <h2 className="text-white font-black text-4xl tracking-tighter uppercase italic leading-none">{selectedWorkout.title}</h2>
+                    </div>
+
+                    <div className="flex items-end justify-between">
                       <div className="text-left">
-                        <p className="text-accent font-black italic text-xs leading-none uppercase tracking-widest mb-1">TATU GYM PRO</p>
-                        <p className="text-white font-black text-xl tracking-tighter uppercase italic leading-none">{selectedWorkout.title}</p>
-                        <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.2em] mt-2">
-                          {selectedWorkout.title.toLowerCase().includes('superior') ? 'SUPERIORES' :
-                           selectedWorkout.title.toLowerCase().includes('inferior') || selectedWorkout.title.toLowerCase().includes('perna') ? 'INFERIORES' :
-                           selectedWorkout.title.toLowerCase().includes('cardio') || selectedWorkout.title.toLowerCase().includes('aeró') ? 'AERÓBICO' :
-                           selectedWorkout.title.toLowerCase().includes('abd') ? 'ABDÔMEN' : 'COMPLETO'}
-                        </p>
-                      </div>
-                      <div className="w-px h-8 bg-white/10"></div>
-                      <div className="text-right">
-                        <p className="text-[8px] font-black text-zinc-400 uppercase tracking-widest mb-1">DURAÇÃO</p>
-                        <p className="text-xl font-black text-white leading-none font-mono tracking-tighter">
+                        <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-1">DURAÇÃO TOTAL</p>
+                        <p className="text-5xl font-black text-white leading-none font-mono tracking-tighter">
                           {workoutDuration ? formatTime(workoutDuration) : '00:00'}
                         </p>
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                       <div className="flex items-center gap-2">
-                          <Clock size={14} className="text-accent" />
-                          <span className="text-[10px] font-black text-white uppercase tracking-widest">TREINO CONCLUÍDO</span>
-                       </div>
-                       <div className="px-2 py-1 bg-accent rounded text-[8px] font-black text-white uppercase tracking-widest italic">
-                          VICTORY
-                       </div>
+                      <div className="rotate-90 origin-bottom-right translate-x-2 text-white/20 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
+                        PRO PERFORMANCE
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
+
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-sm">
                    <button 
                      onClick={downloadSummaryImage}
@@ -396,7 +405,7 @@ export const WorkoutView: React.FC = () => {
                 {isGeneratingImage ? (
                   <>GERANDO... <div className="w-4 h-4 border-2 border-accent/20 border-t-accent rounded-full animate-spin"></div></>
                 ) : (
-                  <>BAIXAR FOTO DE VITÓRIA <Download size={18} /></>
+                  <>EXPORTAR FOTO DE VITÓRIA <Download size={18} /></>
                 )}
               </motion.button>
             )}
@@ -455,7 +464,7 @@ export const WorkoutView: React.FC = () => {
           <div className="min-w-0">
             <h1 className="text-base font-black text-ink italic truncate leading-none uppercase tracking-tighter">{selectedWorkout.title}</h1>
             {isWorkoutActive && (
-              <span className="text-[10px] font-mono text-secondary mt-1 block tracking-tight uppercase">SESSÃO EM CURSO</span>
+              <span className="text-[10px] font-mono text-secondary mt-1 block tracking-tight uppercase">SESSÃO ATIVA</span>
             )}
           </div>
         </div>
@@ -488,11 +497,11 @@ export const WorkoutView: React.FC = () => {
         <div className="space-y-8 animate-fade px-4">
           <div className="flex items-center justify-between">
              <div className="flex flex-col">
-                <span className="text-[9px] font-black text-secondary uppercase tracking-widest">PROGRESSO TOTAL</span>
+                <span className="text-[9px] font-black text-secondary uppercase tracking-widest">Séries Concluídas</span>
                 <span className="text-xl font-black text-ink leading-none mt-1">{completedSets} / {totalSets}</span>
              </div>
              <div className="text-right">
-                <span className="text-[9px] font-black text-secondary uppercase tracking-widest">DURAÇÃO</span>
+                <span className="text-[9px] font-black text-secondary uppercase tracking-widest">Tempo de Treino</span>
                 <span className="block text-xl font-black text-accent leading-none mt-1">{formatTime(elapsedTime)}</span>
              </div>
           </div>
