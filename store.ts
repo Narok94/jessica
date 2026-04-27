@@ -12,6 +12,7 @@ interface AppState {
   activeTab: AppTab;
   selectedWorkout: WorkoutRoutine | null;
   currentSessionProgress: Record<string, SetPerformance[]>;
+  currentCardioProgress: { exercise: string; duration: number; completed: boolean } | null;
   isWorkoutActive: boolean;
   workoutStartTime: number | null;
   elapsedTime: number;
@@ -32,6 +33,7 @@ interface AppState {
   setSelectedStudent: (student: string | null) => void;
   setAllWorkouts: (workouts: AppState['allWorkouts']) => void;
   setCurrentSessionProgress: (progress: Record<string, SetPerformance[]>) => void;
+  setCurrentCardioProgress: (progress: AppState['currentCardioProgress']) => void;
   setIsWorkoutActive: (isActive: boolean) => void;
   setWorkoutStartTime: (time: number | null) => void;
   setElapsedTime: (time: number) => void;
@@ -67,6 +69,7 @@ export const useStore = create<AppState>((set, get) => {
   activeTab: AppTab.DASHBOARD,
   selectedWorkout: null,
   currentSessionProgress: {},
+  currentCardioProgress: null,
   isWorkoutActive: false,
   workoutStartTime: null,
   elapsedTime: 0,
@@ -130,6 +133,7 @@ export const useStore = create<AppState>((set, get) => {
     localStorage.setItem('tatugym_all_workouts', JSON.stringify(allWorkouts));
   },
   setCurrentSessionProgress: (currentSessionProgress) => set({ currentSessionProgress }),
+  setCurrentCardioProgress: (currentCardioProgress) => set({ currentCardioProgress }),
   setIsWorkoutActive: (isWorkoutActive) => set({ isWorkoutActive }),
   setWorkoutStartTime: (workoutStartTime) => set({ workoutStartTime }),
   setElapsedTime: (elapsedTime) => set({ elapsedTime }),

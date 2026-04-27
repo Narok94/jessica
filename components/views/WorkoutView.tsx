@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useStore } from '../../store';
 import { ChevronLeft, Clock, CheckCircle2, Play, LayoutDashboard, Quote, Camera, Download, Trash2, Share2, Dumbbell } from 'lucide-react';
 import { ExerciseItem } from '../ExerciseItem';
-import { SetPerformance, WorkoutHistoryEntry, AppTab } from '../../types';
+import { SetPerformance, WorkoutHistoryEntry, AppTab, CardioSession } from '../../types';
+import { Timer, Wind, X } from 'lucide-react';
 
 export const WorkoutView: React.FC = () => {
   const { 
@@ -14,12 +15,14 @@ export const WorkoutView: React.FC = () => {
     isWorkoutActive, 
     elapsedTime, 
     currentSessionProgress,
+    currentCardioProgress,
     workoutDuration,
     lastWorkoutVolume,
     setIsWorkoutActive,
     setWorkoutStartTime,
     setElapsedTime,
     setCurrentSessionProgress,
+    setCurrentCardioProgress,
     setShowSummary,
     setLastWorkoutVolume,
     setWorkoutDuration,
@@ -36,6 +39,8 @@ export const WorkoutView: React.FC = () => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const timerIntervalRef = useRef<number | null>(null);
   const wakeLockRef = useRef<any>(null);
+  const [showCardioModal, setShowCardioModal] = React.useState(false);
+  const [cardioInput, setCardioInput] = React.useState({ exercise: 'Esteira', duration: 15 });
 
   const requestWakeLock = async () => {
     if ('wakeLock' in navigator) {
@@ -137,7 +142,8 @@ export const WorkoutView: React.FC = () => {
         exerciseId: ex.id,
         name: ex.name,
         performance: currentSessionProgress[ex.id] || []
-      }))
+      })),
+      cardio: currentCardioProgress ? { ...currentCardioProgress } : undefined
     };
 
     const newWeights: Record<string, number> = { ...(user.weights || {}) };
@@ -168,6 +174,7 @@ export const WorkoutView: React.FC = () => {
     setShowSummary(false);
     setSelectedWorkout(null);
     setCurrentSessionProgress({});
+    setCurrentCardioProgress(null);
     setWorkoutStartTime(null);
     setWorkoutDuration(null);
     setElapsedTime(0);
@@ -188,6 +195,7 @@ export const WorkoutView: React.FC = () => {
       }
       setSelectedWorkout(null);
       setCurrentSessionProgress({});
+      setCurrentCardioProgress(null);
       setWorkoutStartTime(null);
       setElapsedTime(0);
       setIsWorkoutActive(false);
@@ -421,7 +429,7 @@ export const WorkoutView: React.FC = () => {
             <canvas ref={canvasRef} className="hidden" />
          </div>
 
-         <div className="grid grid-cols-1 gap-4">
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="glass-card p-8 rounded-[2.5rem] bg-accent/5">
                <p className="text-[10px] font-black text-secondary uppercase tracking-[0.3em] mb-2">Duração da Sessão</p>
                <div className="flex items-center justify-center gap-3">
@@ -429,6 +437,16 @@ export const WorkoutView: React.FC = () => {
                   <Clock size={24} className="text-accent" />
                </div>
             </div>
+            {currentCardioProgress && (
+               <div className="glass-card p-8 rounded-[2.5rem] bg-highlight/5 border border-highlight/10">
+                  <p className="text-[10px] font-black text-secondary uppercase tracking-[0.3em] mb-2">Aeróbico</p>
+                  <div className="flex items-center justify-center gap-3">
+                     <span className="text-3xl font-black text-ink italic tracking-tighter">{currentCardioProgress.duration}min</span>
+                     <Wind size={24} className="text-highlight" />
+                  </div>
+                  <p className="text-[10px] font-black text-secondary uppercase tracking-widest mt-1">{currentCardioProgress.exercise}</p>
+               </div>
+            )}
          </div>
 
          <div className="glass-card p-8 rounded-[2.5rem] space-y-4 relative overflow-hidden">
@@ -531,6 +549,51 @@ export const WorkoutView: React.FC = () => {
                 </motion.div>
               );
             })}
+
+            {/* Cardio Section Trigger */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="mt-4"
+            >
+              {currentCardioProgress ? (
+                 <div className="glass-card p-6 rounded-[2rem] border-accent/20 bg-accent/5 flex items-center justify-between group transition-all">
+                    <div className="flex items-center gap-4">
+                       <div className="w-12 h-12 bg-accent/20 rounded-2xl flex items-center justify-center text-accent">
+                          <Wind size={24} />
+                       </div>
+                       <div>
+                          <p className="text-[10px] font-black text-accent uppercase tracking-widest leading-none mb-1">AERÓBICO CONCLUÍDO</p>
+                          <h4 className="text-base font-black text-ink uppercase tracking-tighter">{currentCardioProgress.exercise}</h4>
+                          <p className="text-[10px] font-bold text-secondary uppercase tracking-widest">{currentCardioProgress.duration} MINUTOS</p>
+                       </div>
+                    </div>
+                    <button 
+                       onClick={() => {
+                         handleVibrate(10);
+                         setCurrentCardioProgress(null);
+                       }}
+                       className="w-10 h-10 rounded-xl bg-bg border border-line flex items-center justify-center text-secondary hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
+                    >
+                       <Trash2 size={16} />
+                    </button>
+                 </div>
+              ) : (
+                <button 
+                   onClick={() => {
+                     handleVibrate(15);
+                     setShowCardioModal(true);
+                   }}
+                   className="w-full glass-card p-8 rounded-[2rem] border-dashed border-line flex flex-col items-center justify-center gap-2 group hover:border-accent transition-all hover:bg-accent/[0.02]"
+                >
+                   <div className="w-12 h-12 bg-ink/[0.03] rounded-2xl flex items-center justify-center text-secondary group-hover:text-accent group-hover:scale-110 transition-all">
+                      <Wind size={24} />
+                   </div>
+                   <p className="text-[10px] font-black text-secondary uppercase tracking-widest group-hover:text-ink">Adicionar Aeróbico</p>
+                </button>
+              )}
+            </motion.div>
             
             <motion.div 
                initial={{ opacity: 0 }}
@@ -580,6 +643,106 @@ export const WorkoutView: React.FC = () => {
             </div>
          </div>
       )}
+
+      {/* Cardio Modal */}
+      <AnimatePresence>
+        {showCardioModal && (
+          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-4">
+             <motion.div 
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               onClick={() => setShowCardioModal(false)}
+               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+             />
+             <motion.div 
+               initial={{ y: "100%" }}
+               animate={{ y: 0 }}
+               exit={{ y: "100%" }}
+               transition={{ type: "spring", damping: 25, stiffness: 300 }}
+               className="relative w-full max-w-sm glass-card bg-bg p-8 rounded-t-[3rem] sm:rounded-[3rem] shadow-2xl border-t border-line"
+             >
+                <div className="flex items-center justify-between mb-8">
+                   <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-accent/20 rounded-xl flex items-center justify-center text-accent">
+                         <Wind size={20} />
+                      </div>
+                      <h2 className="text-xl font-black text-ink uppercase italic tracking-tighter">Aeróbico</h2>
+                   </div>
+                   <button onClick={() => setShowCardioModal(false)} className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-secondary">
+                      <X size={20} />
+                   </button>
+                </div>
+
+                <div className="space-y-6">
+                   <div>
+                      <label className="text-[10px] font-black text-secondary uppercase tracking-widest mb-3 block">Exercício</label>
+                      <div className="grid grid-cols-2 gap-2">
+                         {['Esteira', 'Bike', 'Elíptico', 'Escada'].map(ex => (
+                            <button 
+                               key={ex}
+                               onClick={() => {
+                                  handleVibrate(5);
+                                  setCardioInput({ ...cardioInput, exercise: ex });
+                               }}
+                               className={`py-3 rounded-xl font-black text-[10px] uppercase tracking-widest border transition-all ${
+                                  cardioInput.exercise === ex 
+                                  ? 'bg-accent border-accent text-white shadow-lg shadow-accent/20' 
+                                  : 'bg-ink/[0.03] border-line text-secondary'
+                               }`}
+                            >
+                               {ex}
+                            </button>
+                         ))}
+                      </div>
+                      <input 
+                         type="text" 
+                         value={cardioInput.exercise}
+                         onChange={(e) => setCardioInput({ ...cardioInput, exercise: e.target.value })}
+                         className="w-full mt-3 bg-ink/[0.03] border border-line p-4 rounded-xl text-ink font-bold placeholder:text-secondary/50 focus:border-accent transition-all"
+                         placeholder="Outro..."
+                      />
+                   </div>
+
+                   <div>
+                      <label className="text-[10px] font-black text-secondary uppercase tracking-widest mb-3 block">Tempo (Minutos)</label>
+                      <div className="flex items-center gap-4">
+                         <input 
+                            type="range" 
+                            min="5" 
+                            max="60" 
+                            step="5"
+                            value={cardioInput.duration}
+                            onChange={(e) => setCardioInput({ ...cardioInput, duration: parseInt(e.target.value) })}
+                            className="flex-grow accent-accent"
+                         />
+                         <div className="w-20 bg-ink/[0.03] border border-line p-3 rounded-xl text-center">
+                            <span className="text-xl font-black text-ink font-mono">{cardioInput.duration}</span>
+                            <span className="text-[8px] font-black text-secondary block -mt-1 ml-1">MIN</span>
+                         </div>
+                      </div>
+                      <div className="flex justify-between mt-2 px-1">
+                         <span className="text-[8px] font-black text-secondary uppercase">5m</span>
+                         <span className="text-[8px] font-black text-secondary uppercase">30m</span>
+                         <span className="text-[8px] font-black text-secondary uppercase">60m</span>
+                      </div>
+                   </div>
+
+                   <button 
+                      onClick={() => {
+                         handleVibrate(30);
+                         setCurrentCardioProgress({ ...cardioInput, completed: true });
+                         setShowCardioModal(false);
+                      }}
+                      className="w-full bg-accent text-white py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.4em] shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3"
+                   >
+                      CONCLUIR CARDIO <CheckCircle2 size={18} />
+                   </button>
+                </div>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useStore } from '../../store';
-import { History, Calendar, Clock, LogOut } from 'lucide-react';
+import { History, Calendar, Clock, LogOut, Wind } from 'lucide-react';
 
 export const HistoryView: React.FC = () => {
   const { user, logout } = useStore();
@@ -78,6 +78,17 @@ export const HistoryView: React.FC = () => {
                       </div>
                     </div>
                   ))}
+                  {entry.cardio && (
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-1">
+                        <Wind size={8} className="text-accent" />
+                        <p className="text-[8px] font-black text-accent uppercase tracking-widest truncate">Aeróbico</p>
+                      </div>
+                      <div className="text-[7px] font-bold bg-accent/5 text-accent px-1.5 py-0.5 rounded-md border border-accent/10 inline-block">
+                         {entry.cardio.exercise} - {entry.cardio.duration}min
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             );

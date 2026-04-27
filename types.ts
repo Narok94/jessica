@@ -1,4 +1,9 @@
 
+export interface CardioSession {
+  exercise: string;
+  duration: number; // in minutes
+}
+
 export interface Exercise {
   id: string;
   name: string;
@@ -16,6 +21,7 @@ export interface WorkoutRoutine {
   title: string;
   description: string;
   exercises: Exercise[];
+  cardio?: CardioSession;
   color: string;
 }
 
@@ -37,6 +43,11 @@ export interface WorkoutHistoryEntry {
     name: string;
     performance: SetPerformance[];
   }[];
+  cardio?: {
+    exercise: string;
+    duration: number;
+    completed: boolean;
+  };
 }
 
 export interface User {
