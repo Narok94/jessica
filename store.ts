@@ -82,19 +82,26 @@ export const useStore = create<AppState>((set, get) => {
   theme: initialTheme,
   allWorkouts: (() => {
     const saved = localStorage.getItem('tatugym_all_workouts');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error('Error loading workouts:', e);
-      }
-    }
-    return {
+    let loadedWorkouts = {
       henrique: henriqueWorkouts,
       jessica: jessicaWorkouts,
       maria: mariaWorkouts,
       flavia: flaviaWorkouts
     };
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        loadedWorkouts = { ...loadedWorkouts, ...parsed };
+      } catch (e) {
+        console.error('Error loading workouts:', e);
+      }
+    }
+    // Forçar o novo treino do Henrique para atualizar a versão salva em cache do navegador
+    loadedWorkouts.henrique = henriqueWorkouts;
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('tatugym_all_workouts', JSON.stringify(loadedWorkouts));
+    }
+    return loadedWorkouts;
   })(),
   addToast: undefined,
 

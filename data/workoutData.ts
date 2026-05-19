@@ -77,47 +77,47 @@ export const jessicaWorkouts: WorkoutRoutine[] = [
 
 export const henriqueWorkouts: WorkoutRoutine[] = [
   {
-    id: 'h-1',
-    title: 'Treino 1',
-    description: 'Foco em Peito, Ombros e Tríceps.',
+    id: 'h-a',
+    title: 'Treino A - Empurre',
+    description: 'Foco: Hipertrofia & Segurança Articular (Nível Intermediário)',
     color: 'blue',
     exercises: [
-      { id: 'h1-1', name: 'Supino máquina', muscleGroup: 'Peito', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Supino máquina') },
-      { id: 'h1-2', name: 'Supino inclinado iso articulado deitado (shua)', muscleGroup: 'Peito', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Supino inclinado iso articulado deitado shua') },
-      { id: 'h1-3', name: 'Crucifixo máquina', muscleGroup: 'Peito', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Crucifixo máquina') },
-      { id: 'h1-4', name: 'Elevação lateral c/ halter 0º-180º neutra', muscleGroup: 'Ombros', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Elevação lateral c halter 0-180 neutra') },
-      { id: 'h1-5', name: 'Elevação frontal no cross', muscleGroup: 'Ombros', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Elevação frontal no cross') },
-      { id: 'h1-6', name: 'Tríceps no cross barra reta', muscleGroup: 'Tríceps', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Tríceps no cross barra reta') },
-      { id: 'h1-7', name: 'Tríceps no cross corda', muscleGroup: 'Tríceps', sets: 4, reps: 'Máx rep', rest: 60, image: getExerciseGifUrl('Tríceps no cross corda') }
+      { id: 'ha-1', name: 'Aquecimento: Manguito Rotador na Polia', muscleGroup: 'Manguito', sets: 2, reps: '15', rest: 60, notes: 'Foco em ativação leve', image: getExerciseGifUrl('Aquecimento: Manguito Rotador na Polia') },
+      { id: 'ha-2', name: 'Supino na Máquina (ou Articulado)', muscleGroup: 'Peitoral', sets: 3, reps: '10-12', rest: 90, notes: 'Proteger ombro, movimento controlado', image: getExerciseGifUrl('Supino na Máquina (ou Articulado)') },
+      { id: 'ha-3', name: 'Crucifixo Reto com Halteres', muscleGroup: 'Peitoral', sets: 3, reps: '12', rest: 90, notes: 'Não descer os halteres além do tronco', image: getExerciseGifUrl('Crucifixo Reto com Halteres') },
+      { id: 'ha-4', name: 'Elevação Lateral (Halteres ou Polia)', muscleGroup: 'Ombros', sets: 3, reps: '12-15', rest: 60, notes: 'Braços levemente à frente (plano escapular)', image: getExerciseGifUrl('Elevação Lateral (Halteres ou Polia)') },
+      { id: 'ha-5', name: 'Tríceps Corda na Polia', muscleGroup: 'Tríceps', sets: 4, reps: '12', rest: 60, notes: 'Extensão máxima mantendo cotovelos fixos', image: getExerciseGifUrl('Tríceps Corda na Polia') },
+      { id: 'ha-6', name: 'Tríceps Coice (Cabo ou Halter)', muscleGroup: 'Tríceps', sets: 3, reps: '12', rest: 60, notes: 'Controle bem a fase de retorno', image: getExerciseGifUrl('Tríceps Coice (Cabo ou Halter)') },
+      { id: 'ha-7', name: 'Abdominal Supra (Solo ou Máquina)', muscleGroup: 'Abdômen', sets: 3, reps: '15-20', rest: 60, notes: 'Contrair bem o abdômen no pico', image: getExerciseGifUrl('Abdominal Supra (Solo ou Máquina)') }
     ]
   },
   {
-    id: 'h-2',
-    title: 'Treino 2',
-    description: 'Foco em Costas e Bíceps.',
+    id: 'h-b',
+    title: 'Treino B - Puxe',
+    description: 'Foco: Hipertrofia & Segurança Articular (Nível Intermediário)',
     color: 'orange',
     exercises: [
-      { id: 'h2-1', name: 'Pulley anterior aberta', muscleGroup: 'Costas', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Pulley anterior aberta') },
-      { id: 'h2-2', name: 'Remada articulada neutra', muscleGroup: 'Costas', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Remada articulada neutra') },
-      { id: 'h2-3', name: 'Crucifixo inverso máquina pronada', muscleGroup: 'Ombros/Costas', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Crucifixo inverso máquina pronada') },
-      { id: 'h2-4', name: 'Remada baixa peg. neutra', muscleGroup: 'Costas', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Remada baixa peg neutra') },
-      { id: 'h2-5', name: 'Rosca martelo no cross corda', muscleGroup: 'Bíceps', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Rosca martelo no cross corda') },
-      { id: 'h2-6', name: 'Rosca direta barra reta', muscleGroup: 'Bíceps', sets: 4, reps: 'Máx rep', rest: 60, image: getExerciseGifUrl('Rosca direta barra reta') }
+      { id: 'hb-1', name: 'Aquecimento: Manguito Rotador na Polia', muscleGroup: 'Manguito', sets: 2, reps: '15', rest: 60, notes: 'Foco em ativação leve', image: getExerciseGifUrl('Aquecimento: Manguito Rotador na Polia') },
+      { id: 'hb-2', name: 'Puxada Alta (Lat Pulldown)', muscleGroup: 'Costas', sets: 3, reps: '10-12', rest: 90, notes: 'Puxar em direção ao peito (nunca por trás)', image: getExerciseGifUrl('Puxada Alta (Lat Pulldown)') },
+      { id: 'hb-3', name: 'Remada Baixa Sentado (Triângulo)', muscleGroup: 'Costas', sets: 3, reps: '12', rest: 90, notes: 'Esmagar as escápulas, peito estufado', image: getExerciseGifUrl('Remada Baixa Sentado (Triângulo)') },
+      { id: 'hb-4', name: 'Crucifixo Inverso na Máquina', muscleGroup: 'Ombros/Costas', sets: 3, reps: '15', rest: 60, notes: 'Fortalecimento essencial para o ombro', image: getExerciseGifUrl('Crucifixo Inverso na Máquina') },
+      { id: 'hb-5', name: 'Encolhimento com Halteres (Trapézio)', muscleGroup: 'Trapézio', sets: 4, reps: '12-15', rest: 60, notes: 'Subir e descendo controlado, SEM girar os ombros', image: getExerciseGifUrl('Encolhimento com Halteres (Trapézio)') },
+      { id: 'hb-6', name: 'Rosca Direta com Barra W', muscleGroup: 'Bíceps', sets: 3, reps: '10-12', rest: 60, notes: 'Mais anatômica para punhos e cotovelos', image: getExerciseGifUrl('Rosca Direta com Barra W') },
+      { id: 'hb-7', name: 'Rosca Martelo', muscleGroup: 'Bíceps', sets: 3, reps: '12', rest: 60, notes: 'Pegada neutra', image: getExerciseGifUrl('Rosca Martelo') }
     ]
   },
   {
-    id: 'h-3',
-    title: 'Treino 3',
-    description: 'Foco em Membros Inferiores.',
+    id: 'h-c',
+    title: 'Treino C - Pernas e Core',
+    description: 'Foco: Hipertrofia & Segurança Articular (Nível Intermediário)',
     color: 'emerald',
     exercises: [
-      { id: 'h3-1', name: 'Banco abdutor', muscleGroup: 'Pernas', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Banco abdutor') },
-      { id: 'h3-2', name: 'Leg press 45º', muscleGroup: 'Pernas', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Leg press 45') },
-      { id: 'h3-3', name: 'Agachamento livre', muscleGroup: 'Pernas', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Agachamento livre') },
-      { id: 'h3-4', name: 'Banco extensor', muscleGroup: 'Pernas', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Banco extensor') },
-      { id: 'h3-5', name: 'Mesa flexora', muscleGroup: 'Pernas', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Mesa flexora') },
-      { id: 'h3-6', name: 'Banco sóleo', muscleGroup: 'Panturrilha', sets: 3, reps: '12 a 15', rest: 60, image: getExerciseGifUrl('Banco sóleo') },
-      { id: 'h3-7', name: 'Extensão lombar no banco romano', muscleGroup: 'Lombar', sets: 3, reps: '15', rest: 60, image: getExerciseGifUrl('Extensão lombar no banco romano') }
+      { id: 'hc-1', name: 'Leg Press 45° ou Horizontal', muscleGroup: 'Pernas', sets: 4, reps: '10-12', rest: 90, notes: 'Empurrar com o meio do pé/calcanhar', image: getExerciseGifUrl('Leg Press 45° ou Horizontal') },
+      { id: 'hc-2', name: 'Cadeira Extensora', muscleGroup: 'Quadríceps', sets: 3, reps: '12-15', rest: 60, notes: 'Controlar bem a descida (fase excêntrica)', image: getExerciseGifUrl('Cadeira Extensora') },
+      { id: 'hc-3', name: 'Mesa ou Cadeira Flexora', muscleGroup: 'Posterior', sets: 3, reps: '12', rest: 60, notes: 'Foco em posterior de coxa', image: getExerciseGifUrl('Mesa ou Cadeira Flexora') },
+      { id: 'hc-4', name: 'Panturrilha Sentado (Cavalinho)', muscleGroup: 'Panturrilha', sets: 4, reps: '15', rest: 60, notes: 'Alongamento e contração máxima', image: getExerciseGifUrl('Panturrilha Sentado (Cavalinho)') },
+      { id: 'hc-5', name: 'Abdominal Infra (Solo)', muscleGroup: 'Abdômen', sets: 3, reps: '12-15', rest: 60, notes: 'Elevação de pernas controlada', image: getExerciseGifUrl('Abdominal Infra (Solo)') },
+      { id: 'hc-6', name: 'Prancha Abdominal', muscleGroup: 'CORE', sets: 3, reps: '45-60s', rest: 60, notes: 'Se incomodar o ombro, substituir pelo Infra', image: getExerciseGifUrl('Prancha Abdominal') }
     ]
   }
 ];
