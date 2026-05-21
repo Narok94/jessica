@@ -53,14 +53,11 @@ interface AppState {
 }
 
 export const useStore = create<AppState>((set, get) => {
-  // Theme initialization
-  const savedTheme = localStorage.getItem('tatugym_theme') as 'light' | 'dark' | null;
-  const initialTheme = savedTheme || 'dark';
+  // Theme is strictly locked to premium dark HUD esthetic for Tatu Gym
+  const initialTheme = 'dark';
   
-  // Apply theme class on load
   if (typeof document !== 'undefined') {
-    if (initialTheme === 'light') document.body.classList.add('light');
-    else document.body.classList.remove('light');
+    document.body.classList.remove('light');
   }
 
   return {
@@ -108,27 +105,10 @@ export const useStore = create<AppState>((set, get) => {
   setUser: (user) => {
     set({ user });
     if (user) {
-      const username = user.username.toLowerCase();
-      let preferredTheme: 'light' | 'dark' = 'dark';
-      
-      if (username === 'jessica' || username === 'flavia') {
-        preferredTheme = 'light';
-      } else if (username === 'henrique') {
-        preferredTheme = 'dark';
-      } else {
-        // Fallback to current theme or dark
-        preferredTheme = get().theme;
-      }
-
       if (typeof document !== 'undefined') {
-        if (preferredTheme === 'light') {
-          document.body.classList.add('light');
-        } else {
-          document.body.classList.remove('light');
-        }
-        localStorage.setItem('tatugym_theme', preferredTheme);
+        document.body.classList.remove('light');
       }
-      set({ theme: preferredTheme });
+      set({ theme: 'dark' });
     }
   },
   setIsLoggedIn: (isLoggedIn) => set({ isLoggedIn }),
@@ -152,14 +132,8 @@ export const useStore = create<AppState>((set, get) => {
   setAddToast: (fn) => set({ addToast: fn }),
 
   toggleTheme: () => {
-    const newTheme = get().theme === 'dark' ? 'light' : 'dark';
-    if (newTheme === 'light') {
-      document.body.classList.add('light');
-    } else {
-      document.body.classList.remove('light');
-    }
-    localStorage.setItem('tatugym_theme', newTheme);
-    set({ theme: newTheme });
+    // Strictly locked to premium dark HUD
+    set({ theme: 'dark' });
   },
 
   logout: async () => {

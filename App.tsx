@@ -25,6 +25,7 @@ import { WorkoutView } from './components/views/WorkoutView';
 import { HistoryView } from './components/views/HistoryView';
 import { ProfileView } from './components/views/ProfileView';
 import { TeacherView } from './components/views/TeacherView';
+import { WorkoutsListView } from './components/views/WorkoutsListView';
 
 const AppContent: React.FC = () => {
   const { 
@@ -119,8 +120,12 @@ const AppContent: React.FC = () => {
               username: finalUser.username,
               updatedAt: new Date().toISOString()
             });
-          } catch (err) {
-            console.error('[App] Erro na sincronização Firebase durante auto-login:', err);
+          } catch (err: any) {
+            if (err.code === 'auth/admin-restricted-operation') {
+              console.warn('[App] Anonymous Authentication is disabled in Firebase Console. Auto-login falling back to offline mode.');
+            } else {
+              console.error('[App] Erro na sincronização Firebase durante auto-login:', err);
+            }
           }
 
           setUser(finalUser);
@@ -152,8 +157,30 @@ const AppContent: React.FC = () => {
     
     if (allWorkouts[lowerUser as keyof typeof allWorkouts] || lowerUser === 'professor' || lowerUser === 'admin') {
       let userData: User | null = null;
+      let uid: string | null = null;
+
       try {
-        // Try to get from Firestore first
+        // 1. Sign in anonymously first to get a UID for Firestore rules
+        const userCredential = await signInAnonymously(auth);
+        uid = userCredential.user.uid;
+        
+        // 2. Save UID mapping first to establish ownership so that isOwner(username) is instantly true
+        await setDoc(doc(db, 'uids', uid), { 
+          role: (lowerUser === 'professor' || lowerUser === 'admin') ? 'teacher' : 'student',
+          username: lowerUser,
+          updatedAt: new Date().toISOString()
+        });
+        console.log(`[App] Firebase session synchronized for ${lowerUser} (UID: ${uid})`);
+      } catch (error: any) {
+        if (error.code === 'auth/admin-restricted-operation') {
+          console.warn('[App] Anonymous Authentication is disabled in Firebase Console. Continuing in offline/local fallback mode.');
+        } else {
+          console.error('[App] Firebase Authentication sync error:', error);
+        }
+      }
+
+      try {
+        // 3. Now we can safely perform our read since ownership has been registered
         const userDoc = await getDoc(doc(db, 'users', lowerUser));
         if (userDoc.exists()) {
           userData = userDoc.data() as User;
@@ -165,7 +192,8 @@ const AppContent: React.FC = () => {
           }
         }
       } catch (error) {
-        console.error('Error parsing profile:', error);
+        // Quieter warning for permission policy errors when auth is restricted or database is not yet ready
+        console.warn('Error parsing profile, falling back to local state:', error);
       }
 
       // Password check logic
@@ -217,19 +245,10 @@ const AppContent: React.FC = () => {
       }
       
       try {
-        // Sign in anonymously to get a UID for Firestore rules
-        const userCredential = await signInAnonymously(auth);
-        const uid = userCredential.user.uid;
-        
-        // Save to Firestore
-        await setDoc(doc(db, 'users', lowerUser), userData);
-        
-        // Save UID mapping for security rules
-        await setDoc(doc(db, 'uids', uid), { 
-          role: userData.role,
-          username: lowerUser,
-          updatedAt: new Date().toISOString()
-        });
+        if (uid) {
+          // Save to Firestore
+          await setDoc(doc(db, 'users', lowerUser), userData);
+        }
       } catch (error) {
         console.error('Error syncing with Firebase:', error);
       }
@@ -238,6 +257,8 @@ const AppContent: React.FC = () => {
       setIsLoggedIn(true);
       if (userData.role === 'teacher') {
         setActiveTab(AppTab.TEACHER);
+      } else {
+        setActiveTab(AppTab.DASHBOARD);
       }
       
       // Persistência de login
@@ -374,6 +395,7 @@ const AppContent: React.FC = () => {
     
     switch (activeTab) {
       case AppTab.DASHBOARD: return <DashboardView />;
+      case AppTab.WORKOUT: return <WorkoutsListView />;
       case AppTab.HISTORY: return <HistoryView />;
       case AppTab.PROFILE: return <ProfileView />;
       case AppTab.TEACHER: return <TeacherView />;
@@ -381,45 +403,46 @@ const AppContent: React.FC = () => {
     }
   };
 
+  const isDashboard = isLoggedIn && activeTab === AppTab.DASHBOARD && !selectedWorkout;
+
   return (
-    <div className={`min-h-screen ${theme} bg-bg text-ink pb-32 transition-colors duration-400`}>
-      <div className="max-w-4xl mx-auto p-6">
+    <div className={`min-h-screen ${theme} bg-bg text-ink ${isDashboard ? 'h-screen max-h-screen overflow-hidden pb-[74px]' : 'pb-24'} transition-colors duration-400`}>
+      <div className={isDashboard ? 'max-w-md mx-auto px-4.5 pt-2 h-[calc(100vh-74px)] overflow-hidden flex flex-col justify-between' : 'max-w-md mx-auto px-4.5 pt-4'}>
         {renderView()}
       </div>
 
       {/* Navigation Bar */}
       {!selectedWorkout && (
-        <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50">
-          <div className="glass-card rounded-[2.5rem] p-2 flex items-center justify-between shadow-2xl">
+        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#050505] border-t border-white/[0.06] shadow-2xl select-none">
+          <div className="max-w-md mx-auto h-[74px] px-4 flex items-center justify-around">
             {[
               ...(user?.role === 'teacher' ? [{ id: AppTab.TEACHER, icon: Users, label: 'Alunos' }] : []),
-              { id: AppTab.DASHBOARD, icon: LayoutDashboard, label: 'Home' },
+              { id: AppTab.DASHBOARD, icon: LayoutDashboard, label: 'Dashboard' },
+              { id: AppTab.WORKOUT, icon: Dumbbell, label: 'Treinos' },
               { id: AppTab.HISTORY, icon: HistoryIcon, label: 'Histórico' },
               { id: AppTab.PROFILE, icon: UserIcon, label: 'Perfil' }
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => {
-                  handleVibrate();
-                  setActiveTab(item.id);
-                }}
-                className={`relative flex flex-col items-center justify-center w-16 h-16 rounded-[2rem] transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
-                  activeTab === item.id 
-                  ? 'bg-accent text-white shadow-[0_10px_25px_rgba(var(--color-accent-rgb),0.3)] scale-110' 
-                  : 'text-secondary hover:text-ink'
-                }`}
-              >
-                {activeTab === item.id && (
-                  <motion.div 
-                    layoutId="active-pill"
-                    className="absolute inset-0 bg-accent rounded-[2rem] -z-10 shadow-lg shadow-accent/20"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+            ].map((item) => {
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    handleVibrate();
+                    setActiveTab(item.id);
+                  }}
+                  className="relative flex flex-col items-center justify-center flex-1 h-full py-1 focus:outline-none"
+                >
+                  <item.icon 
+                    size={20} 
+                    className={`transition-colors duration-200 ${isActive ? 'text-[#FF5F00]' : 'text-zinc-500'}`} 
+                    strokeWidth={isActive ? 3 : 2} 
                   />
-                )}
-                <item.icon size={22} strokeWidth={activeTab === item.id ? 3 : 2} />
-                <span className="text-[8px] font-black uppercase tracking-widest mt-1">{item.label}</span>
-              </button>
-            ))}
+                  <span className={`text-[8.5px] font-black uppercase tracking-[0.14em] mt-1.5 transition-colors duration-200 ${isActive ? 'text-[#FF5F00]' : 'text-zinc-500'}`}>
+                    {item.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </nav>
       )}

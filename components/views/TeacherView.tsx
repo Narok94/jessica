@@ -308,8 +308,8 @@ export const TeacherView: React.FC = () => {
               <div key={workout.id} className="glass-card rounded-3xl overflow-hidden group">
                 <div className="p-5 flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl bg-${workout.color}-500/10 flex items-center justify-center border border-${workout.color}-500/20`}>
-                      <Dumbbell size={24} className={`text-${workout.color}-500`} />
+                    <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center border border-accent/20">
+                      <Dumbbell size={24} className="text-accent" />
                     </div>
                     <div>
                       <h4 className="font-black text-ink uppercase tracking-tight italic">Treino {String.fromCharCode(65 + idx)}: {workout.title}</h4>
@@ -359,30 +359,16 @@ export const TeacherView: React.FC = () => {
               </div>
 
               <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-secondary uppercase tracking-widest ml-1">Título</label>
+                    <label className="text-[10px] font-black text-secondary uppercase tracking-widest ml-1">Título do Treino</label>
                     <input 
                       type="text"
                       value={editingWorkout ? editingWorkout.title : newWorkoutData.title}
-                      onChange={(e) => editingWorkout ? setEditingWorkout({...editingWorkout, title: e.target.value}) : setNewWorkoutData({...newWorkoutData, title: e.target.value})}
-                      className="w-full glass-card rounded-2xl p-4 text-ink font-bold outline-none focus:border-accent"
+                      onChange={(e) => editingWorkout ? setEditingWorkout({...editingWorkout, title: e.target.value}) : setNewWorkoutData({...newWorkoutData, title: e.target.value, color: 'orange'})}
+                      className="w-full bg-black border border-white/10 rounded-2xl p-4 text-ink font-bold outline-none focus:border-accent"
                       placeholder="Ex: Peito e Tríceps"
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-secondary uppercase tracking-widest ml-1">Cor</label>
-                    <div className="flex gap-2">
-                      {['blue', 'emerald', 'purple', 'orange', 'rose'].map(color => (
-                        <button
-                          key={color}
-                          onClick={() => editingWorkout ? setEditingWorkout({...editingWorkout, color}) : setNewWorkoutData({...newWorkoutData, color})}
-                          className={`w-10 h-10 rounded-xl bg-${color}-500 transition-all ${
-                            (editingWorkout ? editingWorkout.color : newWorkoutData.color) === color ? 'ring-4 ring-ink/20 scale-110' : 'opacity-40 hover:opacity-100'
-                          }`}
-                        />
-                      ))}
-                    </div>
                   </div>
                 </div>
 
