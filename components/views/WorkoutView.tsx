@@ -406,6 +406,20 @@ export const WorkoutView: React.FC = () => {
 
     const currentSets = getExercisePerformance(currentEx);
     const updatedSets = [...currentSets];
+    
+    // Copy weight and reps from the first set to subsequent uncompleted sets automatically
+    if (setIndex === 0) {
+      const cascadeUpdates: Partial<SetPerformance> = {};
+      if (updates.weight !== undefined) cascadeUpdates.weight = updates.weight;
+      if (updates.reps !== undefined) cascadeUpdates.reps = updates.reps;
+      
+      for (let i = 1; i < updatedSets.length; i++) {
+        if (!updatedSets[i].completed) {
+          updatedSets[i] = { ...updatedSets[i], ...cascadeUpdates };
+        }
+      }
+    }
+
     updatedSets[setIndex] = { ...updatedSets[setIndex], ...updates };
 
     // Emit live to store progress (autosaves natively)
@@ -474,10 +488,6 @@ export const WorkoutView: React.FC = () => {
   };
 
   const openExerciseModal = (ex: Exercise) => {
-    // If user clicks an exercise and training session is offline, auto-engage training to lower friction!
-    if (!isWorkoutActive) {
-      startWorkout();
-    }
     setActiveModalExercise(ex);
   };
 
