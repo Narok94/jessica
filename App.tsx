@@ -436,7 +436,7 @@ const AppContent: React.FC = () => {
   const isDashboard = isLoggedIn && activeTab === AppTab.DASHBOARD && !selectedWorkout;
 
   return (
-    <div className={`h-screen max-h-screen overflow-hidden relative flex flex-col bg-[#050505] text-white transition-colors duration-400 select-none font-sans`}>
+    <div className={`h-[100dvh] max-h-[100dvh] overflow-hidden relative flex flex-col bg-[#050505] text-white transition-colors duration-400 select-none font-sans`}>
       {/* Plexus Connection Grid Background available across all screens */}
       <svg className="absolute inset-0 w-full h-full opacity-30 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
         <defs>
