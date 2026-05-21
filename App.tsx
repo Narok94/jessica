@@ -468,14 +468,14 @@ const AppContent: React.FC = () => {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 bg-[#FF5F00]/5 blur-[100px] rounded-full pointer-events-none"></div>
 
       {/* Main viewport-bounded view container */}
-      <div className="flex-grow flex-1 min-h-0 w-full max-w-sm mx-auto px-2 pt-1 pb-[74px] relative z-10 flex flex-col justify-between overflow-hidden">
+      <div className="flex-grow flex-1 min-h-0 w-full max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto px-2.5 md:px-4 lg:px-6 pt-1 pb-[74px] relative z-10 flex flex-col justify-between overflow-hidden">
         {renderView()}
       </div>
 
       {/* Navigation Bar */}
       {!selectedWorkout && (
         <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#050505] border-t border-white/[0.06] shadow-2xl select-none">
-          <div className="max-w-sm mx-auto h-[74px] px-4 flex items-center justify-around">
+          <div className="w-full max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto h-[74px] px-4 flex items-center justify-around">
             {[
               ...(user?.role === 'teacher' ? [{ id: AppTab.TEACHER, icon: Users, label: 'Alunos' }] : []),
               { id: AppTab.DASHBOARD, icon: LayoutDashboard, label: 'Dashboard' },

@@ -517,7 +517,7 @@ export const WorkoutView: React.FC = () => {
 
   if (showSummary) {
     return (
-      <div className="h-full max-h-full overflow-hidden flex flex-col justify-between py-2 px-1 text-center bg-transparent text-white font-sans antialiased selection:bg-[#FF5F00]/30 select-none max-w-sm mx-auto space-y-2">
+      <div className="h-full max-h-full overflow-hidden flex flex-col justify-between py-2 px-1 text-center bg-transparent text-white font-sans antialiased selection:bg-[#FF5F00]/30 select-none w-full max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto space-y-2">
           
           {/* HEADER COMPACTO */}
           <div className="flex items-center gap-3 bg-[#0c0c0c]/90 border border-white/5 p-3 rounded-xl shrink-0 shadow-sm">
@@ -684,7 +684,7 @@ export const WorkoutView: React.FC = () => {
   }, 0);
 
   return (
-    <div className="h-full max-h-full overflow-hidden flex flex-col justify-between pb-1.5 max-w-sm mx-auto px-1 bg-transparent select-none">
+    <div className="h-full max-h-full overflow-hidden flex flex-col justify-between pb-1.5 w-full max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto px-1 bg-transparent select-none">
       {/* Upper Navigation Header */}
       <header className="flex items-center justify-between py-1.5 border-b border-white/5 shrink-0">
         <div className="flex items-center gap-2 min-w-0">

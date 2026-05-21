@@ -48,8 +48,8 @@ export const ProfileView: React.FC = () => {
     let defaultLevel = 'Atleta';
     
     if (usernameLower === 'henrique') {
-      defaultWeight = 84.5;
-      defaultHeight = 1.81;
+      defaultWeight = 68.0;
+      defaultHeight = 1.68;
       defaultLevel = 'Atleta Avançado';
     } else if (usernameLower === 'flavia' || usernameLower === 'flávia') {
       defaultWeight = 62.0;
