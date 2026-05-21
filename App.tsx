@@ -8,7 +8,8 @@ import {
   Lock,
   Check,
   ArrowRight,
-  Users
+  Users,
+  Plus
 } from 'lucide-react';
 import { useStore } from './store';
 import { useWorkoutPersistence } from './hooks/useWorkoutPersistence';
@@ -283,108 +284,137 @@ const AppContent: React.FC = () => {
 
   if (!isLoggedIn) {
     return (
-      <div className={`min-h-screen ${theme} bg-bg text-ink flex flex-col items-center justify-center p-6 font-sans selection:bg-accent/30 relative overflow-hidden transition-colors duration-400`}>
-        {/* Animated Mesh Background (CSS variable based) */}
-        <div className="bg-mesh absolute inset-0 opacity-40 pointer-events-none"></div>
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_left,_var(--accent-color)_5%,_transparent_40%)] opacity-20 pointer-events-none"></div>
-        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_bottom_right,_var(--highlight-color)_5%,_transparent_40%)] opacity-20 pointer-events-none"></div>
+      <div className="h-screen overflow-hidden bg-[#050505] relative flex flex-col justify-center items-center p-6 font-sans selection:bg-[#FF5F00]/30 select-none">
+        
+        {/* Fundo Tecnológico (Efeito de Linhas Conexas) */}
+        <svg className="absolute inset-0 w-full h-full opacity-30 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
+              <circle cx="40" cy="0" r="1.5" fill="rgba(255, 95, 0, 0.08)" />
+              <circle cx="0" cy="40" r="1.5" fill="rgba(255, 95, 0, 0.08)" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+          
+          <line x1="10%" y1="20%" x2="30%" y2="40%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
+          <line x1="30%" y1="40%" x2="25%" y2="70%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
+          <line x1="25%" y1="70%" x2="60%" y2="85%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
+          <line x1="60%" y1="85%" x2="80%" y2="45%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
+          <line x1="80%" y1="45%" x2="55%" y2="25%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
+          <line x1="55%" y1="25%" x2="10%" y2="20%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
+          <line x1="30%" y1="40%" x2="55%" y2="25%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
+          <line x1="25%" y1="70%" x2="55%" y2="25%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
+          <line x1="60%" y1="85%" x2="55%" y2="25%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
+          
+          <circle cx="10%" cy="20%" r="2" fill="rgba(255, 95, 0, 0.15)" />
+          <circle cx="30%" cy="40%" r="2.5" fill="rgba(255, 95, 0, 0.2)" />
+          <circle cx="25%" cy="70%" r="2" fill="rgba(255, 95, 0, 0.15)" />
+          <circle cx="60%" cy="85%" r="3" fill="rgba(255, 95, 0, 0.2)" />
+          <circle cx="80%" cy="45%" r="2" fill="rgba(255, 95, 0, 0.15)" />
+          <circle cx="55%" cy="25%" r="2.5" fill="rgba(255, 95, 0, 0.2)" />
+        </svg>
+
+        {/* Efeito de iluminação sutil no topo */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 bg-[#FF5F00]/5 blur-[100px] rounded-full pointer-events-none"></div>
 
         <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full max-w-md space-y-12 relative z-10"
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="w-full max-w-sm space-y-10 relative z-10"
         >
-          <div className="flex flex-col items-center gap-6 text-center">
-             <motion.div 
-               whileHover={{ rotate: 5, scale: 1.05 }}
-               className="p-8 glass-card rounded-[3rem] shadow-2xl relative"
-             >
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-highlight rounded-full animate-pulse shadow-[0_0_15px_var(--highlight-color)]"></div>
-                <Dumbbell size={64} className="text-accent" strokeWidth={2.5} />
-             </motion.div>
-             <div className="space-y-2">
-                <h1 className="text-5xl font-black text-ink tracking-tighter italic uppercase leading-none">
-                  TATU <span className="text-accent">GYM</span>
-                </h1>
-                <p className="text-[10px] font-black text-secondary uppercase tracking-[0.4em]">Elite Performance System</p>
-             </div>
+          {/* Bloco do Logotipo (Brand Header) */}
+          <div className="flex flex-col items-center text-center space-y-3">
+            <Dumbbell size={48} className="text-[#FF5F00] drop-shadow-[0_0_15px_rgba(255,95,0,0.3)]" strokeWidth={2.5} />
+            <div className="space-y-1">
+              <h1 className="text-3xl font-[950] italic uppercase tracking-wider text-white">
+                TATU<span className="text-[#FF5F00]">GYM</span>
+              </h1>
+              <p className="text-white/40 text-[10px] uppercase tracking-[0.25em] font-mono mt-1">
+                ELITE PERFORMANCE SYSTEM
+              </p>
+            </div>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-5">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] ml-1">Usuário</label>
-                <div className="relative group">
-                  <UserIcon className="absolute left-6 top-1/2 -translate-y-1/2 text-secondary group-focus-within:text-accent transition-colors" size={20} />
-                  <input 
-                    type="text" 
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="w-full glass-card rounded-2xl p-5 pl-16 text-ink font-bold outline-none focus:border-accent group-hover:bg-white/5 transition-all placeholder:text-secondary/30"
-                    placeholder="Seu usuário"
-                    required
-                  />
+          {/* Formulário com Inputs Otimizados */}
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div className="space-y-4">
+              {/* Input Usuário */}
+              <div className="space-y-1.5">
+                <label className="text-white/50 text-[11px] uppercase tracking-wider font-bold mb-1.5 px-1 block">
+                  USUÁRIO
+                </label>
+                <div className="bg-[#0c0c0c] border border-white/5 focus-within:border-[#FF5F00]/40 rounded-2xl p-4 transition-all flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <UserIcon className="text-[#FF5F00] shrink-0" size={18} />
+                    <input 
+                      type="text" 
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="w-full bg-transparent text-white font-bold outline-none text-sm placeholder:text-white/20"
+                      placeholder="Seu usuário"
+                      required
+                    />
+                  </div>
+                  <Plus className="text-white/20 shrink-0" size={16} />
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] ml-1">Senha</label>
-                <div className="relative group">
-                  <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-secondary group-focus-within:text-accent transition-colors" size={20} />
-                  <input 
-                    type="password" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full glass-card rounded-2xl p-5 pl-16 text-ink font-bold outline-none focus:border-accent group-hover:bg-white/5 transition-all placeholder:text-secondary/30"
-                    placeholder="••••••••"
-                    required
-                  />
+              {/* Input Senha */}
+              <div className="space-y-1.5">
+                <label className="text-white/50 text-[11px] uppercase tracking-wider font-bold mb-1.5 px-1 block">
+                  SENHA
+                </label>
+                <div className="bg-[#0c0c0c] border border-white/5 focus-within:border-[#FF5F00]/40 rounded-2xl p-4 transition-all flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <Lock className="text-[#FF5F00] shrink-0" size={18} />
+                    <input 
+                      type="password" 
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full bg-transparent text-white font-bold outline-none text-sm placeholder:text-white/20"
+                      placeholder="••••••••"
+                      required
+                    />
+                  </div>
+                  <Plus className="text-white/20 shrink-0" size={16} />
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-between px-2">
+            {/* Opção Unica de Lembrar Acesso */}
+            <div className="flex items-center justify-between px-1">
               <label className="flex items-center gap-3 cursor-pointer group">
                 <div 
-                  className={`w-6 h-6 rounded-xl border-2 flex items-center justify-center transition-all duration-300 ${rememberMe ? 'bg-accent border-accent shadow-lg shadow-accent/20' : 'border-line bg-white/5'}`}
+                  className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-all ${
+                    rememberMe ? 'bg-[#FF5F00] border-[#FF5F00]' : 'border-white/10 bg-[#0c0c0c]'
+                  }`}
                   onClick={(e) => {
                     e.preventDefault();
                     handleVibrate();
                     setRememberMe(!rememberMe);
                   }}
                 >
-                  {rememberMe && <Check size={14} className="text-white" strokeWidth={4} />}
+                  {rememberMe && <Check size={11} className="text-black" strokeWidth={4.5} />}
                 </div>
-                <span className="text-[11px] font-black text-secondary uppercase tracking-widest">Lembrar acesso</span>
+                <span className="text-[11px] font-black text-white/50 uppercase tracking-widest">
+                  Lembrar acesso
+                </span>
               </label>
-              <button 
-                type="button" 
-                onClick={handleVibrate}
-                className="text-[10px] font-black text-secondary uppercase tracking-widest hover:text-accent transition-colors"
-              >
-                Esqueci
-              </button>
             </div>
 
+            {/* Botão de Entrada Massivo (CTA) */}
             <motion.button 
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className={`w-full py-6 rounded-2xl font-black text-sm uppercase tracking-[0.5em] transition-all flex items-center justify-center gap-4 border shadow-xl ${
-                (username || password) 
-                ? 'bg-accent text-white border-accent shadow-accent/20' 
-                : 'bg-white/5 border-line text-secondary'
-              }`}
+              type="submit"
+              className="w-full mt-6 bg-[#FF5F00] hover:bg-[#ff7722] text-white font-black italic uppercase py-4 rounded-3xl text-[15px] tracking-widest shadow-[0_0_25px_rgba(255,95,0,0.35)] active:scale-[0.98] transition-all flex justify-center items-center gap-2 font-sans cursor-pointer border-0"
             >
-              ENTRAR <ArrowRight size={20} strokeWidth={3} />
+              ENTRAR <ArrowRight size={18} strokeWidth={3} />
             </motion.button>
           </form>
 
-          <div className="pt-8 text-center">
-             <p className="text-secondary text-[10px] font-black uppercase tracking-[0.3em] leading-relaxed opacity-50">
-               © 2026 TATU GYM PRO • HIGH TECH FITNESS
-             </p>
-          </div>
         </motion.div>
       </div>
     );
@@ -406,15 +436,46 @@ const AppContent: React.FC = () => {
   const isDashboard = isLoggedIn && activeTab === AppTab.DASHBOARD && !selectedWorkout;
 
   return (
-    <div className={`min-h-screen ${theme} bg-bg text-ink ${isDashboard ? 'h-screen max-h-screen overflow-hidden pb-[74px]' : 'pb-24'} transition-colors duration-400`}>
-      <div className={isDashboard ? 'max-w-md mx-auto px-4.5 pt-2 h-[calc(100vh-74px)] overflow-hidden flex flex-col justify-between' : 'max-w-md mx-auto px-4.5 pt-4'}>
+    <div className={`h-screen max-h-screen overflow-hidden relative flex flex-col bg-[#050505] text-white transition-colors duration-400 select-none font-sans`}>
+      {/* Plexus Connection Grid Background available across all screens */}
+      <svg className="absolute inset-0 w-full h-full opacity-30 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="global-grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
+            <circle cx="40" cy="0" r="1.2" fill="rgba(255, 95, 0, 0.06)" />
+            <circle cx="0" cy="40" r="1.2" fill="rgba(255, 95, 0, 0.06)" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#global-grid-pattern)" />
+        
+        <line x1="15%" y1="15%" x2="40%" y2="28%" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
+        <line x1="40%" y1="28%" x2="25%" y2="65%" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
+        <line x1="25%" y1="65%" x2="65%" y2="80%" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
+        <line x1="65%" y1="80%" x2="80%" y2="40%" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
+        <line x1="80%" y1="40%" x2="55%" y2="20%" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
+        <line x1="55%" y1="20%" x2="15%" y2="15%" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
+        <line x1="40%" y1="28%" x2="55%" y2="20%" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
+        
+        <circle cx="15%" cy="15%" r="1.5" fill="rgba(255, 95, 0, 0.12)" />
+        <circle cx="40%" cy="28%" r="2" fill="rgba(255, 95, 0, 0.15)" />
+        <circle cx="25%" cy="65%" r="1.5" fill="rgba(255, 95, 0, 0.12)" />
+        <circle cx="65%" cy="80%" r="2.5" fill="rgba(255, 95, 0, 0.15)" />
+        <circle cx="80%" cy="40%" r="1.5" fill="rgba(255, 95, 0, 0.12)" />
+        <circle cx="55%" cy="20%" r="2" fill="rgba(255, 95, 0, 0.15)" />
+      </svg>
+
+      {/* Sutil lighting on top */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 bg-[#FF5F00]/5 blur-[100px] rounded-full pointer-events-none"></div>
+
+      {/* Main viewport-bounded view container */}
+      <div className="flex-grow flex-1 min-h-0 w-full max-w-sm mx-auto px-2 pt-1 pb-[74px] relative z-10 flex flex-col justify-between overflow-hidden">
         {renderView()}
       </div>
 
       {/* Navigation Bar */}
       {!selectedWorkout && (
         <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#050505] border-t border-white/[0.06] shadow-2xl select-none">
-          <div className="max-w-md mx-auto h-[74px] px-4 flex items-center justify-around">
+          <div className="max-w-sm mx-auto h-[74px] px-4 flex items-center justify-around">
             {[
               ...(user?.role === 'teacher' ? [{ id: AppTab.TEACHER, icon: Users, label: 'Alunos' }] : []),
               { id: AppTab.DASHBOARD, icon: LayoutDashboard, label: 'Dashboard' },

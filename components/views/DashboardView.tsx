@@ -80,15 +80,15 @@ export const DashboardView: React.FC = () => {
   };
 
   return (
-    <div className="h-full max-h-full overflow-hidden flex flex-col justify-between pb-3 bg-[#050505] text-white font-sans antialiased selection:bg-[#FF5F00]/30 select-none">
+    <div className="h-full max-h-full overflow-hidden flex flex-col justify-between pb-1 bg-transparent text-white font-sans antialiased selection:bg-[#FF5F00]/30 select-none">
       
       {/* HEADER MINIMIZADO */}
-      <div className="pt-2 px-4 flex justify-between items-center shrink-0">
+      <div className="pt-1.5 px-2 flex justify-between items-center shrink-0">
         <div>
-          <h1 className="text-xl font-[950] italic uppercase tracking-tight text-white leading-none">
+          <h1 className="text-lg font-[950] italic uppercase tracking-tight text-white leading-none">
             TATU <span className="text-[#FF5F00]">GYM</span>
           </h1>
-          <p className="text-white/40 text-[8px] mt-0.5 uppercase tracking-widest font-mono font-black leading-none">
+          <p className="text-white/40 text-[7.5px] mt-0.5 uppercase tracking-widest font-mono font-black leading-none">
             Estética Máxima Performance
           </p>
         </div>
@@ -97,35 +97,35 @@ export const DashboardView: React.FC = () => {
             handleVibrate();
             logout();
           }} 
-          className="text-[8px] font-black text-white/40 hover:text-white uppercase tracking-widest transition-colors py-1 px-2 border border-white/5 rounded-lg bg-white/[0.01]"
+          className="text-[7.5px] font-black text-white/40 hover:text-white uppercase tracking-widest transition-colors py-0.5 px-1.5 border border-white/5 rounded bg-white/[0.01]"
         >
           SAIR
         </button>
       </div>
 
       {/* BIOMETRIA EM LINHA ÚNICA COMPACTA */}
-      <div className="px-4 mt-2 shrink-0">
-        <div className="bg-[#0c0c0c] border border-white/5 p-2 rounded-xl flex items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-[#FF5F00]/10 border border-[#FF5F00]/20 flex items-center justify-center text-[#FF5F00] font-black italic text-xs shrink-0">
+      <div className="px-1.5 mt-1 shrink-0">
+        <div className="bg-[#0c0c0c]/80 border border-white/5 p-1.5 rounded-lg flex items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 rounded-full bg-[#FF5F00]/10 border border-[#FF5F00]/20 flex items-center justify-center text-[#FF5F00] font-black italic text-[11px] shrink-0">
               {bio.initial}
             </div>
             <div>
-              <h2 className="font-bold text-white leading-none text-[11px]">{user.name}</h2>
-              <p className="text-[9px] text-white/40 leading-none mt-0.5">{bio.level}</p>
+              <h2 className="font-bold text-white leading-none text-[10px]">{user.name}</h2>
+              <p className="text-[8px] text-white/40 leading-none mt-0.5">{bio.level}</p>
             </div>
           </div>
-          <div className="flex gap-3 items-center border-l border-white/5 pl-3">
+          <div className="flex gap-2 items-center border-l border-white/5 pl-2.5">
             <div className="flex items-center gap-1">
-              <Scale className="w-3 h-3 text-[#FF5F00]" />
-              <p className="font-mono font-bold text-white text-xs">
-                {bio.weight}<span className="text-[9px] text-white/40 font-sans ml-0.5">kg</span>
+              <Scale className="w-2.5 h-2.5 text-[#FF5F00]" />
+              <p className="font-mono font-bold text-white text-base leading-none">
+                {bio.weight}<span className="text-[9px] text-white/45 font-sans ml-0.5">kg</span>
               </p>
             </div>
             <div className="flex items-center gap-1">
-              <Ruler className="w-3 h-3 text-[#FF5F00]" />
-              <p className="font-mono font-bold text-white text-xs">
-                {bio.height}<span className="text-[9px] text-white/40 font-sans ml-0.5">m</span>
+              <Ruler className="w-2.5 h-2.5 text-[#FF5F00]" />
+              <p className="font-mono font-bold text-white text-base leading-none">
+                {bio.height}<span className="text-[9px] text-white/45 font-sans ml-0.5">m</span>
               </p>
             </div>
           </div>
@@ -133,14 +133,14 @@ export const DashboardView: React.FC = () => {
       </div>
 
       {/* VISÃO GERAL DE PERFORMANCE (CONSISTÊNCIA SEMANAL EXTRA COMPACTA) */}
-      <div className="px-4 mt-2 shrink-0">
-        <div className="bg-[#0c0c0c] border border-white/5 p-3 rounded-2xl space-y-2">
+      <div className="px-1.5 mt-1 shrink-0">
+        <div className="bg-[#0c0c0c]/80 border border-white/5 p-2 rounded-xl space-y-1.5">
           <div className="flex justify-between items-baseline">
-            <h3 className="text-[9px] font-black italic uppercase text-white tracking-widest">Performance</h3>
-            <span className="text-[8px] font-mono text-white/40 uppercase font-black">Últimos 7 dias</span>
+            <h3 className="text-[8px] font-black italic uppercase text-white tracking-widest">Performance</h3>
+            <span className="text-[7.5px] font-mono text-white/40 uppercase font-black">Últimos 7 dias</span>
           </div>
           
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             {/* Grid dos Dias compactado */}
             <div className="grid grid-cols-7 gap-1">
               {weekDays.map((dia, idx) => {
@@ -153,14 +153,14 @@ export const DashboardView: React.FC = () => {
                 }
                 
                 return (
-                  <div key={idx} className="flex flex-col items-center gap-1">
-                    <span className="text-[8px] font-black font-mono text-white/40 leading-none">{dia}</span>
-                    <div className={`w-7.5 h-7.5 rounded-lg flex items-center justify-center transition-all ${
+                  <div key={idx} className="flex flex-col items-center gap-0.5">
+                    <span className="text-[7.5px] font-black font-mono text-white/40 leading-none">{dia}</span>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                       treinou 
-                        ? 'bg-[#FF5F00] text-black shadow-[0_0_8px_rgba(255,95,0,0.35)]' 
+                        ? 'bg-[#FF5F00] text-black shadow-[0_0_6px_rgba(255,95,0,0.3)]' 
                         : 'bg-white/[0.01] border border-white/5 text-white/10'
                     }`}>
-                      {treinou ? <Dumbbell className="w-3 h-3 text-black fill-black" strokeWidth={3.5} /> : <Shield className="w-3 h-3 text-white/10" />}
+                      {treinou ? <Dumbbell className="w-3.5 h-3.5 text-black fill-black animate-pulse" strokeWidth={3.5} /> : <Shield className="w-3 h-3 text-white/10" />}
                     </div>
                   </div>
                 );
@@ -168,7 +168,7 @@ export const DashboardView: React.FC = () => {
             </div>
             
             {/* Sub-legendas de rotas rápidas */}
-            <div className="flex gap-3 justify-center text-[8px] text-white/20 font-black tracking-wider uppercase font-mono">
+            <div className="flex gap-2 justify-center text-[7.5px] text-white/20 font-black tracking-wider uppercase font-mono">
               <span>A - Peito</span>
               <span>B - Costas</span>
               <span>R - Repouso</span>
@@ -176,38 +176,40 @@ export const DashboardView: React.FC = () => {
           </div>
 
           {/* Barra de Progresso da Meta ultrafina */}
-          <div className="border-t border-white/5 pt-2 space-y-1">
-            <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+          <div className="border-t border-white/5 pt-1 space-y-0.5">
+            <div className="w-full bg-white/5 h-0.5 rounded-full overflow-hidden">
               <div 
-                className="bg-[#FF5F00] h-full rounded-full shadow-[0_0_6px_rgba(255,95,0,0.5)] transition-all duration-500"
+                className="bg-[#FF5F00] h-full rounded-full shadow-[0_0_5px_rgba(255,95,0,0.4)] transition-all duration-500"
                 style={{ width: `${Math.min(100, (displayCount / 5) * 100)}%` }}
               ></div>
             </div>
-            <div className="flex justify-between text-[8px] font-black uppercase font-mono text-white/40 tracking-wider">
+            <div className="flex justify-between text-[7.5px] font-black uppercase font-mono text-white/40 tracking-wider">
               <span>Meta: 5 treinos/semana</span>
-              <span className="text-white/60">Atual: {displayCount}/5</span>
+              <span className="text-[#FF5F00] font-black">
+                {displayCount >= 5 ? 'meta de treinos atingida' : `Atual: ${displayCount}/5`}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
       {/* SEÇÃO CARD DO TREINO OTIMIZADO */}
-      <div className="px-4 mt-2 shrink-0">
-        <div className="bg-[#0c0c0c] border border-white/5 p-3 rounded-2xl space-y-2">
+      <div className="px-1.5 mt-1 shrink-0">
+        <div className="bg-[#0c0c0c]/80 border border-white/5 p-2 rounded-xl space-y-1">
           <div className="flex justify-between items-center">
-            <p className="text-[9px] font-black italic uppercase text-[#FF5F00] tracking-widest leading-none">Treino do Dia</p>
-            <span className="text-[8px] font-mono font-black text-[#FF5F00] uppercase bg-[#FF5F00]/10 border border-[#FF5F00]/20 px-1.5 py-0.5 rounded leading-none shrink-0">
+            <p className="text-[8.5px] font-black italic uppercase text-[#FF5F00] tracking-widest leading-none">Treino do Dia</p>
+            <span className="text-[7.5px] font-mono font-black text-[#FF5F00] uppercase bg-[#FF5F00]/10 border border-[#FF5F00]/20 px-1 py-0.5 rounded leading-none shrink-0">
               {seriesTotais} Séries
             </span>
           </div>
           <div>
-            <h4 className="text-[13px] font-black text-white uppercase italic tracking-tight leading-tight">{workoutTitle}</h4>
+            <h4 className="text-xs font-black text-white uppercase italic tracking-tight leading-tight">{workoutTitle}</h4>
             {workoutFocus && (
-              <p className="text-[10px] text-white/45 mt-0.5 font-semibold italic truncate">{workoutFocus}</p>
+              <p className="text-[9px] text-white/45 mt-0.5 font-semibold italic truncate leading-none">{workoutFocus}</p>
             )}
           </div>
           
-          <div className="flex justify-between items-center text-[9px] text-white/35 pt-1.5 border-t border-white/5 font-sans font-black uppercase tracking-wider">
+          <div className="flex justify-between items-center text-[8.5px] text-white/35 pt-1 border-t border-white/5 font-sans font-black uppercase tracking-wider">
             <span>Metodologia Avançada</span>
             <span className="text-white/60 shrink-0">
               {exercisesCount} Exercícios Compactos
@@ -217,12 +219,12 @@ export const DashboardView: React.FC = () => {
       </div>
 
       {/* BOTÃO FLAMEJANTE MASSIVO DE INICIALIZAÇÃO */}
-      <div className="px-4 mt-2 shrink-0">
+      <div className="px-1.5 mt-1 pb-1 shrink-0">
         <button
           onClick={startActiveWorkout}
-          className="w-full bg-[#FF5F00] hover:bg-[#ff7722] text-[#050505] font-[950] italic uppercase py-3 rounded-xl text-xs shadow-[0_0_20px_rgba(255,95,0,0.3)] active:scale-[0.97] transition-all transform flex justify-center items-center gap-1.5 tracking-widest cursor-pointer font-sans shrink-0"
+          className="w-full bg-[#FF5F00] hover:bg-[#ff7722] text-[#050505] font-[950] italic uppercase py-2.5 rounded-lg text-[10px] shadow-[0_0_15px_rgba(255,95,0,0.25)] active:scale-[0.97] transition-all transform flex justify-center items-center gap-1 tracking-widest cursor-pointer font-sans shrink-0"
         >
-          <Play className="w-3 h-3 fill-[#050505] text-[#050505]" /> INICIAR TREINO DO DIA
+          <Play className="w-2.5 h-2.5 fill-[#050505] text-[#050505]" /> INICIAR TREINO DO DIA
         </button>
       </div>
       
