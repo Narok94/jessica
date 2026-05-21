@@ -24,12 +24,21 @@ export const WorkoutsListView: React.FC = () => {
   };
 
   const getWorkoutFocus = (workout: WorkoutRoutine) => {
+    if (workout.title.includes('Treino A') || workout.id === 'h-a') return 'PEITO, OMBROS E TRÍCEPS';
+    if (workout.title.includes('Treino B') || workout.id === 'h-b') return 'COSTAS, TRAPÉZIO E BÍCEPS';
+    if (workout.title.includes('Treino C') || workout.id === 'h-c') return 'COXAS, PANTURRILHAS E CORE';
+
     const groups = Array.from(new Set(workout.exercises.map(ex => ex.muscleGroup)))
       .filter(g => g && g.toLowerCase() !== 'manguito')
       .map(g => g.toUpperCase());
     
     if (groups.length > 0) {
-      return groups.join(', ');
+      if (groups.length > 1) {
+        const last = groups[groups.length - 1];
+        const rest = groups.slice(0, -1).join(', ');
+        return `${rest} E ${last}`;
+      }
+      return groups[0];
     }
     return workout.title.replace(/Treino\s+[A-Z]\s*-\s*/i, '').toUpperCase();
   };
@@ -55,11 +64,12 @@ export const WorkoutsListView: React.FC = () => {
       </div>
 
       {/* List of Workout Routines inside an active scrollable list with zero styling borders */}
-      <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar py-1.5 space-y-1.5 mt-1.5">
+      <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar py-2 space-y-2 mt-1.5">
         {workouts.map((workout, index) => {
           const focus = getWorkoutFocus(workout);
           const label = getWorkoutCardLabel(workout, index);
           const exerciseCount = workout.exercises.length;
+          const cleanDesc = workout.description ? workout.description.replace(/^Foco:\s*/i, '') : 'Fisiologia linear de máxima sobrecarga progressiva.';
           
           return (
             <motion.div
@@ -67,28 +77,41 @@ export const WorkoutsListView: React.FC = () => {
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.05 }}
-              className="group relative overflow-hidden rounded-xl border border-white/5 bg-[#0b0b0d]/70 p-2 hover:border-[#FF5F00]/40 active:scale-[0.99] transition-all duration-300 cursor-pointer flex items-center justify-between gap-3 shadow-md"
+              className="group relative overflow-hidden rounded-xl border border-white/5 bg-[#0b0b0d]/75 p-3 hover:border-[#FF5F00]/40 active:scale-[0.99] transition-all duration-300 cursor-pointer flex flex-col gap-1.5 shadow-md"
               onClick={() => startWorkout(workout)}
             >
-              {/* Active accent dots */}
-              <span className="w-1 h-3 rounded bg-[#FF5F00] shrink-0"></span>
+              {/* Active accent dot in top right */}
+              <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 rounded-full bg-[#FF5F00] shadow-[0_0_8px_rgba(255,95,0,0.8)]"></span>
 
-              <div className="space-y-1 min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="inline-block bg-[#FF5F00]/15 border border-[#FF5F00]/25 text-[#FF5F00] text-[8px] font-black uppercase tracking-wider px-1 py-0.5 rounded leading-none">
-                    {label}
-                  </span>
-                  <span className="text-[7.5px] font-mono font-bold text-white/40 uppercase tracking-widest">{exerciseCount} EXERCÍCIOS COMPACTOS</span>
-                </div>
-                
-                <h2 className="text-xs font-black italic text-white tracking-tight uppercase leading-none truncate">
-                  {focus}
-                </h2>
+              {/* Tag header */}
+              <div className="flex items-center">
+                <span className="inline-block bg-[#FF5F00]/10 border border-[#FF5F00]/20 text-[#FF5F00] text-[8.5px] font-[900] uppercase tracking-wider px-1.5 py-0.5 rounded leading-none">
+                  {label}
+                </span>
               </div>
 
-              <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-white/10 bg-white/5 text-white font-black text-[9px] uppercase tracking-wider hover:bg-[#FF5F00] hover:border-[#FF5F00] hover:text-[#050505] active:scale-95 transition-all duration-300 shrink-0 leading-none">
-                TREINAR <span className="text-[8px] font-serif font-black">❯</span>
-              </button>
+              {/* Workout Focus & Description */}
+              <div className="space-y-0.5">
+                <h2 className={`text-sm font-[950] italic tracking-tight uppercase leading-none ${
+                  index % 2 === 0 ? 'text-white' : 'text-[#FF5F00]'
+                }`}>
+                  {focus}
+                </h2>
+                <p className="text-[9.5px] font-medium text-white/45 leading-relaxed italic truncate max-w-full">
+                  {cleanDesc}
+                </p>
+              </div>
+
+              {/* Footer row with metrics on left and "TREINAR >" button on right */}
+              <div className="flex items-center justify-between mt-1 pt-1.5 border-t border-white/5">
+                <span className="text-[8.5px] font-mono font-black text-white/40 uppercase tracking-widest leading-none">
+                  {exerciseCount} EXERCÍCIOS COMPACTOS
+                </span>
+                
+                <button className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-white font-black text-[9px] uppercase tracking-wider hover:bg-[#FF5F00] hover:border-[#FF5F00] hover:text-[#050505] active:scale-95 transition-all duration-300 shrink-0 leading-none">
+                  TREINAR <span className="text-[8px] font-serif font-black">❯</span>
+                </button>
+              </div>
             </motion.div>
           );
         })}

@@ -507,23 +507,26 @@ export const WorkoutView: React.FC = () => {
 
   if (showSummary) {
     return (
-      <div className="max-w-xl mx-auto space-y-8 animate-slide-up py-6 text-center pb-24 px-4">
-          <div className="space-y-4">
-            <div className="mx-auto w-24 h-24 bg-accent rounded-[2.5rem] flex items-center justify-center shadow-2xl transform rotate-12 animate-fade">
-              <CheckCircle2 size={48} className="text-white" strokeWidth={3} />
+      <div className="h-full max-h-full overflow-hidden flex flex-col justify-between py-2 px-1 text-center bg-transparent text-white font-sans antialiased selection:bg-[#FF5F00]/30 select-none max-w-sm mx-auto space-y-2">
+          
+          {/* HEADER COMPACTO */}
+          <div className="flex items-center gap-3 bg-[#0c0c0c]/90 border border-white/5 p-3 rounded-xl shrink-0 shadow-sm">
+            <div className="w-9 h-9 bg-[#FF5F00]/10 border border-[#FF5F00]/20 rounded-xl flex items-center justify-center text-[#FF5F00] shrink-0">
+              <CheckCircle2 size={18} className="text-[#FF5F00]" strokeWidth={3} />
             </div>
-            <div>
-              <h1 className="text-4xl font-black text-ink uppercase tracking-tighter italic leading-none">Missão <span className="text-accent">Cumprida!</span></h1>
-              <p className="text-secondary text-[10px] font-black uppercase tracking-[0.3em] mt-3">Seu desempenho foi registrado com sucesso.</p>
+            <div className="text-left leading-none">
+              <h1 className="text-base font-[950] text-white uppercase tracking-tight italic">Missão <span className="text-[#FF5F00]">Cumprida!</span></h1>
+              <p className="text-white/40 text-[8px] mt-1 uppercase tracking-widest font-mono font-black">REGISTRO SALVO COM SUCESSO</p>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-between px-2">
-               <span className="text-[10px] font-black text-secondary uppercase tracking-widest">Victory Photo</span>
+          {/* FOTO DE VITÓRIA EXTRA COMPACTA */}
+          <div className="bg-[#0c0c0c]/90 border border-white/5 p-2 rounded-xl space-y-2 shrink-0 shadow-sm">
+            <div className="flex items-center justify-between px-1.5">
+               <span className="text-[8px] font-black text-white/45 uppercase tracking-widest font-mono">Foto de Vitória</span>
                {capturedImage && (
-                 <button onClick={() => setCapturedImage(null)} className="text-secondary hover:text-red-500 transition-colors">
-                    <Trash2 size={16} />
+                 <button onClick={() => setCapturedImage(null)} className="text-white/40 hover:text-red-500 transition-colors">
+                    <Trash2 size={12} />
                  </button>
                )}
             </div>
@@ -531,76 +534,76 @@ export const WorkoutView: React.FC = () => {
             {!capturedImage ? (
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full aspect-[4/5] glass-card rounded-[2.5rem] border-dashed border-line flex flex-col items-center justify-center gap-4 group transition-all"
+                className="w-full h-24 border border-dashed border-white/10 hover:border-[#FF5F00]/30 rounded-xl flex flex-col items-center justify-center gap-1.5 transition-all bg-white/[0.01] cursor-pointer"
               >
-                <div className="w-16 h-16 rounded-full bg-ink/[0.03] flex items-center justify-center group-hover:scale-110 group-hover:bg-accent/10 transition-all">
-                  <Camera size={32} className="text-secondary group-hover:text-accent" />
+                <div className="w-8 h-8 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center">
+                  <Camera size={14} className="text-[#FF5F00]" />
                 </div>
-                <p className="text-[10px] font-black text-secondary uppercase tracking-widest group-hover:text-ink">Registrar Vitória</p>
+                <p className="text-[8px] font-black text-[#FF5F00]/90 uppercase tracking-widest">Registrar Vitória</p>
               </button>
             ) : (
-              <div className="relative group rounded-[2.5rem] overflow-hidden border border-line">
-                <img src={capturedImage} alt="Victory" className="w-full aspect-[4/5] object-cover" />
-                
-                <div className="absolute inset-0 p-8 flex flex-col justify-between pointer-events-none">
-                  <div className="text-left font-black">
-                    <p className="text-white font-black text-xl tracking-tighter uppercase leading-none">TATU GYM</p>
-                    <div className="w-10 h-1 bg-accent mt-2"></div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div>
-                      <p className="text-accent font-black text-xs uppercase tracking-widest mb-1">
-                        {selectedWorkout.title.toLowerCase().includes('superior') ? 'SUPERIORES' :
-                         selectedWorkout.title.toLowerCase().includes('inferior') || selectedWorkout.title.toLowerCase().includes('perna') ? 'INFERIORES' :
-                         selectedWorkout.title.toLowerCase().includes('cardio') || selectedWorkout.title.toLowerCase().includes('aeró') ? 'AERÓBICO' :
-                         selectedWorkout.title.toLowerCase().includes('abd') ? 'ABDÔMEN' : 'COMPLETO'}
-                      </p>
-                      <h2 className="text-white font-black text-4xl tracking-tighter uppercase italic leading-none">{selectedWorkout.title}</h2>
+              <div className="space-y-1.5">
+                <div className="relative group rounded-xl overflow-hidden border border-white/10 h-28">
+                  <img src={capturedImage} alt="Victory" className="w-full h-full object-cover" />
+                  
+                  <div className="absolute inset-0 p-3 flex flex-col justify-between pointer-events-none">
+                    <div className="text-left font-black leading-none">
+                      <p className="text-white font-[950] text-xs tracking-tighter uppercase">TATU GYM</p>
+                      <div className="w-6 h-0.5 bg-[#FF5F00] mt-1"></div>
                     </div>
 
-                    <div className="flex items-end justify-between">
-                      <div className="text-left font-black">
-                        <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-1">DURAÇÃO TOTAL</p>
-                        <p className="text-5xl font-black text-white leading-none font-mono tracking-tighter">
-                          {workoutDuration ? formatTime(workoutDuration) : '00:00'}
+                    <div className="space-y-1.5 text-left">
+                      <div>
+                        <p className="text-[#FF5F00] font-[900] text-[7px] uppercase tracking-widest leading-none">
+                          {selectedWorkout.title.toLowerCase().includes('superior') ? 'SUPERIORES' :
+                           selectedWorkout.title.toLowerCase().includes('inferior') || selectedWorkout.title.toLowerCase().includes('perna') ? 'INFERIORES' :
+                           selectedWorkout.title.toLowerCase().includes('cardio') || selectedWorkout.title.toLowerCase().includes('aeró') ? 'AERÓBICO' :
+                           selectedWorkout.title.toLowerCase().includes('abd') ? 'ABDÔMEN' : 'COMPLETO'}
                         </p>
+                        <h2 className="text-white font-black text-xs tracking-tight uppercase italic leading-none mt-0.5 truncate">{selectedWorkout.title}</h2>
                       </div>
-                      <div className="rotate-90 origin-bottom-right translate-x-2 text-white/20 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
-                        PRO PERFORMANCE
+
+                      <div className="flex items-end justify-between leading-none">
+                        <div className="text-left">
+                          <p className="text-white/40 text-[6.5px] font-black uppercase tracking-widest">DURAÇÃO TOTAL</p>
+                          <p className="text-sm font-black text-white font-mono mt-0.5">
+                            {workoutDuration ? formatTime(workoutDuration) : '00:00'}
+                          </p>
+                        </div>
+                        <div className="text-white/20 text-[6px] font-mono font-black uppercase tracking-widest whitespace-nowrap">
+                          PRO PERFORMANCE
+                        </div>
                       </div>
                     </div>
                   </div>
+
+                  <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none"></div>
+
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-sm">
+                     <button 
+                       onClick={downloadSummaryImage}
+                       disabled={isGeneratingImage}
+                       className="w-9 h-9 rounded-full bg-[#FF5F00] text-black flex items-center justify-center shadow-lg active:scale-95 transition-all"
+                     >
+                       {isGeneratingImage ? <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></div> : <Download size={16} />}
+                     </button>
+                  </div>
                 </div>
 
-                <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
-
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-sm">
-                   <button 
-                     onClick={downloadSummaryImage}
-                     disabled={isGeneratingImage}
-                     className="w-14 h-14 rounded-full bg-accent text-white flex items-center justify-center shadow-lg active:scale-95 transition-all"
-                   >
-                     {isGeneratingImage ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <Download size={24} />}
-                   </button>
-                </div>
+                <motion.button 
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  onClick={downloadSummaryImage}
+                  disabled={isGeneratingImage}
+                  className="w-full py-1.5 bg-[#FF5F00]/10 border border-[#FF5F00]/20 text-[#FF5F00] font-black text-[8px] uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5 active:scale-95 transition-all text-center"
+                >
+                  {isGeneratingImage ? (
+                    <>GERANDO... <div className="w-2.5 h-2.5 border border-[#FF5F00]/30 border-t-[#FF5F00] rounded-full animate-spin"></div></>
+                  ) : (
+                    <>SALVAR NA GALERIA <Download size={10} /></>
+                  )}
+                </motion.button>
               </div>
-            )}
-
-            {capturedImage && (
-              <motion.button 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                onClick={downloadSummaryImage}
-                disabled={isGeneratingImage}
-                className="w-full py-4 bg-accent/10 border border-accent/20 text-accent font-black text-[11px] uppercase tracking-[0.3em] rounded-2xl flex items-center justify-center gap-3 active:scale-95 transition-all"
-              >
-                {isGeneratingImage ? (
-                  <>GERANDO... <div className="w-4 h-4 border-2 border-accent/20 border-t-accent rounded-full animate-spin"></div></>
-                ) : (
-                  <>EXPORTAR FOTO DE VITÓRIA <Download size={18} /></>
-                )}
-              </motion.button>
             )}
 
             <input 
@@ -614,41 +617,51 @@ export const WorkoutView: React.FC = () => {
             <canvas ref={canvasRef} className="hidden" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <div className="glass-card p-8 rounded-[2.5rem] bg-accent/5">
-                <p className="text-[10px] font-black text-secondary uppercase tracking-[0.3em] mb-2 font-black">Duração da Sessão</p>
-                <div className="flex items-center justify-center gap-3">
-                   <span className="text-4xl font-black text-ink italic tracking-tighter leading-none">{workoutDuration ? formatTime(workoutDuration) : '00:00'}</span>
-                   <Clock size={24} className="text-accent animate-pulse" />
+          {/* METRICAS DE PERFORMANCE EXTRA COMPACTAS */}
+          <div className="grid grid-cols-2 gap-2 mt-1 shrink-0">
+             <div className="bg-[#0c0c0c]/80 border border-white/5 p-2 rounded-xl flex items-center justify-between gap-1 shadow-sm font-sans text-left">
+                <div className="leading-none min-w-0">
+                   <p className="text-[7.5px] font-black text-white/40 uppercase tracking-widest font-mono truncate">DURAÇÃO</p>
+                   <span className="text-xs font-black text-white font-mono mt-0.5 block italic">{workoutDuration ? formatTime(workoutDuration) : '00:00'}</span>
                 </div>
+                <Clock size={14} className="text-[#FF5F00] shrink-0" />
              </div>
-             {currentCardioProgress && (
-                <div className="glass-card p-8 rounded-[2.5rem] bg-highlight/5 border border-highlight/10">
-                   <p className="text-[10px] font-black text-secondary uppercase tracking-[0.3em] mb-2 font-black">Aeróbico</p>
-                   <div className="flex items-center justify-center gap-3">
-                      <span className="text-3xl font-black text-ink italic tracking-tighter leading-none">{currentCardioProgress.duration}min</span>
-                      <Wind size={24} className="text-highlight animate-pulse" />
+             
+             {currentCardioProgress ? (
+                <div className="bg-[#0c0c0c]/80 border border-white/5 p-2 rounded-xl flex items-center justify-between gap-1 shadow-sm font-sans text-left">
+                   <div className="leading-none min-w-0">
+                      <p className="text-[7.5px] font-black text-white/40 uppercase tracking-widest font-mono truncate">AERÓBICO</p>
+                      <span className="text-xs font-black text-white font-mono mt-0.5 block italic truncate">{currentCardioProgress.duration}m ({currentCardioProgress.exercise})</span>
                    </div>
-                   <p className="text-[10px] font-black text-secondary uppercase tracking-widest mt-1 font-black">{currentCardioProgress.exercise}</p>
+                   <Wind size={14} className="text-[#FF5F00] shrink-0" />
+                </div>
+             ) : (
+                <div className="bg-[#0c0c0c]/80 border border-white/5 p-2 rounded-xl flex items-center justify-between gap-1 shadow-sm font-sans text-left">
+                   <div className="leading-none min-w-0">
+                      <p className="text-[7.5px] font-black text-white/40 uppercase tracking-widest font-mono truncate">CARGATONELADA (VOL)</p>
+                      <span className="text-xs font-black text-white font-mono mt-0.5 block italic">{calculateVolume()} kg</span>
+                   </div>
+                   <Dumbbell size={14} className="text-[#FF5F00] shrink-0" />
                 </div>
              )}
           </div>
 
-          <div className="glass-card p-8 rounded-[2.5rem] space-y-4 relative overflow-hidden">
-             <Quote className="absolute -top-4 -left-4 text-accent/5 w-24 h-24" />
-             <div className="relative z-10">
-                <p className="text-ink font-bold italic text-lg leading-relaxed">
-                  "A constância é a mãe da evolução. Parabéns por hoje."
-                </p>
-             </div>
+          {/* MOTIVAÇÃO EXTRA SLIM */}
+          <div className="bg-[#0c0c0c]/90 border border-white/5 py-1.5 px-3 rounded-lg shrink-0">
+             <p className="text-[#FF5F00] font-bold italic text-[8.5px] uppercase tracking-wider">
+               "A constância é a mãe da evolução. Parabéns por hoje!"
+             </p>
           </div>
 
-          <button 
-            onClick={closeSummary} 
-            className="w-full bg-accent text-white font-black py-5 rounded-[1.8rem] shadow-xl uppercase tracking-[0.4em] active:scale-95 text-[10px] transition-all flex items-center justify-center gap-3 font-black"
-          >
-            <LayoutDashboard size={18} /> Voltar para o Dashboard
-          </button>
+          {/* BOTÃO VOLTAR PARA O DASHBOARD */}
+          <div className="shrink-0 pt-1">
+            <button 
+              onClick={closeSummary} 
+              className="w-full bg-[#FF5F00] hover:bg-[#ff7722] text-[#050505] font-[950] py-3.5 rounded-xl shadow-[0_0_15px_rgba(255,95,0,0.25)] text-center active:scale-95 text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-1.5 font-sans shrink-0"
+            >
+              <LayoutDashboard size={14} /> VOLTAR PARA O DASHBOARD
+            </button>
+          </div>
       </div>
     );
   }
@@ -692,7 +705,7 @@ export const WorkoutView: React.FC = () => {
       </header>
 
       {/* Selected Workout Upper Banner matching attachment 1 */}
-      <div className="relative overflow-hidden rounded-xl border border-white/5 bg-gradient-to-br from-zinc-950/90 to-zinc-900/50 p-3 text-center space-y-2 shadow-lg shrink-0 mt-1.5">
+      <div className="relative overflow-hidden rounded-xl border border-white/5 bg-gradient-to-br from-zinc-950/90 to-zinc-900/50 p-3 text-center space-y-2 shadow-lg shrink-0 mt-1.5 ">
         {/* Play Icon centering frame */}
         <div className="mx-auto w-8 h-8 rounded-lg bg-[#FF5F00]/10 border border-[#FF5F00]/20 flex items-center justify-center text-[#FF5F00]">
           <Play size={14} className="fill-[#FF5F00] ml-0.5" />
@@ -702,9 +715,6 @@ export const WorkoutView: React.FC = () => {
           <h2 className="text-xs font-black italic tracking-tight text-white/60 uppercase leading-none">
             TREINO SELECIONADO: <span className="text-white font-[950] italic">{getWorkoutFocus(selectedWorkout)}</span>
           </h2>
-          <p className="text-[9.5px] font-medium text-white/45 leading-normal max-w-xs mx-auto">
-            A fita de cargas de <span className="text-white font-semibold">{user.name}</span> foi carregada com sucesso. Toque abaixo para acionar o cronômetro oficial e começar a treinar!
-          </p>
         </div>
 
         {/* Action Button inside banner */}
@@ -890,7 +900,7 @@ export const WorkoutView: React.FC = () => {
       {/* Floating Single Exercise Detailed Modal Window exactly matching attachment 2 & 3 */}
       <AnimatePresence>
         {activeModalExercise && (
-          <div className="fixed inset-0 z-[120] flex items-end sm:items-center justify-center p-4">
+          <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
             {/* Backdrop translucent black filter */}
             <motion.div 
               initial={{ opacity: 0 }}
@@ -902,10 +912,10 @@ export const WorkoutView: React.FC = () => {
 
             {/* Modal Body Card */}
             <motion.div 
-              initial={{ y: "100%", opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: "100%", opacity: 0 }}
-              transition={{ type: "spring", damping: 28, stiffness: 280 }}
+              initial={{ scale: 0.92, opacity: 0, y: -20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.92, opacity: 0, y: -20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="relative w-full max-w-sm bg-zinc-950 p-3.5 rounded-xl shadow-2xl border border-white/10 overflow-hidden space-y-3 max-h-[95vh] overflow-y-auto no-scrollbar"
             >
               {/* Header Container */}
