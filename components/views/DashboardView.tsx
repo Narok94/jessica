@@ -17,15 +17,32 @@ export const DashboardView: React.FC = () => {
   // Profile biometrics and metadata
   const getBiometrics = () => {
     const usernameLower = user.username.toLowerCase();
+    
+    // Default values if not specified in user profile
+    let defaultWeight = '75.0';
+    let defaultHeight = '1.75';
+    let defaultLevel = 'Atleta';
+    
     if (usernameLower === 'henrique') {
-      return { weight: '84.5', height: '1.81', level: 'Atleta Avançado', initial: 'H' };
+      defaultWeight = '84.5';
+      defaultHeight = '1.81';
+      defaultLevel = 'Atleta Avançado';
     } else if (usernameLower === 'flavia' || usernameLower === 'flávia') {
-      return { weight: '62.0', height: '1.65', level: 'Atleta Intermediário', initial: 'F' };
+      defaultWeight = '62.0';
+      defaultHeight = '1.65';
+      defaultLevel = 'Atleta Intermediário';
     } else if (usernameLower === 'jessica' || usernameLower === 'jéssica') {
-      return { weight: '60.0', height: '1.68', level: 'Atleta Avançado', initial: 'J' };
-    } else {
-      return { weight: '75.0', height: '1.75', level: 'Atleta', initial: user.name.charAt(0).toUpperCase() };
+      defaultWeight = '60.0';
+      defaultHeight = '1.68';
+      defaultLevel = 'Atleta Avançado';
     }
+
+    return {
+      weight: user.weight !== undefined && user.weight !== null ? user.weight.toString() : defaultWeight,
+      height: user.height !== undefined && user.height !== null ? user.height.toString() : defaultHeight,
+      level: user.goal || defaultLevel,
+      initial: user.name ? user.name.charAt(0).toUpperCase() : (user.username ? user.username.charAt(0).toUpperCase() : 'U')
+    };
   };
   const bio = getBiometrics();
 
