@@ -25,7 +25,7 @@ export const HistoryView: React.FC = () => {
     <div className="h-full max-h-full overflow-hidden flex flex-col justify-between pb-1 bg-transparent select-none font-sans">
       <header className="flex items-center justify-between py-1.5 px-1.5 border-b border-white/5 shrink-0">
         <div>
-          <h1 className="text-xl font-black text-white tracking-tighter italic uppercase leading-none">Meus <span className="text-[#FF5F00]">Treinos</span></h1>
+          <h1 className="text-xl font-black text-white tracking-tighter italic uppercase leading-none">Meus <span className="text-accent">Treinos</span></h1>
           <p className="text-white/40 uppercase tracking-widest mt-1 text-[8px] font-mono">Histórico de progresso.</p>
         </div>
         <button 
@@ -51,7 +51,7 @@ export const HistoryView: React.FC = () => {
         <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar py-2 space-y-1.5 mt-1.5">
           {user?.history.map((entry) => {
             return (
-              <div key={entry.id} className="bg-[#0c0c0c]/80 border border-white/5 p-2 rounded-xl space-y-1.5 border-l-2 border-l-[#FF5F00] shadow-sm">
+              <div key={entry.id} className="bg-[#0c0c0c]/80 border border-white/5 p-2 rounded-xl space-y-1.5 border-l-2 border-l-accent shadow-sm">
                 <div className="flex justify-between items-start gap-2">
                   <div className="min-w-0 flex-1">
                     <h3 className="text-xs font-black text-white uppercase tracking-tight italic leading-none truncate">{entry.workoutTitle}</h3>
@@ -63,7 +63,7 @@ export const HistoryView: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-1 shrink-0">
-                    <span className="bg-[#FF5F00]/10 text-[#FF5F00] border border-[#FF5F00]/20 px-1.5 py-0.5 rounded text-[6.5px] font-black uppercase tracking-wider leading-none">
+                    <span className="bg-accent/10 text-accent border border-accent/20 px-1.5 py-0.5 rounded text-[6.5px] font-black uppercase tracking-wider leading-none">
                       Finalizado
                     </span>
                     {entry.duration && (
@@ -91,10 +91,10 @@ export const HistoryView: React.FC = () => {
                   {entry.cardio && (
                     <div className="space-y-0.5 min-w-0">
                       <div className="flex items-center gap-0.5 leading-none">
-                        <Wind size={8} className="text-[#FF5F00]" />
-                        <p className="text-[7.5px] font-black text-[#FF5F00] uppercase truncate">Aeróbico</p>
+                        <Wind size={8} className="text-accent" />
+                        <p className="text-[7.5px] font-black text-accent uppercase truncate">Aeróbico</p>
                       </div>
-                      <div className="text-[6.5px] font-bold bg-[#FF5F00]/5 text-[#FF5F00] px-1 py-0.5 rounded border border-[#FF5F00]/10 inline-block leading-none truncate max-w-full">
+                      <div className="text-[6.5px] font-bold bg-accent/5 text-accent px-1 py-0.5 rounded border border-accent/10 inline-block leading-none truncate max-w-full">
                          {entry.cardio.exercise} - {entry.cardio.duration}min
                       </div>
                     </div>

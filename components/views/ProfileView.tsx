@@ -97,11 +97,11 @@ export const ProfileView: React.FC = () => {
     setIsEditing(false);
   };
 
-  const badgeIcons: Record<string, any> = {
-    Rocket: <Rocket size={18} className="text-[#FF5F00]" />,
-    Trophy: <Trophy size={18} className="text-[#FF5F00]" />,
-    Flame: <Flame size={18} className="text-[#FF5F00]" />,
-    Award: <Award size={18} className="text-[#FF5F00]" />
+   const badgeIcons: Record<string, any> = {
+    Rocket: <Rocket size={18} className="text-accent" />,
+    Trophy: <Trophy size={18} className="text-accent" />,
+    Flame: <Flame size={18} className="text-accent" />,
+    Award: <Award size={18} className="text-accent" />
   };
 
   return (
@@ -109,7 +109,7 @@ export const ProfileView: React.FC = () => {
        {/* Compact Header */}
        <header className="flex items-center justify-between py-1.5 px-1 border-b border-white/5 shrink-0">
           <div>
-            <h1 className="text-xl font-black text-white tracking-tighter italic uppercase leading-none">Meu <span className="text-[#FF5F00]">Perfil</span></h1>
+            <h1 className="text-xl font-black text-white tracking-tighter italic uppercase leading-none">Meu <span className="text-accent">Perfil</span></h1>
             <p className="text-white/40 uppercase tracking-widest mt-1 text-[8px] font-mono leading-none">Configurações e conquistas.</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -118,7 +118,7 @@ export const ProfileView: React.FC = () => {
                 handleVibrate(5);
                 toggleTheme();
               }} 
-              className="w-7 h-7 bg-white/[0.01] border border-white/5 rounded-lg flex items-center justify-center text-[#FF5F00] active:scale-95 transition-all"
+              className="w-7 h-7 bg-white/[0.01] border border-white/5 rounded-lg flex items-center justify-center text-accent active:scale-95 transition-all"
             >
               {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
             </button>
@@ -137,8 +137,8 @@ export const ProfileView: React.FC = () => {
        {/* Biometrics Profile Card - Compact Horizontal */}
        <div className="bg-[#0c0c0c]/80 border border-white/5 p-2.5 rounded-xl flex items-center justify-between gap-3 shrink-0 mt-2 text-left">
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="w-12 h-12 rounded-xl bg-[#FF5F00]/10 flex items-center justify-center border border-[#FF5F00]/20 shrink-0">
-              <UserCircle2 size={32} className="text-[#FF5F00]" />
+            <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center border border-accent/20 shrink-0">
+              <UserCircle2 size={32} className="text-accent" />
             </div>
             <div className="min-w-0 flex-1">
               <h2 className="text-sm font-black text-white uppercase tracking-tight leading-none truncate">{user.name}</h2>
@@ -151,7 +151,7 @@ export const ProfileView: React.FC = () => {
           
           <button 
             onClick={handleOpenEdit}
-            className="flex items-center gap-1 py-1.5 px-2 text-[8px] font-black uppercase tracking-widest text-[#FF5F00] bg-[#FF5F00]/5 hover:bg-[#FF5F00]/10 border border-[#FF5F00]/15 rounded-lg transition-colors shrink-0"
+            className="flex items-center gap-1 py-1.5 px-2 text-[8px] font-black uppercase tracking-widest text-accent bg-accent/5 hover:bg-accent/10 border border-accent/15 rounded-lg transition-colors shrink-0"
           >
             <Edit2 size={10} />
             Editar
@@ -162,7 +162,7 @@ export const ProfileView: React.FC = () => {
        <div className="bg-[#0c0c0c]/60 border border-white/5 px-3 py-2 rounded-xl grid grid-cols-3 gap-1.5 mt-1.5 shrink-0 text-left">
           <div className="flex flex-col">
             <span className="text-[7px] font-mono text-white/30 uppercase tracking-widest">Nível</span>
-            <span className="text-[9.5px] font-black text-[#FF5F00] uppercase truncate">{bio.level}</span>
+            <span className="text-[9.5px] font-black text-accent uppercase truncate">{bio.level}</span>
           </div>
           <div className="flex flex-col border-l border-white/5 pl-2">
             <span className="text-[7px] font-mono text-white/30 uppercase tracking-widest flex items-center gap-0.5">
@@ -189,7 +189,7 @@ export const ProfileView: React.FC = () => {
                 <p className="text-[7.5px] font-black text-white/40 uppercase tracking-widest font-mono">Sequência</p>
                 <p className="text-lg font-black text-white font-mono leading-none mt-0.5">{user.streak || 0}</p>
              </div>
-             <Flame size={16} className="text-[#FF5F00]" />
+             <Flame size={16} className="text-accent" />
           </div>
        </div>
 
@@ -211,7 +211,7 @@ export const ProfileView: React.FC = () => {
                     className="flex-shrink-0 w-28 bg-[#0c0c0c]/80 border border-white/5 p-2 rounded-xl flex flex-col items-center text-center space-y-1.5 shadow-sm"
                   >
                     <div className="w-8 h-8 bg-white/[0.02] rounded-lg flex items-center justify-center border border-white/5 shrink-0">
-                      {badgeIcons[badge.icon] || <Award size={18} className="text-[#FF5F00]" />}
+                      {badgeIcons[badge.icon] || <Award size={18} className="text-accent" />}
                     </div>
                     <div>
                       <p className="text-[8.5px] font-black text-white uppercase tracking-tight leading-tight truncate w-[100px]">{badge.name}</p>
@@ -267,7 +267,7 @@ export const ProfileView: React.FC = () => {
                      type="text" 
                      value={editName}
                      onChange={(e) => setEditName(e.target.value)}
-                     className="w-full bg-[#0e0e0e] border border-white/5 text-white placeholder-zinc-700 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-[#FF5F00] transition-colors font-bold uppercase tracking-wide"
+                     className="w-full bg-[#0e0e0e] border border-white/5 text-white placeholder-zinc-700 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-accent transition-colors font-bold uppercase tracking-wide"
                      required
                      maxLength={24}
                    />
@@ -277,27 +277,27 @@ export const ProfileView: React.FC = () => {
                  <div className="grid grid-cols-2 gap-3">
                    <div className="space-y-1">
                      <label className="text-[7.5px] font-mono font-black text-white/40 uppercase tracking-widest flex items-center gap-1">
-                       <Scale size={10} className="text-[#FF5F00]" /> Peso Corporall (kg)
+                       <Scale size={10} className="text-accent" /> Peso Corporall (kg)
                      </label>
                      <input 
                        type="number" 
                        step="0.1" 
                        value={editWeight}
                        onChange={(e) => setEditWeight(e.target.value)}
-                       className="w-full bg-[#0e0e0e] border border-white/5 text-white placeholder-zinc-700 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-[#FF5F00] transition-colors font-mono font-bold"
+                       className="w-full bg-[#0e0e0e] border border-white/5 text-white placeholder-zinc-700 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-accent transition-colors font-mono font-bold"
                        required
                      />
                    </div>
                    <div className="space-y-1">
                      <label className="text-[7.5px] font-mono font-black text-white/40 uppercase tracking-widest flex items-center gap-1">
-                       <Ruler size={10} className="text-[#FF5F00]" /> Altura (m)
+                       <Ruler size={10} className="text-accent" /> Altura (m)
                      </label>
                      <input 
                        type="number" 
                        step="0.01" 
                        value={editHeight}
                        onChange={(e) => setEditHeight(e.target.value)}
-                       className="w-full bg-[#0e0e0e] border border-white/5 text-white placeholder-zinc-700 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-[#FF5F00] transition-colors font-mono font-bold"
+                       className="w-full bg-[#0e0e0e] border border-white/5 text-white placeholder-zinc-700 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-accent transition-colors font-mono font-bold"
                        required
                      />
                    </div>
@@ -322,7 +322,7 @@ export const ProfileView: React.FC = () => {
                          }}
                          className={`py-2 px-2.5 text-[8.5px] font-black uppercase tracking-wide rounded-lg border text-center transition-all ${
                            editLevel === lvl
-                             ? 'bg-[#FF5F00]/10 border-[#FF5F00] text-white shadow-[0_0_8px_rgba(255,95,0,0.15)]'
+                             ? 'bg-accent/10 border-accent text-white shadow-[0_0_8px_rgba(var(--accent-color-rgb),0.15)]'
                              : 'bg-[#0f0f0f] border-white/5 text-white/40 hover:text-white hover:border-white/10'
                          }`}
                        >
@@ -336,7 +336,7 @@ export const ProfileView: React.FC = () => {
                  <div className="pt-2">
                    <button
                      type="submit"
-                     className="w-full bg-[#FF5F00] hover:bg-[#ff7722] text-[#050505] font-[950] italic uppercase py-3 rounded-xl text-xs transition-colors shadow-md flex justify-center items-center gap-2 cursor-pointer uppercase tracking-widest"
+                     className="w-full bg-accent hover:bg-accent/90 text-[#050505] font-[950] italic uppercase py-3 rounded-xl text-xs transition-colors shadow-md flex justify-center items-center gap-2 cursor-pointer uppercase tracking-widest duration-200"
                    >
                      <Check size={14} strokeWidth={3} /> Salvar Alterações
                    </button>

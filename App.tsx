@@ -63,6 +63,35 @@ const AppContent: React.FC = () => {
     document.documentElement.classList.add(theme);
   }, [theme]);
 
+  // Sync Dynamic User Accent Color with global CSS variables based on target layouts
+  useEffect(() => {
+    let accentColor = '#00D2FF'; // Default / Henrique Electric Blue
+    let accentRgb = '0, 210, 255';
+    
+    if (user) {
+      const uName = user.username.toLowerCase();
+      if (uName.includes('jessica') || uName.includes('jéssica')) {
+        accentColor = '#FF2A85'; // Jessica Premium Pink
+        accentRgb = '255, 42, 133';
+      } else if (uName.includes('henrique')) {
+        accentColor = '#00D2FF'; // Henrique Electric Blue
+        accentRgb = '0, 210, 255';
+      } else if (uName.includes('flavia') || uName.includes('flávia')) {
+        accentColor = '#D4AF37'; // Flávia Premium Gold
+        accentRgb = '212, 175, 55';
+      } else {
+        accentColor = '#00D2FF';
+        accentRgb = '0, 210, 255';
+      }
+    }
+    
+    const root = document.documentElement;
+    root.style.setProperty('--accent-color', accentColor);
+    root.style.setProperty('--accent-color-rgb', accentRgb);
+    root.style.setProperty('--highlight-color', accentColor);
+    root.style.setProperty('--glow-color', `rgba(${accentRgb}, 0.15)`);
+  }, [user]);
+
   // Safety sync for already logged-in users to ensure security rules work
   useEffect(() => {
     if (isLoggedIn && user && auth.currentUser) {
@@ -284,39 +313,39 @@ const AppContent: React.FC = () => {
 
   if (!isLoggedIn) {
     return (
-      <div className="h-screen overflow-hidden bg-[#050505] relative flex flex-col justify-center items-center p-6 font-sans selection:bg-[#FF5F00]/30 select-none">
+      <div className="h-screen overflow-hidden bg-[#050505] relative flex flex-col justify-center items-center p-6 font-sans selection:bg-accent/30 select-none">
         
         {/* Fundo Tecnológico (Efeito de Linhas Conexas) */}
         <svg className="absolute inset-0 w-full h-full opacity-30 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
-              <circle cx="40" cy="0" r="1.5" fill="rgba(255, 95, 0, 0.08)" />
-              <circle cx="0" cy="40" r="1.5" fill="rgba(255, 95, 0, 0.08)" />
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(var(--accent-color-rgb), 0.03)" strokeWidth="0.5" />
+              <circle cx="40" cy="0" r="1.5" fill="rgba(var(--accent-color-rgb), 0.08)" />
+              <circle cx="0" cy="40" r="1.5" fill="rgba(var(--accent-color-rgb), 0.08)" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#grid)" />
           
-          <line x1="10%" y1="20%" x2="30%" y2="40%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
-          <line x1="30%" y1="40%" x2="25%" y2="70%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
-          <line x1="25%" y1="70%" x2="60%" y2="85%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
-          <line x1="60%" y1="85%" x2="80%" y2="45%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
-          <line x1="80%" y1="45%" x2="55%" y2="25%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
-          <line x1="55%" y1="25%" x2="10%" y2="20%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
-          <line x1="30%" y1="40%" x2="55%" y2="25%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
-          <line x1="25%" y1="70%" x2="55%" y2="25%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
-          <line x1="60%" y1="85%" x2="55%" y2="25%" stroke="rgba(255, 95, 0, 0.03)" strokeWidth="0.5" />
+          <line x1="10%" y1="20%" x2="30%" y2="40%" stroke="rgba(var(--accent-color-rgb), 0.03)" strokeWidth="0.5" />
+          <line x1="30%" y1="40%" x2="25%" y2="70%" stroke="rgba(var(--accent-color-rgb), 0.03)" strokeWidth="0.5" />
+          <line x1="25%" y1="70%" x2="60%" y2="85%" stroke="rgba(var(--accent-color-rgb), 0.03)" strokeWidth="0.5" />
+          <line x1="60%" y1="85%" x2="80%" y2="45%" stroke="rgba(var(--accent-color-rgb), 0.03)" strokeWidth="0.5" />
+          <line x1="80%" y1="45%" x2="55%" y2="25%" stroke="rgba(var(--accent-color-rgb), 0.03)" strokeWidth="0.5" />
+          <line x1="55%" y1="25%" x2="10%" y2="20%" stroke="rgba(var(--accent-color-rgb), 0.03)" strokeWidth="0.5" />
+          <line x1="30%" y1="40%" x2="55%" y2="25%" stroke="rgba(var(--accent-color-rgb), 0.03)" strokeWidth="0.5" />
+          <line x1="25%" y1="70%" x2="55%" y2="25%" stroke="rgba(var(--accent-color-rgb), 0.03)" strokeWidth="0.5" />
+          <line x1="60%" y1="85%" x2="55%" y2="25%" stroke="rgba(var(--accent-color-rgb), 0.03)" strokeWidth="0.5" />
           
-          <circle cx="10%" cy="20%" r="2" fill="rgba(255, 95, 0, 0.15)" />
-          <circle cx="30%" cy="40%" r="2.5" fill="rgba(255, 95, 0, 0.2)" />
-          <circle cx="25%" cy="70%" r="2" fill="rgba(255, 95, 0, 0.15)" />
-          <circle cx="60%" cy="85%" r="3" fill="rgba(255, 95, 0, 0.2)" />
-          <circle cx="80%" cy="45%" r="2" fill="rgba(255, 95, 0, 0.15)" />
-          <circle cx="55%" cy="25%" r="2.5" fill="rgba(255, 95, 0, 0.2)" />
+          <circle cx="10%" cy="20%" r="2" fill="rgba(var(--accent-color-rgb), 0.15)" />
+          <circle cx="30%" cy="40%" r="2.5" fill="rgba(var(--accent-color-rgb), 0.2)" />
+          <circle cx="25%" cy="70%" r="2" fill="rgba(var(--accent-color-rgb), 0.15)" />
+          <circle cx="60%" cy="85%" r="3" fill="rgba(var(--accent-color-rgb), 0.2)" />
+          <circle cx="80%" cy="45%" r="2" fill="rgba(var(--accent-color-rgb), 0.15)" />
+          <circle cx="55%" cy="25%" r="2.5" fill="rgba(var(--accent-color-rgb), 0.2)" />
         </svg>
 
         {/* Efeito de iluminação sutil no topo */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 bg-[#FF5F00]/5 blur-[100px] rounded-full pointer-events-none"></div>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 bg-accent/5 blur-[100px] rounded-full pointer-events-none"></div>
 
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
@@ -326,10 +355,10 @@ const AppContent: React.FC = () => {
         >
           {/* Bloco do Logotipo (Brand Header) */}
           <div className="flex flex-col items-center text-center space-y-3">
-            <Dumbbell size={48} className="text-[#FF5F00] drop-shadow-[0_0_15px_rgba(255,95,0,0.3)]" strokeWidth={2.5} />
+            <Dumbbell size={48} className="text-accent drop-shadow-[0_0_15px_rgba(var(--accent-color-rgb),0.3)]" strokeWidth={2.5} />
             <div className="space-y-1">
               <h1 className="text-3xl font-[950] italic uppercase tracking-wider text-white">
-                TATU<span className="text-[#FF5F00]">GYM</span>
+                TATU<span className="text-accent">GYM</span>
               </h1>
               <p className="text-white/40 text-[10px] uppercase tracking-[0.25em] font-mono mt-1">
                 ELITE PERFORMANCE SYSTEM
@@ -337,6 +366,7 @@ const AppContent: React.FC = () => {
             </div>
           </div>
 
+          {" "}
           {/* Formulário com Inputs Otimizados */}
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-4">
@@ -345,9 +375,9 @@ const AppContent: React.FC = () => {
                 <label className="text-white/50 text-[11px] uppercase tracking-wider font-bold mb-1.5 px-1 block">
                   USUÁRIO
                 </label>
-                <div className="bg-[#0c0c0c] border border-white/5 focus-within:border-[#FF5F00]/40 rounded-2xl p-4 transition-all flex items-center justify-between gap-3">
+                <div className="bg-[#0c0c0c] border border-white/5 focus-within:border-accent/40 rounded-2xl p-4 transition-all flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <UserIcon className="text-[#FF5F00] shrink-0" size={18} />
+                    <UserIcon className="text-accent shrink-0" size={18} />
                     <input 
                       type="text" 
                       value={username}
@@ -361,14 +391,15 @@ const AppContent: React.FC = () => {
                 </div>
               </div>
               
+              {" "}
               {/* Input Senha */}
               <div className="space-y-1.5">
                 <label className="text-white/50 text-[11px] uppercase tracking-wider font-bold mb-1.5 px-1 block">
                   SENHA
                 </label>
-                <div className="bg-[#0c0c0c] border border-white/5 focus-within:border-[#FF5F00]/40 rounded-2xl p-4 transition-all flex items-center justify-between gap-3">
+                <div className="bg-[#0c0c0c] border border-white/5 focus-within:border-accent/40 rounded-2xl p-4 transition-all flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <Lock className="text-[#FF5F00] shrink-0" size={18} />
+                    <Lock className="text-accent shrink-0" size={18} />
                     <input 
                       type="password" 
                       value={password}
@@ -383,12 +414,13 @@ const AppContent: React.FC = () => {
               </div>
             </div>
 
+            {" "}
             {/* Opção Unica de Lembrar Acesso */}
             <div className="flex items-center justify-between px-1">
               <label className="flex items-center gap-3 cursor-pointer group">
                 <div 
                   className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-all ${
-                    rememberMe ? 'bg-[#FF5F00] border-[#FF5F00]' : 'border-white/10 bg-[#0c0c0c]'
+                    rememberMe ? 'bg-accent border-accent' : 'border-white/10 bg-[#0c0c0c]'
                   }`}
                   onClick={(e) => {
                     e.preventDefault();
@@ -404,12 +436,13 @@ const AppContent: React.FC = () => {
               </label>
             </div>
 
+            {" "}
             {/* Botão de Entrada Massivo (CTA) */}
             <motion.button 
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
-              className="w-full mt-6 bg-[#FF5F00] hover:bg-[#ff7722] text-white font-black italic uppercase py-4 rounded-3xl text-[15px] tracking-widest shadow-[0_0_25px_rgba(255,95,0,0.35)] active:scale-[0.98] transition-all flex justify-center items-center gap-2 font-sans cursor-pointer border-0"
+              className="w-full mt-6 bg-accent hover:opacity-90 text-[#050505] font-black italic uppercase py-4 rounded-3xl text-[15px] tracking-widest shadow-[0_0_25px_rgba(var(--accent-color-rgb),0.35)] active:scale-[0.98] transition-all flex justify-center items-center gap-2 font-sans cursor-pointer border-0"
             >
               ENTRAR <ArrowRight size={18} strokeWidth={3} />
             </motion.button>
@@ -437,35 +470,35 @@ const AppContent: React.FC = () => {
 
   return (
     <div className={`h-[100dvh] max-h-[100dvh] overflow-hidden relative flex flex-col bg-[#050505] text-white transition-colors duration-400 select-none font-sans`}>
-      {/* Plexus Connection Grid Background available across all screens */}
-      <svg className="absolute inset-0 w-full h-full opacity-30 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+      {/* Plexus Connection Grid Background available across all screens - extremely subtle and highly refined */}
+      <svg className="absolute inset-0 w-full h-full opacity-10 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <pattern id="global-grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
-            <circle cx="40" cy="0" r="1.2" fill="rgba(255, 95, 0, 0.06)" />
-            <circle cx="0" cy="40" r="1.2" fill="rgba(255, 95, 0, 0.06)" />
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255, 255, 255, 0.02)" strokeWidth="0.5" />
+            <circle cx="40" cy="0" r="1.0" fill="rgba(255, 255, 255, 0.05)" />
+            <circle cx="0" cy="40" r="1.0" fill="rgba(255, 255, 255, 0.05)" />
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill="url(#global-grid-pattern)" />
         
-        <line x1="15%" y1="15%" x2="40%" y2="28%" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
-        <line x1="40%" y1="28%" x2="25%" y2="65%" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
-        <line x1="25%" y1="65%" x2="65%" y2="80%" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
-        <line x1="65%" y1="80%" x2="80%" y2="40%" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
-        <line x1="80%" y1="40%" x2="55%" y2="20%" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
-        <line x1="55%" y1="20%" x2="15%" y2="15%" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
-        <line x1="40%" y1="28%" x2="55%" y2="20%" stroke="rgba(255, 95, 0, 0.025)" strokeWidth="0.5" />
+        <line x1="15%" y1="15%" x2="40%" y2="28%" stroke="rgba(255, 255, 255, 0.02)" strokeWidth="0.5" />
+        <line x1="40%" y1="28%" x2="25%" y2="65%" stroke="rgba(255, 255, 255, 0.02)" strokeWidth="0.5" />
+        <line x1="25%" y1="65%" x2="65%" y2="80%" stroke="rgba(255, 255, 255, 0.02)" strokeWidth="0.5" />
+        <line x1="65%" y1="80%" x2="80%" y2="40%" stroke="rgba(255, 255, 255, 0.02)" strokeWidth="0.5" />
+        <line x1="80%" y1="40%" x2="55%" y2="20%" stroke="rgba(255, 255, 255, 0.02)" strokeWidth="0.5" />
+        <line x1="55%" y1="20%" x2="15%" y2="15%" stroke="rgba(255, 255, 255, 0.02)" strokeWidth="0.5" />
+        <line x1="40%" y1="28%" x2="55%" y2="20%" stroke="rgba(255, 255, 255, 0.02)" strokeWidth="0.5" />
         
-        <circle cx="15%" cy="15%" r="1.5" fill="rgba(255, 95, 0, 0.12)" />
-        <circle cx="40%" cy="28%" r="2" fill="rgba(255, 95, 0, 0.15)" />
-        <circle cx="25%" cy="65%" r="1.5" fill="rgba(255, 95, 0, 0.12)" />
-        <circle cx="65%" cy="80%" r="2.5" fill="rgba(255, 95, 0, 0.15)" />
-        <circle cx="80%" cy="40%" r="1.5" fill="rgba(255, 95, 0, 0.12)" />
-        <circle cx="55%" cy="20%" r="2" fill="rgba(255, 95, 0, 0.15)" />
+        <circle cx="15%" cy="15%" r="1.2" fill="rgba(255, 255, 255, 0.06)" />
+        <circle cx="40%" cy="28%" r="1.5" fill="rgba(255, 255, 255, 0.08)" />
+        <circle cx="25%" cy="65%" r="1.2" fill="rgba(255, 255, 255, 0.06)" />
+        <circle cx="65%" cy="80%" r="2.0" fill="rgba(255, 255, 255, 0.08)" />
+        <circle cx="80%" cy="40%" r="1.2" fill="rgba(255, 255, 255, 0.06)" />
+        <circle cx="55%" cy="20%" r="1.5" fill="rgba(255, 255, 255, 0.08)" />
       </svg>
 
       {/* Sutil lighting on top */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 bg-[#FF5F00]/5 blur-[100px] rounded-full pointer-events-none"></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 bg-accent/5 blur-[100px] rounded-full pointer-events-none"></div>
 
       {/* Main viewport-bounded view container */}
       <div className="flex-grow flex-1 min-h-0 w-full max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto px-2.5 md:px-4 lg:px-6 pt-1 pb-[74px] relative z-10 flex flex-col justify-between overflow-hidden">
@@ -495,10 +528,10 @@ const AppContent: React.FC = () => {
                 >
                   <item.icon 
                     size={20} 
-                    className={`transition-colors duration-200 ${isActive ? 'text-[#FF5F00]' : 'text-zinc-500'}`} 
+                    className={`transition-colors duration-200 ${isActive ? 'text-accent' : 'text-zinc-500'}`} 
                     strokeWidth={isActive ? 3 : 2} 
                   />
-                  <span className={`text-[8.5px] font-black uppercase tracking-[0.14em] mt-1.5 transition-colors duration-200 ${isActive ? 'text-[#FF5F00]' : 'text-zinc-500'}`}>
+                  <span className={`text-[8.5px] font-black uppercase tracking-[0.14em] mt-1.5 transition-colors duration-200 ${isActive ? 'text-accent' : 'text-zinc-500'}`}>
                     {item.label}
                   </span>
                 </button>

@@ -56,7 +56,7 @@ export const WorkoutsListView: React.FC = () => {
       {/* Header Container */}
       <div className="space-y-0.5 px-1 pt-1 text-left shrink-0">
         <h1 className="text-xl font-black italic tracking-tighter leading-none text-white uppercase">
-          TREINOS <span className="text-[#FF5F00]">TATU GYM</span>
+          TREINOS <span className="text-accent">TATU GYM</span>
         </h1>
         <p className="text-[9px] font-medium text-white/50 leading-normal max-w-xs mt-0.5">
           Selecione o protocolo fisiológico prescrito para a sessão de <span className="text-white font-bold">{user.name}</span> hoje e esmague as cargas.
@@ -77,15 +77,15 @@ export const WorkoutsListView: React.FC = () => {
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.05 }}
-              className="group relative overflow-hidden rounded-xl border border-white/5 bg-[#0b0b0d]/75 p-3 hover:border-[#FF5F00]/40 active:scale-[0.99] transition-all duration-300 cursor-pointer flex flex-col gap-1.5 shadow-md"
+              className="group relative overflow-hidden rounded-xl border border-white/5 bg-[#0b0b0d]/75 p-3 hover:border-accent/40 active:scale-[0.99] transition-all duration-300 cursor-pointer flex flex-col gap-1.5 shadow-md"
               onClick={() => startWorkout(workout)}
             >
               {/* Active accent dot in top right */}
-              <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 rounded-full bg-[#FF5F00] shadow-[0_0_8px_rgba(255,95,0,0.8)]"></span>
+              <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_8px_rgba(var(--accent-color-rgb),0.8)]"></span>
 
               {/* Tag header */}
               <div className="flex items-center">
-                <span className="inline-block bg-[#FF5F00]/10 border border-[#FF5F00]/20 text-[#FF5F00] text-[8.5px] font-[900] uppercase tracking-wider px-1.5 py-0.5 rounded leading-none">
+                <span className="inline-block bg-accent/10 border border-accent/20 text-accent text-[8.5px] font-[900] uppercase tracking-wider px-1.5 py-0.5 rounded leading-none">
                   {label}
                 </span>
               </div>
@@ -93,7 +93,7 @@ export const WorkoutsListView: React.FC = () => {
               {/* Workout Focus & Description */}
               <div className="space-y-0.5">
                 <h2 className={`text-sm font-[950] italic tracking-tight uppercase leading-none ${
-                  index % 2 === 0 ? 'text-white' : 'text-[#FF5F00]'
+                  index % 2 === 0 ? 'text-white' : 'text-accent'
                 }`}>
                   {focus}
                 </h2>
@@ -108,7 +108,7 @@ export const WorkoutsListView: React.FC = () => {
                   {exerciseCount} EXERCÍCIOS COMPACTOS
                 </span>
                 
-                <button className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-white font-black text-[9px] uppercase tracking-wider hover:bg-[#FF5F00] hover:border-[#FF5F00] hover:text-[#050505] active:scale-95 transition-all duration-300 shrink-0 leading-none">
+                <button className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-white font-black text-[9px] uppercase tracking-wider hover:bg-accent hover:border-accent hover:text-[#050505] active:scale-95 transition-all duration-300 shrink-0 leading-none">
                   TREINAR <span className="text-[8px] font-serif font-black">❯</span>
                 </button>
               </div>
@@ -124,7 +124,7 @@ export const WorkoutsListView: React.FC = () => {
         transition={{ delay: 0.15 }}
         className="rounded-xl border border-white/5 bg-[#09090b]/80 p-1.5 flex gap-2 items-start shadow-sm mt-1 shrink-0"
       >
-        <div className="w-5 h-5 rounded bg-white/5 border border-white/10 flex items-center justify-center text-[#FF5F00] shrink-0">
+        <div className="w-5 h-5 rounded bg-white/5 border border-white/10 flex items-center justify-center text-accent shrink-0">
           <Shield size={10} />
         </div>
         <p className="text-[8.5px] font-semibold text-white/45 leading-snug italic">
