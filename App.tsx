@@ -109,6 +109,87 @@ const AppContent: React.FC = () => {
     }
   }, [isLoggedIn, user]);
 
+  // Reset Henrique's training history and check-ins (One-time execute)
+  useEffect(() => {
+    const performHenriqueReset = async () => {
+      const RESET_FLAG_KEY = 'tatugym_henrique_reset_v3';
+      if (typeof window !== 'undefined' && !localStorage.getItem(RESET_FLAG_KEY)) {
+        console.log('[Reset] Iniciando reset de progresso do Henrique...');
+        
+        let henriqueData: any = null;
+        try {
+          const saved = localStorage.getItem('tatugym_user_profile_henrique');
+          if (saved) {
+            henriqueData = JSON.parse(saved);
+          }
+        } catch (e) {
+          console.error('[Reset] Erro ao carregar perfil de Henrique:', e);
+        }
+
+        if (!henriqueData) {
+          henriqueData = {
+            username: 'henrique',
+            name: 'Henrique',
+            password: '9860',
+            age: undefined,
+            goal: 'Atleta Avançado',
+            totalWorkouts: 0,
+            history: [],
+            weights: {},
+            checkIns: [],
+            streak: 0,
+            badges: [],
+            isProfileComplete: true,
+            role: 'student'
+          };
+        } else {
+          henriqueData.history = [];
+          henriqueData.checkIns = [];
+          henriqueData.streak = 0;
+          henriqueData.totalWorkouts = 0;
+          henriqueData.badges = [];
+        }
+
+        localStorage.setItem('tatugym_user_profile_henrique', JSON.stringify(henriqueData));
+        localStorage.removeItem('tatugym_active_session_henrique');
+
+        const remembered = localStorage.getItem('tatugym_remembered');
+        if (remembered) {
+          try {
+            const rememberedUser = JSON.parse(remembered);
+            if (rememberedUser.username.toLowerCase() === 'henrique') {
+              localStorage.setItem('tatugym_remembered', JSON.stringify(henriqueData));
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+
+        try {
+          await setDoc(doc(db, 'users', 'henrique'), henriqueData);
+          console.log('[Reset] Sincronização de reset do Henrique com sucesso no Firestore.');
+        } catch (dbErr) {
+          console.warn('[Reset] Firestore ainda não pôde ser gravado, guardado localmente.', dbErr);
+        }
+
+        if (user && user.username.toLowerCase() === 'henrique') {
+          setUser(henriqueData);
+          setSelectedWorkout(null);
+          setIsWorkoutActive(false);
+          setCurrentSessionProgress({});
+          setWorkoutStartTime(null);
+        }
+
+        localStorage.setItem(RESET_FLAG_KEY, 'true');
+        if (addToast) {
+          addToast('Histórico do Henrique resetado para Dia 1 (Treino A)!', 'success');
+        }
+      }
+    };
+
+    performHenriqueReset();
+  }, [user, setUser, setSelectedWorkout, setIsWorkoutActive, setCurrentSessionProgress, setWorkoutStartTime, addToast]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
