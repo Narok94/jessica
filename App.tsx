@@ -71,8 +71,8 @@ const AppContent: React.FC = () => {
     if (user) {
       const uName = user.username.toLowerCase();
       if (uName.includes('jessica') || uName.includes('jéssica')) {
-        accentColor = '#FF2A85'; // Jessica Premium Pink
-        accentRgb = '255, 42, 133';
+        accentColor = '#DC006C'; // Jessica Premium Pink
+        accentRgb = '220, 0, 108';
       } else if (uName.includes('henrique')) {
         accentColor = '#00D2FF'; // Henrique Electric Blue
         accentRgb = '0, 210, 255';

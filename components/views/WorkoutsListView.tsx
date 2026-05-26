@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Play, Dumbbell, Activity } from 'lucide-react';
+import { Play, Dumbbell, Activity, Calendar } from 'lucide-react';
 import { useStore } from '../../store';
 import { AppTab, WorkoutRoutine } from '../../types';
 
@@ -73,6 +73,24 @@ export const WorkoutsListView: React.FC = () => {
           const exerciseCount = workout.exercises.length;
           const cleanDesc = workout.description ? workout.description.replace(/^Foco:\s*/i, '') : 'Fisiologia linear de sobrecarga progressiva.';
           
+          // Find the last completed date for this specific workout
+          const latestEntry = user.history?.find(
+            h => h.workoutId === workout.id || h.workoutTitle.toLowerCase() === workout.title.toLowerCase()
+          );
+
+          let lastDoneText = '';
+          if (latestEntry) {
+            try {
+              const d = new Date(latestEntry.date);
+              const day = String(d.getDate()).padStart(2, '0');
+              const month = String(d.getMonth() + 1).padStart(2, '0');
+              const year = d.getFullYear();
+              lastDoneText = `${day}/${month}/${year}`;
+            } catch (e) {
+              console.error(e);
+            }
+          }
+          
           return (
             <motion.div
               key={workout.id}
@@ -84,13 +102,19 @@ export const WorkoutsListView: React.FC = () => {
             >
               {/* Left Zone: Details */}
               <div className="min-w-0 flex-1 space-y-1.5 text-left">
-                <div className="flex items-center gap-2">
-                  <span className="text-[8px] font-bold bg-zinc-900 border border-white/5 text-zinc-400 px-2 py-0.5 rounded-full uppercase tracking-wider font-mono">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[8px] font-bold bg-zinc-900 border border-white/5 text-zinc-400 px-2 py-0.5 rounded-full uppercase tracking-wider font-mono font-extrabold">
                     {label}
                   </span>
                   <span className="text-[7.5px] font-mono text-zinc-500 font-bold uppercase tracking-wider">
                     {exerciseCount} Exercícios
                   </span>
+                  {lastDoneText && (
+                    <span className="text-[7.5px] font-mono text-accent font-extrabold uppercase tracking-wider flex items-center gap-1 bg-accent/5 border border-accent/10 px-1.5 py-0.5 rounded-md shadow-sm">
+                      <Calendar size={8} />
+                      Feito: {lastDoneText}
+                    </span>
+                  )}
                 </div>
 
                 <h2 className="text-base font-extrabold text-white tracking-tight group-hover:text-accent transition-colors leading-tight">
