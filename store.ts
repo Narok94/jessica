@@ -93,8 +93,9 @@ export const useStore = create<AppState>((set, get) => {
         console.error('Error loading workouts:', e);
       }
     }
-    // Forçar o novo treino do Henrique para atualizar a versão salva em cache do navegador
+    // Forçar o novo treino do Henrique e da Jessica para atualizar a versão salva em cache do navegador
     loadedWorkouts.henrique = henriqueWorkouts;
+    loadedWorkouts.jessica = jessicaWorkouts;
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('tatugym_all_workouts', JSON.stringify(loadedWorkouts));
     }
