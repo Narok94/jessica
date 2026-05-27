@@ -319,15 +319,28 @@ export const WorkoutView: React.FC = () => {
       ctx.fillStyle = gradient;
       ctx.fillRect(0, targetHeight * 0.4, targetWidth, targetHeight * 0.6);
 
+      // Get the correct dynamic accent color with safety fallback
+      let accentColor = '#00D2FF'; // Default E-Blue
+      if (user) {
+        const uName = user.username.toLowerCase();
+        if (uName.includes('jessica') || uName.includes('jéssica')) {
+          accentColor = '#DC006C'; // Jessica Premium Pink
+        } else if (uName.includes('henrique')) {
+          accentColor = '#00D2FF'; // Henrique Electric Blue
+        } else if (uName.includes('flavia') || uName.includes('flávia')) {
+          accentColor = '#D4AF37'; // Flávia Premium Gold
+        }
+      }
+
       // Add "TATU GYM" Branding (TOP LEFT)
-      ctx.font = '900 40px sans-serif';
+      ctx.font = '900 36px sans-serif';
       ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'left';
       ctx.fillText('TATU GYM', 60, 100);
       
-      // PINK Accent Spot
-      ctx.fillStyle = '#EC4899';
-      ctx.fillRect(60, 115, 60, 8);
+      // Dynamic Accent Spot
+      ctx.fillStyle = accentColor;
+      ctx.fillRect(60, 115, 60, 6);
 
       // Infer Focus
       const focusText = selectedWorkout.title.toLowerCase().includes('superior') ? 'SUPERIORES' :
@@ -336,30 +349,39 @@ export const WorkoutView: React.FC = () => {
                         selectedWorkout.title.toLowerCase().includes('abd') ? 'ABDÔMEN' : 'COMPLETO';
 
       // Focus Tag (BOTTOM)
-      ctx.font = '900 24px sans-serif';
-      ctx.fillStyle = '#EC4899';
-      ctx.fillText(focusText, 60, targetHeight - 480);
+      ctx.font = '900 18px sans-serif';
+      ctx.fillStyle = accentColor;
+      ctx.fillText(focusText, 60, targetHeight - 425);
 
-      // Add Workout Title
-      ctx.font = 'italic 900 90px sans-serif';
+      // Add Workout Title with Auto-Sizing to prevent cutting off
+      let titleFontSize = 64; // Sleek and elegant title size
+      ctx.font = `italic 900 ${titleFontSize}px sans-serif`;
+      
+      const maxTextWidth = targetWidth - 140; // leaving 70px safe padding on each side
+      const upperTitle = selectedWorkout.title.toUpperCase();
+      while (ctx.measureText(upperTitle).width > maxTextWidth && titleFontSize > 32) {
+        titleFontSize -= 2;
+        ctx.font = `italic 900 ${titleFontSize}px sans-serif`;
+      }
+      
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(selectedWorkout.title.toUpperCase(), 60, targetHeight - 380);
+      ctx.fillText(upperTitle, 60, targetHeight - 325);
 
       // Stats Label
-      ctx.font = '900 24px sans-serif';
+      ctx.font = '900 18px sans-serif';
       ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.fillText('DURAÇÃO TOTAL', 60, targetHeight - 270);
+      ctx.fillText('DURAÇÃO TOTAL', 60, targetHeight - 225);
 
       // Elapsed Time
-      ctx.font = '900 120px sans-serif';
+      ctx.font = '900 96px sans-serif';
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(workoutDuration ? formatTime(workoutDuration) : '00:00', 60, targetHeight - 150);
+      ctx.fillText(workoutDuration ? formatTime(workoutDuration) : '00:00', 60, targetHeight - 125);
 
       // PRO PERFORMANCE branding (BOTTOM RIGHT)
       ctx.save();
-      ctx.translate(targetWidth - 60, targetHeight - 150);
+      ctx.translate(targetWidth - 60, targetHeight - 125);
       ctx.rotate(-Math.PI / 2);
-      ctx.font = '900 20px sans-serif';
+      ctx.font = '900 18px sans-serif';
       ctx.fillStyle = 'rgba(255,255,255,0.4)';
       ctx.textAlign = 'right';
       ctx.fillText('PRO PERFORMANCE', 0, 0);
