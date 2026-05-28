@@ -51,7 +51,25 @@ export const DashboardView: React.FC = () => {
 
   // Next/Active workout
   const workouts = allWorkouts[user.username.toLowerCase() as keyof typeof allWorkouts] || [];
-  const nextWorkout = workouts[0] || null;
+  
+  let nextWorkout = workouts[0] || null;
+  
+  if (user.history && user.history.length > 0 && workouts.length > 0) {
+    // Find the last completed workout that is part of the user's active routine list
+    const lastCompleted = user.history.find(h => 
+      workouts.some(w => w.id === h.workoutId || w.title.toLowerCase() === h.workoutTitle.toLowerCase())
+    );
+    
+    if (lastCompleted) {
+      const lastIndex = workouts.findIndex(w => 
+        w.id === lastCompleted.workoutId || w.title.toLowerCase() === lastCompleted.workoutTitle.toLowerCase()
+      );
+      if (lastIndex !== -1) {
+        const nextIndex = (lastIndex + 1) % workouts.length;
+        nextWorkout = workouts[nextIndex];
+      }
+    }
+  }
 
   const startActiveWorkout = () => {
     handleVibrate();

@@ -111,19 +111,150 @@ export const WorkoutView: React.FC = () => {
     };
   }, [isWorkoutActive, workoutStartTime, setElapsedTime]);
 
-  // Modal Rest Timer Countdown
+  // Reference to store precise ending epoch timestamp to survive app minimization & tab sleep
+  const restEndTimeRef = React.useRef<number | null>(null);
+
+  // Sync activeModalExercise to localStorage in real-time
   useEffect(() => {
-    if (modalRestTimeLeft !== null && modalRestTimeLeft > 0 && !isModalRestPaused) {
-      const countdown = setTimeout(() => {
-        setModalRestTimeLeft(modalRestTimeLeft - 1);
-      }, 1000);
-      return () => clearTimeout(countdown);
-    } else if (modalRestTimeLeft === 0) {
-      handleVibrate(250);
-      playBeep();
-      setModalRestTimeLeft(null);
+    if (!user) return;
+    const lowerUser = user.username.toLowerCase();
+    if (activeModalExercise) {
+      localStorage.setItem(`tatugym_active_ex_${lowerUser}`, activeModalExercise.id);
+    } else {
+      localStorage.removeItem(`tatugym_active_ex_${lowerUser}`);
     }
-  }, [modalRestTimeLeft, isModalRestPaused]);
+  }, [activeModalExercise, user]);
+
+  // Load initial rest timer state on mount (and restore active exercise when workout loads)
+  useEffect(() => {
+    if (!user) return;
+    const lowerUser = user.username.toLowerCase();
+
+    // 1. Restore the Active Exercise Modal inside activeWorkout context
+    if (selectedWorkout && !activeModalExercise) {
+      const savedActiveExId = localStorage.getItem(`tatugym_active_ex_${lowerUser}`);
+      if (savedActiveExId) {
+        const foundEx = selectedWorkout.exercises.find(e => e.id === savedActiveExId);
+        if (foundEx) {
+          setActiveModalExercise(foundEx);
+        }
+      }
+    }
+
+    // 2. Restore Rest Timer
+    const savedRestEnd = localStorage.getItem(`tatugym_rest_end_${lowerUser}`);
+    const savedRestPaused = localStorage.getItem(`tatugym_rest_paused_${lowerUser}`);
+    const savedRestLeft = localStorage.getItem(`tatugym_rest_left_${lowerUser}`);
+
+    if (savedRestLeft !== null && modalRestTimeLeft === null) {
+      const parsedLeft = parseInt(savedRestLeft, 10);
+      const isPaused = savedRestPaused === 'true';
+      setIsModalRestPaused(isPaused);
+
+      if (isPaused) {
+        setModalRestTimeLeft(parsedLeft);
+      } else if (savedRestEnd !== null) {
+        const endTime = parseInt(savedRestEnd, 10);
+        const timeLeft = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+        if (timeLeft > 0) {
+          setModalRestTimeLeft(timeLeft);
+          restEndTimeRef.current = endTime;
+        } else {
+          setModalRestTimeLeft(null);
+          restEndTimeRef.current = null;
+          localStorage.removeItem(`tatugym_rest_end_${lowerUser}`);
+          localStorage.removeItem(`tatugym_rest_paused_${lowerUser}`);
+          localStorage.removeItem(`tatugym_rest_left_${lowerUser}`);
+        }
+      }
+    }
+  }, [user, selectedWorkout]);
+
+  // Synchronize restEndTimeRef with modalRestTimeLeft state changes
+  useEffect(() => {
+    if (!user) return;
+    const lowerUser = user.username.toLowerCase();
+
+    if (modalRestTimeLeft === null) {
+      restEndTimeRef.current = null;
+      localStorage.removeItem(`tatugym_rest_end_${lowerUser}`);
+      localStorage.removeItem(`tatugym_rest_paused_${lowerUser}`);
+      localStorage.removeItem(`tatugym_rest_left_${lowerUser}`);
+    } else if (isModalRestPaused) {
+      restEndTimeRef.current = null;
+      localStorage.setItem(`tatugym_rest_paused_${lowerUser}`, 'true');
+      localStorage.setItem(`tatugym_rest_left_${lowerUser}`, modalRestTimeLeft.toString());
+      localStorage.removeItem(`tatugym_rest_end_${lowerUser}`);
+    } else {
+      const currentExpectedEnd = restEndTimeRef.current;
+      const calculatedLeft = currentExpectedEnd ? Math.ceil((currentExpectedEnd - Date.now()) / 1000) : -999;
+      
+      // If out of sync by greater than 1s (indicating manual adjustment or initialization),
+      // we recalculate the absolute end timestamp.
+      if (Math.abs(calculatedLeft - modalRestTimeLeft) > 1) {
+        const newEndTime = Date.now() + (modalRestTimeLeft * 1000);
+        restEndTimeRef.current = newEndTime;
+        localStorage.setItem(`tatugym_rest_end_${lowerUser}`, newEndTime.toString());
+        localStorage.setItem(`tatugym_rest_paused_${lowerUser}`, 'false');
+        localStorage.setItem(`tatugym_rest_left_${lowerUser}`, modalRestTimeLeft.toString());
+      }
+    }
+  }, [modalRestTimeLeft, isModalRestPaused, user]);
+
+  // Tick Rest Timer (updates dynamic countdown using delta timestamps, allowing background/minimization consistency)
+  useEffect(() => {
+    if (modalRestTimeLeft === null || modalRestTimeLeft <= 0 || isModalRestPaused) return;
+
+    const interval = setInterval(() => {
+      if (restEndTimeRef.current) {
+        const secondsLeft = Math.max(0, Math.ceil((restEndTimeRef.current - Date.now()) / 1000));
+        
+        if (secondsLeft === 0) {
+          handleVibrate(250);
+          playBeep();
+          setModalRestTimeLeft(null);
+          restEndTimeRef.current = null;
+        } else {
+          // Update safely if changed
+          setModalRestTimeLeft(prev => {
+            if (prev === secondsLeft) return prev;
+            return secondsLeft;
+          });
+          if (user) {
+            const lowerUser = user.username.toLowerCase();
+            localStorage.setItem(`tatugym_rest_left_${lowerUser}`, secondsLeft.toString());
+          }
+        }
+      }
+    }, 200);
+
+    return () => clearInterval(interval);
+  }, [modalRestTimeLeft === null, isModalRestPaused, user]);
+
+  // Tab switch/visibility state listener to immediately synchronize upon return
+  useEffect(() => {
+    const handleVisibilityAndFocus = () => {
+      if (document.visibilityState === 'visible' && modalRestTimeLeft !== null && !isModalRestPaused && restEndTimeRef.current) {
+        const secondsLeft = Math.max(0, Math.ceil((restEndTimeRef.current - Date.now()) / 1000));
+        if (secondsLeft === 0) {
+          handleVibrate(250);
+          playBeep();
+          setModalRestTimeLeft(null);
+          restEndTimeRef.current = null;
+        } else {
+          setModalRestTimeLeft(secondsLeft);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityAndFocus);
+    window.addEventListener('focus', handleVisibilityAndFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityAndFocus);
+      window.removeEventListener('focus', handleVisibilityAndFocus);
+    };
+  }, [modalRestTimeLeft === null, isModalRestPaused]);
 
   if (!selectedWorkout || !user) return null;
 
