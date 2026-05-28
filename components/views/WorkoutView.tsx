@@ -21,7 +21,8 @@ import {
   Check, 
   Flame, 
   Pause, 
-  SkipForward 
+  SkipForward,
+  Upload
 } from 'lucide-react';
 import { SetPerformance, WorkoutHistoryEntry, AppTab, Exercise } from '../../types';
 import confetti from 'canvas-confetti';
@@ -54,6 +55,7 @@ export const WorkoutView: React.FC = () => {
   const [capturedImage, setCapturedImage] = React.useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const libraryInputRef = React.useRef<HTMLInputElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const timerIntervalRef = useRef<number | null>(null);
   const wakeLockRef = useRef<any>(null);
@@ -696,89 +698,107 @@ export const WorkoutView: React.FC = () => {
             </div>
             
             {!capturedImage ? (
-              <button 
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full h-24 border border-dashed border-white/10 hover:border-accent/30 rounded-xl flex flex-col items-center justify-center gap-1.5 transition-all bg-white/[0.01] cursor-pointer"
-              >
-                <div className="w-8 h-8 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center">
-                  <Camera size={14} className="text-accent" />
-                </div>
-                <p className="text-[8px] font-black text-accent/90 uppercase tracking-widest">Registrar Vitória</p>
-              </button>
-            ) : (
-              <div className="space-y-1.5">
-                <div className="relative group rounded-xl overflow-hidden border border-white/10 h-28">
-                  <img src={capturedImage} alt="Victory" className="w-full h-full object-cover" />
-                  
-                  <div className="absolute inset-0 p-3 flex flex-col justify-between pointer-events-none">
-                    <div className="text-left font-black leading-none">
-                      <p className="text-white font-[950] text-xs tracking-tighter uppercase">TATU GYM</p>
-                      <div className="w-6 h-0.5 bg-accent mt-1"></div>
-                    </div>
+               <div className="grid grid-cols-2 gap-2 h-24">
+                 <button 
+                   onClick={() => fileInputRef.current?.click()}
+                   className="w-full h-full border border-dashed border-white/10 hover:border-accent/30 rounded-xl flex flex-col items-center justify-center gap-1.5 transition-all bg-white/[0.01] cursor-pointer"
+                 >
+                   <div className="w-8 h-8 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center">
+                     <Camera size={14} className="text-accent" />
+                   </div>
+                   <p className="text-[8px] font-black text-accent/90 uppercase tracking-widest">Tirar Foto</p>
+                 </button>
+                 <button 
+                   onClick={() => libraryInputRef.current?.click()}
+                   className="w-full h-full border border-dashed border-white/10 hover:border-accent/30 rounded-xl flex flex-col items-center justify-center gap-1.5 transition-all bg-white/[0.01] cursor-pointer"
+                 >
+                   <div className="w-8 h-8 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center">
+                     <Upload size={14} className="text-accent" />
+                   </div>
+                   <p className="text-[8px] font-black text-accent/90 uppercase tracking-widest">Buscar na Galeria</p>
+                 </button>
+               </div>
+             ) : (
+               <div className="space-y-1.5">
+                 <div className="relative group rounded-xl overflow-hidden border border-white/10 h-28">
+                   <img src={capturedImage} alt="Victory" className="w-full h-full object-cover" />
+                   
+                   <div className="absolute inset-0 p-3 flex flex-col justify-between pointer-events-none">
+                     <div className="text-left font-black leading-none">
+                       <p className="text-white font-[950] text-xs tracking-tighter uppercase">TATU GYM</p>
+                       <div className="w-6 h-0.5 bg-accent mt-1"></div>
+                     </div>
 
-                    <div className="space-y-1.5 text-left">
-                      <div>
-                        <p className="text-accent font-[900] text-[7px] uppercase tracking-widest leading-none">
-                          {selectedWorkout.title.toLowerCase().includes('superior') ? 'SUPERIORES' :
-                           selectedWorkout.title.toLowerCase().includes('inferior') || selectedWorkout.title.toLowerCase().includes('perna') ? 'INFERIORES' :
-                           selectedWorkout.title.toLowerCase().includes('cardio') || selectedWorkout.title.toLowerCase().includes('aeró') ? 'AERÓBICO' :
-                           selectedWorkout.title.toLowerCase().includes('abd') ? 'ABDÔMEN' : 'COMPLETO'}
-                        </p>
-                        <h2 className="text-white font-black text-xs tracking-tight uppercase italic leading-none mt-0.5 truncate">{selectedWorkout.title}</h2>
-                      </div>
+                     <div className="space-y-1.5 text-left">
+                       <div>
+                         <p className="text-accent font-[900] text-[7px] uppercase tracking-widest leading-none">
+                           {selectedWorkout.title.toLowerCase().includes('superior') ? 'SUPERIORES' :
+                            selectedWorkout.title.toLowerCase().includes('inferior') || selectedWorkout.title.toLowerCase().includes('perna') ? 'INFERIORES' :
+                            selectedWorkout.title.toLowerCase().includes('cardio') || selectedWorkout.title.toLowerCase().includes('aeró') ? 'AERÓBICO' :
+                            selectedWorkout.title.toLowerCase().includes('abd') ? 'ABDÔMEN' : 'COMPLETO'}
+                         </p>
+                         <h2 className="text-white font-black text-xs tracking-tight uppercase italic leading-none mt-0.5 truncate">{selectedWorkout.title}</h2>
+                       </div>
 
-                      <div className="flex items-end justify-between leading-none">
-                        <div className="text-left">
-                          <p className="text-white/40 text-[6.5px] font-black uppercase tracking-widest">DURAÇÃO TOTAL</p>
-                          <p className="text-sm font-black text-white font-mono mt-0.5">
-                            {workoutDuration ? formatTime(workoutDuration) : '00:00'}
-                          </p>
-                        </div>
-                        <div className="text-white/20 text-[6px] font-mono font-black uppercase tracking-widest whitespace-nowrap">
-                          PRO PERFORMANCE
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                       <div className="flex items-end justify-between leading-none">
+                         <div className="text-left">
+                           <p className="text-white/40 text-[6.5px] font-black uppercase tracking-widest">DURAÇÃO TOTAL</p>
+                           <p className="text-sm font-black text-white font-mono mt-0.5">
+                             {workoutDuration ? formatTime(workoutDuration) : '00:00'}
+                           </p>
+                         </div>
+                         <div className="text-white/20 text-[6px] font-mono font-black uppercase tracking-widest whitespace-nowrap">
+                           PRO PERFORMANCE
+                         </div>
+                       </div>
+                     </div>
+                   </div>
 
-                  <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none"></div>
+                   <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none"></div>
 
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-sm">
-                     <button 
-                       onClick={downloadSummaryImage}
-                       disabled={isGeneratingImage}
-                       className="w-9 h-9 rounded-full bg-accent text-black flex items-center justify-center shadow-lg active:scale-95 transition-all"
-                     >
-                       {isGeneratingImage ? <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></div> : <Download size={16} />}
-                     </button>
-                  </div>
-                </div>
+                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-sm">
+                      <button 
+                        onClick={downloadSummaryImage}
+                        disabled={isGeneratingImage}
+                        className="w-9 h-9 rounded-full bg-accent text-black flex items-center justify-center shadow-lg active:scale-95 transition-all"
+                      >
+                        {isGeneratingImage ? <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></div> : <Download size={16} />}
+                      </button>
+                   </div>
+                 </div>
 
-                <motion.button 
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  onClick={downloadSummaryImage}
-                  disabled={isGeneratingImage}
-                  className="w-full py-1.5 bg-accent/10 border border-accent/20 text-accent font-black text-[8px] uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5 active:scale-95 transition-all text-center"
-                >
-                  {isGeneratingImage ? (
-                    <>GERANDO... <div className="w-2.5 h-2.5 border border-accent/30 border-t-accent rounded-full animate-spin"></div></>
-                  ) : (
-                    <>SALVAR NA GALERIA <Download size={10} /></>
-                  )}
-                </motion.button>
-              </div>
-            )}
+                 <motion.button 
+                   initial={{ opacity: 0, y: 5 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   onClick={downloadSummaryImage}
+                   disabled={isGeneratingImage}
+                   className="w-full py-1.5 bg-accent/10 border border-accent/20 text-accent font-black text-[8px] uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5 active:scale-95 transition-all text-center"
+                 >
+                   {isGeneratingImage ? (
+                     <>GERANDO... <div className="w-2.5 h-2.5 border border-accent/30 border-t-accent rounded-full animate-spin"></div></>
+                   ) : (
+                     <>SALVAR NA GALERIA <Download size={10} /></>
+                   )}
+                 </motion.button>
+               </div>
+             )}
 
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleImageCapture} 
-              accept="image/*" 
-              capture="environment" 
-              className="hidden" 
-            />
-            <canvas ref={canvasRef} className="hidden" />
+             <input 
+               type="file" 
+               ref={fileInputRef} 
+               onChange={handleImageCapture} 
+               accept="image/*" 
+               capture="environment" 
+               className="hidden" 
+             />
+             <input 
+               type="file" 
+               ref={libraryInputRef} 
+               onChange={handleImageCapture} 
+               accept="image/*" 
+               className="hidden" 
+             />
+             <canvas ref={canvasRef} className="hidden" />
           </div>
 
           {/* METRICAS DE PERFORMANCE EXTRA COMPACTAS */}
